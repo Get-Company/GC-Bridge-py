@@ -1,1 +1,4 @@
 /logfiles/
+/db/docker-compose.yml
+/db/gc-bridge_python.db
+/migrations/

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block headtitle %}
+Match Mappei2Classei
+{% endblock %}
+
+{% block header %}
+Match Mappei2Classei
+{% endblock %}
+
+{% block body %}
+
+<ul>
+{% for product in products %}
+    <li>{{product.erp_nr}}</li>
+    {% if product.categories %}
+        <ul>
+        {% for category in product.categories %}
+            <li>{{category.}}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}}
+
+
+{% endfor %}
+</ul>
+
+{% endblock %}

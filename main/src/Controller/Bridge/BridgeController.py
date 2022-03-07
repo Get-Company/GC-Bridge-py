@@ -26,6 +26,8 @@ from datetime import datetime, timedelta
 from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import *
 from main.src.Controller.Mappei.MappeiController import *
 from main.src.Controller.Amazon.AmazonController import *
+from main.src.Controller.SW6.SW6Controller import *
+from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
 
 
 def sync_all_continuously():
@@ -127,3 +129,7 @@ def sync_all_changed_addresses():
 """
 From this line on, TESTS
 """
+
+
+def tests():
+    SW6_test()

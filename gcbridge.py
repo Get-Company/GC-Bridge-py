@@ -51,22 +51,22 @@ def main():
     # sync_all_addresses()
 
     # All
-    erp_connect()
-    try:
-        while True:
-            sync_all_continuously()
-    except KeyboardInterrupt:
-        erp_close()
-        pass
-    except StopIteration:
-        print("Iteration Stop")
+    # erp_connect()
+    # try:
+    #     while True:
+    #         sync_all_continuously()
+    # except KeyboardInterrupt:
+    #     erp_close()
+    #     pass
+    # except StopIteration:
+    #     print("Iteration Stop")
 
     """
     ######################
     Tests
     ######################
     """
-    # tests()
+    tests()
     # EOF main
 
     """

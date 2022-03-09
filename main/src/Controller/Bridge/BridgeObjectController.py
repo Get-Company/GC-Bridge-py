@@ -13,9 +13,12 @@ import inspect
 # For the image json object
 import json
 
+from main.src.Controller.SW6.SW6CategoryController import *
+
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
 
 from main.src.Repository.functions_repository import write_log
+
 
 class BridgeObjectController:
     """
@@ -105,7 +108,7 @@ class BridgeObjectController:
                     # 2.1 Map and
                     # 2.2 Upsert
                     self.dataset_save_to_db(dataset_changed)
-
+                SW6_test(dataset_changed.Fields.Item("Nr").AsString)
                 dataset_changed.Next()
 
                 # Add 1 to the iterator

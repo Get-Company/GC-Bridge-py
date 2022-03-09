@@ -40,7 +40,7 @@ class ConfShopware6ApiBase(object):
       perform administrative actions and require a user-based authentication
 
     """
-    username: str = "git commit -m"
+    username: str = ""
     password: str = ""
 
     """
@@ -55,9 +55,9 @@ class ConfShopware6ApiBase(object):
     were <fqdn> is the fully qualified domain name, like https://myshop.mydomain.com/admin#/sw/integration/index
     """
     # the client ID, setup at Web Administration Interface > settings > system > integration > access_id
-    client_id: str = "SWIAD0X5ZJBRQZVBEGFNT2R3QG"
+    client_id: str = "SWUABGNODM5WDWVORE9SYNRXYW"
     # the client secret, setup at Web Administration Interface > settings > system > integration > access_secret
-    client_secret: str = "VHI4MGNtb0RhZmxrWVVNUzhFaUlCVlYxanZhTDFKTXNhd1IzbUg"
+    client_secret: str = "M3YyZXhJYjFKUUhRcDJVcmRWbjlpekw4dE1UZFB6VnVmWEVJVXc"
 
     """
     Admin API:

@@ -11,6 +11,7 @@ from main.src.Controller.SW6.SW6CategoryController import *
 
 
 def SW6_test():
+
     my_conf = ConfShopware6ApiBase()
     my_api = Shopware6API(use_docker_test_container=True)
 
@@ -28,18 +29,8 @@ def SW6_test():
 
     # Category
 
-    ntt = BridgeCategoryEntity.query.filter_by(erp_nr=11).first()
-    print(ntt.erp_ltz_aend)
-    payload = {
-        "id": ntt.api_id,
-        "name": ntt.translations[0].title,
-        "createdAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "parent_id": ntt.api_idparent,
-        "displayNestedProducts": True,
-        "productAssignmentType": "product",
-        "type": "page",
-    }
-    admin_client.request_post("category", payload)
+    category_api = SW6CategoryController()
+    category_api.sync_all_categories_from_db_to_sw6()
 
 
 def upsert_category_payload():

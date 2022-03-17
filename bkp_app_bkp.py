@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from libretranslatepy import LibreTranslateAPI
-import pymysql
+
 
 """
 #######################################
@@ -20,7 +20,6 @@ Making the db and all tables
 #######################################
 """
 db = SQLAlchemy(app)
-
 
 """
 #######################################

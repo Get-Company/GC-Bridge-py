@@ -12,9 +12,9 @@ class SW6CategoryController(SW6ObjectController):
     def __init__(self):
 
         # Initiate all variables to forward them to super.__init__
-        self.api_name = "category"
+        self.api_name = "product"
         self.api_check_field = "id"
-        self.api_instance = SW6CategoryEntity()
+        self.api_instance = SW6ProductEntity()
 
         super().__init__(
             api_name=self.api_name,

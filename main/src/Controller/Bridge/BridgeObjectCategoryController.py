@@ -65,7 +65,6 @@ class BridgeObjectCategoryController(BridgeObjectController):
         # Get mapped entity
         entity = map_category_erp_to_bridge_db(dataset, self.img_file, self.dataset_lang)
         print("This is the entity", entity)
-
         return entity
 
     def dataset_upsert_entity(self, entity):

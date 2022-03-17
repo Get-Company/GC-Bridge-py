@@ -1,27 +1,83 @@
-from lib_shopware6_api import Shopware6AdminAPIClientBase, ConfShopware6ApiBase
+from lib_shopware6_api import Shopware6AdminAPIClientBase, ConfShopware6ApiBase, dal
 from typing import Any, Dict, List, Optional, Tuple, Union
-
-from lib_shopware6_api.sub_product import Product
-from lib_shopware6_api.sub_currency import Currency
-from lib_shopware6_api.sub_tax import Tax
-from lib_shopware6_api.sub_media import Media
+from functools import lru_cache
 
 
 class SW6ObjectController:
     def __init__(self,
-                 entity,
-                 admin_client: Optional[Shopware6AdminAPIClientBase] = None,
-                 config: Optional[ConfShopware6ApiBase] = None,
-                 use_docker_test_container: bool = True):
+                 api_name,
+                 api_instance,
+                 api_check_field,
+                 ):
 
-        self.product = Product(use_docker_test_container=True)
-        self.currency = Currency(use_docker_test_container=True)
-        self.tax = Tax(use_docker_test_container=True)
-        self.media = Media(use_docker_test_container=True)
+        # if self.admin_client is None:
+        #     self._admin_client = Shopware6AdminAPIClientBase(
+        #         config=self.config,
+        #         use_docker_test_container=self.use_docker_test_container)
+        #     print("Admin Client Credentials were given")
+        # else:
+        #     self._admin_client = self.admin_client
+        #     print("Admin Client Credentials weren't given")
 
-        if admin_client is None:
-            self._admin_client = Shopware6AdminAPIClientBase(config=config,
-                                                             use_docker_test_container=use_docker_test_container)
+        self._admin_client = Shopware6AdminAPIClientBase(
+            use_docker_test_container=True
+        )
+
+        self.api_check_field = api_check_field
+        self.api_name = api_name
+        self.api_instance = api_instance
+
+    def upsert_ntt(self, ntt, add_parent=False):
+        payload = self._map_db_to_sw6(ntt, add_parent)
+        id_in_db = self.is_already_in_sw6(check_value=ntt.api_id)
+        if id_in_db:
+            self._update_payload(id_in_db, payload=payload)
         else:
-            self._admin_client = admin_client
+            self._insert_payload(api_id=ntt.api_id, payload=payload)
 
+    def _map_db_to_sw6(self, ntt, add_parent):
+        payload = self.api_instance.map_db_to_sw6(ntt, add_parent=False)
+        return payload
+
+    def _update_payload(self, id_in_db: str, payload: Dict[str, Any]) -> None:
+        print("Update")
+        print(f'{self.api_check_field}')
+        self._admin_client.request_patch(f"{self.api_name}/{id_in_db}", payload)
+
+    def _insert_payload(self, api_id: str, payload: Dict[str, Any]) -> None:
+        print("Insert")
+        payload["id"] = api_id
+        self._admin_client.request_post(self.api_name, payload)
+        self.cache_clear()
+
+    @lru_cache(maxsize=None)
+    def is_already_in_sw6(self, check_value):
+        print("Let's search for id %s in sw6." % check_value)
+
+        payload = dal.Criteria()
+        payload.page = 1
+        payload.limit = 1
+        payload.filter = [dal.EqualsFilter(field=self.api_check_field, value=str(check_value))]
+        payload.includes = {self.api_name: ["id"]}
+
+        dict_response = self._admin_client.request_post(request_url=f"search/{self.api_name}", payload=payload)
+
+        if dict_response['total'] >= 1:
+            return_id = str(dict_response["data"][0]["id"])
+            self.is_already_in_sw6.cache_clear()
+        else:
+            print(f'{self.api_name} with id "{check_value}" not found')
+            return_id = None
+
+        return return_id
+
+    # cache_clear_category{{{
+    def cache_clear(self) -> None:
+        """
+        Cache of some functions has to be cleared if articles are inserted or deleted
+        """
+        # cache_clear_product}}}
+        self.is_already_in_sw6.cache_clear()
+
+    def db_save_all_to_sw6(self):
+        pass

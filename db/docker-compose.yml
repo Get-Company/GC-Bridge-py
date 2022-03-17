@@ -1,22 +1,40 @@
-version: '3.2'
+version: "3"
 
 services:
-   db:
-      image: mysql:8.0
-      container_name: appsDB
-      restart: always
-      ports:
-       - '6603:3306'
-      environment:
-        MYSQL_ROOT_PASSWORD: helloworld
 
-   app:
-      depends_on:
-       - db
-      image: phpmyadmin/phpmyadmin
-      container_name: phpmyadmin
-      restart: always
-      ports:
-       - '8080:80'
-      environment:
-        PMA_HOST: db
+  shopware:
+    # use either tag "latest" or any other version like "6.1.5", ...
+    image: dockware/dev:6.4.8.2
+    container_name: shopware
+    ports:      
+      - "22:22"     # ssh
+      - "80:80"     # apache2
+      - "443:443"   # apache2 https
+      - "8888:8888" # watch admin
+      - "9998:9998" # watch storefront proxy
+      - "9999:9999" # watch storefront
+      - "3306:3306" # mysql port
+    volumes:
+      - "db_volume:/var/lib/mysql"
+      - "shop_volume:/var/www/html"
+      # Use the Shopware Version as Folder
+      - "./../6.4.0.0/custom/plugins:/var/www/html/custom/plugins"
+    networks:
+      - web
+    environment:
+      # default = 0, recommended to be OFF for frontend devs
+      - XDEBUG_ENABLED=1
+      # default = latest PHP, optional = specific version
+      - PHP_VERSION=7.4
+      #- PHP_VERSION=8
+
+volumes:
+  db_volume:
+    driver: local
+  shop_volume:
+    driver: local
+
+networks:
+  web:
+    external: false
+# dev startet with 6.3.3.1 - best!

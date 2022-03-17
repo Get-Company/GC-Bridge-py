@@ -17,6 +17,13 @@ from main.src.Controller.Mappei.parser import *
 
 """
 ######################
+Tests
+#######################
+"""
+from main.src.Controller.SW6.SW6CategoryController import *
+
+"""
+######################
 App Factory
 The context has to be pushed to app, to grant access to the db's
 ######################
@@ -24,6 +31,7 @@ The context has to be pushed to app, to grant access to the db's
 
 app = create_app()
 app.app_context().push()
+
 """ 
 ######################
 Migration
@@ -40,7 +48,7 @@ def main():
     ######################
     """
     # Categories
-    # _sync_all_categories()
+    # sync_all_categories()
     # sync_all_changed_categories()
 
     # Products
@@ -66,7 +74,7 @@ def main():
     Tests
     ######################
     """
-    tests()
+    # tests()
     # EOF main
 
     """
@@ -80,24 +88,30 @@ def main():
     # get_products_list()
 
     # Standard Route for index
-    @app.route('/')
-    def index():
-        content = "Some filling Text from gcbridge.py"
-        # Forward var "content" to the template to read it in the template like {{content}}
-        return render_template('index.html', content=content)
+    # @app.route('/')
+    # def index():
+    #     content = "Some filling Text from gcbridge.py"
+    #     # Forward var "content" to the template to read it in the template like {{content}}
+    #     return render_template('index.html', content=content)
+    #
+    # @app.route('/mappei/match')
+    # def mappei_match():
+    #     products = BridgeProductEntity.query.order_by(BridgeProductEntity.erp_nr.asc()).limit(10).all()
+    #     m_products = MappeiProductEntity.query.order_by(MappeiProductEntity.nr.asc()).all()
+    #     return render_template('mappei/match.html', products=products)
+    #
+    # @app.route('/mappei/match/ajax/get_mappei_product', methods=['GET', 'POST'])
+    # def get_mappei_product_ajax():
+    #     if request.method == 'POST':
+    #         search = "%{}%".format(request.form['data'])
+    #         m_products = MappeiProductEntity.query.filter(MappeiProductEntity.nr.like(search)).asc().all
+    #         return m_products
 
-    @app.route('/mappei/match')
-    def mappei_match():
-        products = BridgeProductEntity.query.order_by(BridgeProductEntity.erp_nr.asc()).limit(10).all()
-        m_products = MappeiProductEntity.query.order_by(MappeiProductEntity.nr.asc()).all()
-        return render_template('mappei/match.html', products=products)
+    cat_api = SW6CategoryController()
+    cat_api.db_save_all_to_sw6()
+    # cat_ntt = BridgeCategoryEntity.query.filter_by(erp_nr=110).first()
+    # cat_api.upsert_ntt(cat_ntt)
 
-    @app.route('/mappei/match/ajax/get_mappei_product', methods=['GET', 'POST'])
-    def get_mappei_product_ajax():
-        if request.method == 'POST':
-            search = "%{}%".format(request.form['data'])
-            m_products = MappeiProductEntity.query.filter(MappeiProductEntity.nr.like(search)).asc().all
-            return m_products
 
 
 """ 

@@ -4,8 +4,9 @@ from config import Config
 
 db = SQLAlchemy()
 
+
 # We need to create this here
-def create_app(test_config=None):
+def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.debug = True

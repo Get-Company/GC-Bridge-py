@@ -2,7 +2,6 @@
 from sqlalchemy.orm import joinedload
 
 from main.src.Controller.ERP.ERPController import *
-from main.src.Controller.SW6.SW6Controller import *
 # Functions
 from datetime import datetime
 import os
@@ -13,7 +12,6 @@ import inspect
 # For the image json object
 import json
 
-from main.src.Controller.SW6.SW6CategoryController import *
 
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
 
@@ -108,7 +106,7 @@ class BridgeObjectController:
                     # 2.1 Map and
                     # 2.2 Upsert
                     self.dataset_save_to_db(dataset_changed)
-                SW6_test(dataset_changed.Fields.Item("Nr").AsString)
+
                 dataset_changed.Next()
 
                 # Add 1 to the iterator
@@ -271,13 +269,3 @@ class BridgeObjectController:
 
         return img
 
-#############################
-# SW6 Functions
-#############################
-
-    def db_save_all_to_sw6(self):
-        self.print_method_info(self.class_name)
-
-        product_id = sw6_get_product_id_by_product_number('SWDEMO10007')
-
-        print(product_id)

@@ -26,7 +26,6 @@ from datetime import datetime, timedelta
 from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import *
 from main.src.Controller.Mappei.MappeiController import *
 from main.src.Controller.Amazon.AmazonController import *
-from main.src.Controller.SW6.SW6Controller import *
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
 
 
@@ -132,4 +131,33 @@ From this line on, TESTS
 
 
 def tests():
-    SW6_test()
+    # SW6_test()
+    erp_connect()
+    category = erp_get_dataset('ArtikelKategorien')
+    erp_get_dataset_by_id(category, 'Nr', '2')
+
+    output(category)
+
+    erp_close()
+
+
+def output(dataset):
+    print(''
+          'Name: %s; '
+          'Nr: %s; '
+          'Index: %s; '
+          'KatID: %s; '
+          'ParentNr: %s; '
+          'NrPath: %s; '
+          'KatIDPath :%s'
+          %
+          (
+              dataset.Fields.Item("Bez").AsString,
+              dataset.Fields.Item("Nr").AsInteger,
+              dataset.Fields.Item("Index").AsInteger,
+              dataset.Fields.Item("KatID").AsString,
+              dataset.Fields.Item("ParentNr").AsString,
+              dataset.Fields.Item("NrPath").AsString,
+              dataset.Fields.Item("KatIDPath").AsString
+          )
+          )

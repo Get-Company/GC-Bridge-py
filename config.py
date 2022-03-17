@@ -55,9 +55,9 @@ class ConfShopware6ApiBase(object):
     were <fqdn> is the fully qualified domain name, like https://myshop.mydomain.com/admin#/sw/integration/index
     """
     # the client ID, setup at Web Administration Interface > settings > system > integration > access_id
-    client_id: str = "SWUABGNODM5WDWVORE9SYNRXYW"
+    client_id: str = "SWUAA09NYXBRNXPCUWNQWLHLZW"
     # the client secret, setup at Web Administration Interface > settings > system > integration > access_secret
-    client_secret: str = "M3YyZXhJYjFKUUhRcDJVcmRWbjlpekw4dE1UZFB6VnVmWEVJVXc"
+    client_secret: str = "OTZqZ2tOaUJTYzRDMVFrYmt0UTJtVjlxWm14aGhxTmRLeWZwaHM"
 
     """
     Admin API:

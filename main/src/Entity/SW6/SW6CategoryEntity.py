@@ -1,4 +1,5 @@
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
+from os import path
 
 
 class SW6CategoryEntity:
@@ -8,7 +9,7 @@ class SW6CategoryEntity:
         payload = self.map_fields_db_to_sw6(ntt)
 
         if add_parent:
-            payload = self.add_parent_to_entity(ntt, payload)
+            payload = self.add_parent_to_sw6(ntt, payload)
 
         return payload
 
@@ -25,9 +26,18 @@ class SW6CategoryEntity:
 
         return payload
 
-    def add_parent_to_entity(self, ntt, payload):
+    def add_parent_to_sw6(self, ntt, payload):
         ntt_parent = BridgeCategoryEntity.query.filter_by(api_id=ntt.api_idparent).first()
         if ntt_parent:
             print("Parent of %s is %s." % (ntt.title, ntt_parent.title))
             payload["parent"] = self.map_fields_db_to_sw6(ntt_parent)
         return payload
+
+    def add_image_to_sw6(self, ntt):
+        img = ntt.img
+        payload = {
+            "name": ntt.title,
+
+        }
+
+

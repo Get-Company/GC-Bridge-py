@@ -10,6 +10,10 @@ from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
 from main.src.Controller.SW6.SW6CategoryController import *
 
 
+def sync_all_categories():
+    category_api = SW6CategoryController()
+    category_api.sync_all_categories_from_db_to_sw6()
+
 def SW6_test():
 
     my_conf = ConfShopware6ApiBase()

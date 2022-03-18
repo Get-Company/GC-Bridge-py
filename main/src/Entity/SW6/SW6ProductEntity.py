@@ -5,28 +5,41 @@ class SW6ProductEntity:
 
     def map_db_to_sw6(self, ntt: BridgeProductEntity, add_parent=True):
 
-        payload = self.map_fields_db_to_sw6(ntt)
+        payload = self.map_standard_fields_db_to_sw6(ntt)
         return payload
 
-    def map_fields_db_to_sw6(self, ntt):
+    def map_standard_fields_db_to_sw6(self, ntt):
+        categories = ntt.categories
         payload = {
             "id": ntt.api_id,
-            "name": ntt.translations[0].name,
-            "createdAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "price": [
-                {"currencyId": 'B7D2554B0CE847CD82F3AC9BD1C0DFCA',
-                 "gross": int(ntt.price * 1.19),
-                 "net": int(ntt.price),
-                 "linked": True}],
+            "name": ntt.name,
             "productNumber": ntt.erp_nr,
-            "stock": 999999,
-            "taxId": '679E8B0D9111461BB153D9EDEA757BFA'
+            "stock": 10,
+            # Attention Small Caps!!!!!!
+            "taxId": "679e8b0d9111461bb153d9edea757bfa",
+            "createdAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "categories": [
+                {
+                    "id": categories[0].api_id,
+                    "name": categories[0].translations[0].title,
+                    "createdAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "displayNestedProducts": True,
+                    "productAssignmentType": "product",
+                    "type": "page",
+                    "description": categories[0].description
+                }
+            ],
+            "price": [
+                {
+                    # Attention Small Caps!!!!!!
+                    "currencyId": "b7d2554b0ce847cd82f3ac9bd1c0dfca",
+                    "gross": ntt.price * 1.19,
+                    "net": ntt.price,
+                    "linked": True
+                }
+            ],
+            "cmsPageId": "7a6d253a67204037966f42b0119704d5"
         }
-
-        ntt_categories = ntt.categories
-        for category in ntt_categories:
-            cat_ids = [category.api_id]
-        payload["categoryIds"] = cat_ids
 
         return payload
 

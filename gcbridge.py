@@ -21,6 +21,7 @@ Tests
 #######################
 """
 from main.src.Controller.SW6.SW6CategoryController import *
+from main.src.Controller.SW6.SW6ProductController import *
 
 """
 ######################
@@ -108,9 +109,14 @@ def main():
     #         return m_products
 
     cat_api = SW6CategoryController()
-    cat_api.db_save_all_to_sw6()
-    # cat_ntt = BridgeCategoryEntity.query.filter_by(erp_nr=110).first()
-    # cat_api.upsert_ntt(cat_ntt)
+    # cat_api.db_save_all_to_sw6()
+    cat_ntt = BridgeCategoryEntity.query.filter_by(erp_nr=110).first()
+    cat_api.upsert_ntt(cat_ntt)
+
+    prod_api = SW6ProductController()
+    # prod_api.db_save_all_to_sw6()
+    prod_ntt = BridgeProductEntity.query.filter_by(erp_nr=104014).first()
+    prod_api.upsert_ntt(prod_ntt)
 
 
 

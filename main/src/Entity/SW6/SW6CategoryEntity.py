@@ -21,7 +21,8 @@ class SW6CategoryEntity:
             "displayNestedProducts": True,
             "productAssignmentType": "product",
             "type": "page",
-            "description": ntt.description
+            "description": ntt.description,
+            "cmsPageId": "0Fa91ce3e96a4bc2be4bd9ce752c3425"
         }
 
         return payload

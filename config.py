@@ -7,6 +7,7 @@ class Config:
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
         os.path.join(BASE_DIR, 'db/gc-bridge_python.db')
+    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:qwerty@localhost:8000/gc-bridge_python?charset=utf8'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
@@ -19,6 +20,7 @@ class MappeiConfig:
     mappei_de_sitemap = mappei_shop_url + "/" + sitemap
     mappei_at_sitemap = mappei_shop_url + "/" + at + "/" + sitemap
     mappei_ch_sitemap = mappei_shop_url + "/" + ch + "/" + sitemap
+
 
 import attrs
 from attrs import validators

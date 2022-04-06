@@ -29,6 +29,10 @@ class BridgeProductEntity(db.Model):
     price = db.Column(db.Float(), nullable=True)
     price_rebate = db.Column(db.Float, nullable=True)
     stock = db.Column(db.Integer(), nullable=False)
+    factor = db.Column(db.Integer(), nullable=True)
+    min_purchase = db.Column(db.Integer(), nullable=True)
+    purchase_unit = db.Column(db.Integer(), nullable=True)
+
     erp_ltz_aend = db.Column(db.DateTime(), default=datetime.now())
 
     # Translation for Product one - to - many
@@ -53,6 +57,10 @@ class BridgeProductEntity(db.Model):
         return f"Product Entity {self.name}({self.erp_nr})"
 
     def update_entity(self, entity):
+        """
+        The entity is produced by ERP. Simply use the same names
+        self.hans = entity_hans
+        """
         self.erp_nr = entity.erp_nr
         if entity.api_id:
             self.api_id = entity.api_id
@@ -62,6 +70,9 @@ class BridgeProductEntity(db.Model):
         self.price = entity.price
         self.price_rebate = entity.price_rebate
         self.stock = entity.stock
+        self.factor = entity.factor
+        self.min_purchase = entity.min_purchase
+        self.purchase_unit = entity.purchase_unit
         return True
 
     def update_category(self, category_entity):
@@ -101,7 +112,10 @@ def map_product_erp_to_bridge_db(dataset, img=None):
         description=dataset.Fields.Item("Bez1").Text,
         stock=99999,
         price=parse_european_number_to_float(dataset.Fields.Item("Vk0.Preis").AsString),
-        price_rebate=parse_european_number_to_float(dataset.Fields("Vk0.Rab0.Pr").AsString)
+        price_rebate=parse_european_number_to_float(dataset.Fields("Vk0.Rab0.Pr").AsString),
+        factor=dataset.Fields.Item("Sel16").AsInteger,
+        min_purchase=dataset.Fields.Item("Sel10").AsInteger,
+        purchase_unit=dataset.Fields.Item("Sel11").AsInteger
     )
     print('This is the "ArtKat1" : "%s"' % dataset.Fields.Item("ArtKat1").AsInteger)
 

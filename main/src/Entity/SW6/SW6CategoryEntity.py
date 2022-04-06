@@ -4,7 +4,7 @@ from os import path
 
 class SW6CategoryEntity:
 
-    def map_db_to_sw6(self, ntt: BridgeCategoryEntity, add_parent=True):
+    def map_db_to_sw6(self, ntt: BridgeCategoryEntity, add_parent=False):
 
         payload = self.map_fields_db_to_sw6(ntt)
 
@@ -22,7 +22,7 @@ class SW6CategoryEntity:
             "productAssignmentType": "product",
             "type": "page",
             "description": ntt.description,
-            "cmsPageId": "0Fa91ce3e96a4bc2be4bd9ce752c3425"
+            "cmsPageId": "6ed1bfdce0cb4e43a2702590d686ec5d"
         }
 
         return payload

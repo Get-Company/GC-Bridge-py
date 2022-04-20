@@ -8,6 +8,7 @@ class BridgeSynchronizeEntity(db.Model):
     dataset_category_sync_date = db.Column(db.DateTime(), nullable=True)
     dataset_product_sync_date = db.Column(db.DateTime(), nullable=True)
     dataset_address_sync_date = db.Column(db.DateTime(), nullable=True)
+    dataset_tax_sync_date = db.Column(db.DateTime(), nullable=True)
     # SW6 Fields
     sw6_category_sync_date = db.Column(db.DateTime(), nullable=True)
     sw6_product_sync_date = db.Column(db.DateTime(), nullable=True)

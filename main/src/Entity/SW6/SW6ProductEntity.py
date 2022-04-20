@@ -46,3 +46,4 @@ class SW6ProductEntity:
         }
 
         return payload
+

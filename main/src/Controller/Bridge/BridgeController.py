@@ -17,6 +17,7 @@ from main.src.Controller.ERP.ERPController import *
 from main.src.Controller.Bridge.BridgeObjectProductController import BridgeObjectProductController as Product
 from main.src.Controller.Bridge.BridgeObjectCategoryController import BridgeObjectCategoryController as Category
 from main.src.Controller.Bridge.BridgeObjectAddressController import BridgeObjectAddressController as Adresse
+from main.src.Controller.Bridge.BridgeObjectTaxController import BridgeObjectTaxController as Tax
 # from main.src.Controller.SW6.SW6Controller import *
 # Testing
 from main.src.Entity.Mappei.MappeiProductEntity import *
@@ -86,7 +87,14 @@ def sync_all_continuously():
 
         # Call Loop
         # sync_all_continuously()
+
         return True
+
+
+def sync_all_to_db():
+    sync_all_categories()
+    sync_all_products()
+    sync_all_addresses()
 
 
 def sync_all_categories():
@@ -123,6 +131,12 @@ def sync_all_changed_addresses():
     erp_connect()
     Adresse().dataset_save_changed_to_db()
     erp_close()
+
+def sync_all_tax():
+    erp_connect()
+    Tax().dataset_save_all_to_db()
+    erp_close()
+
 
 
 """

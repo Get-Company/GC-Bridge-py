@@ -27,18 +27,21 @@ class BridgeObjectCategoryController(BridgeObjectController):
         self.dataset_field_img = "Bild"
         self.dataset_lang = dataset_lang
         self.img_file = 0
+        self.entity = BridgeCategoryEntity
         self.class_name = "A-BOCatC"
 
-        super().__init__(self.dataset,
-                         self.last_sync_date_field,
-                         self.dataset_field_ltzaend,
-                         self.dataset_field_gspkz,
-                         self.dataset_field_gspkz_must_be,
-                         self.dataset_field_title,
-                         self.dataset_field_img,
-                         self.class_name,
-                         self.dataset_lang
-                         )
+        super().__init__(
+            dataset=self.dataset,
+            last_sync_date_field=self.last_sync_date_field,
+            dataset_field_ltzaend=self.dataset_field_ltzaend,
+            dataset_field_gspkz=self.dataset_field_gspkz,
+            dataset_field_gspkz_must_be=self.dataset_field_gspkz_must_be,
+            dataset_field_title=self.dataset_field_title,
+            dataset_field_img=self.dataset_field_img,
+            entity=self.entity,
+            class_name=self.class_name,
+            dataset_lang=self.dataset_lang
+        )
 
     def dataset_save_to_db(self, dataset):
         self.print_method_info(self.class_name)
@@ -104,7 +107,7 @@ class BridgeObjectCategoryController(BridgeObjectController):
         """
         self.print_method_info("A-BOCatC")
         print('Set translation entity id: "%s"' % entity.id)
-        translation_db = translation_entity.query.\
+        translation_db = translation_entity.query. \
             filter_by(language_iso=language). \
             filter_by(product_id=entity.id). \
             first()

@@ -12,6 +12,7 @@ erp = win32.dynamic.Dispatch('BpNT.Application')
 def erp_test(mandant="Test"):
     print(erp.Init('Egon Heimann GmbH', "", 'f.buchner', ''))
 
+
 def erp_connect(mandant="TEST"):
     # Connect ERP
     erp.Init('Egon Heimann GmbH', "", 'f.buchner', '')
@@ -32,7 +33,7 @@ def erp_get_dataset_infos(name):
 
 def erp_close():
     # Absolute necessary step
-    erp.LogOff()
+    # erp.LogOff()
     erp.DeInit()
     print("ERP Connection geschlossen: ", erp)
 
@@ -153,4 +154,3 @@ def erp_print_index_fields(dataset_name: str) -> None:
         print("Index: %s" % Index.Name)
         for IndexField in Index.IndexFields:
             print("  %s: %s" % (IndexField.Name, IndexField.Info))
-

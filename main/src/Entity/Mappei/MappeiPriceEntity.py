@@ -11,7 +11,7 @@ class MappeiPriceEntity(db.Model):
     price_high = db.Column(db.Float(), nullable=True)
     price_low = db.Column(db.Float(), nullable=True)
     price_quantity = db.Column(db.Integer(), nullable=True)
-    land = db.Column(db.String(), nullable=True)
+    land = db.Column(db.String(255), nullable=True)
     last_mod = db.Column(db.DateTime(), default=datetime.now())
 
     # Mappei Product many - to - one

@@ -18,7 +18,7 @@ class MappeiProductEntity(db.Model):
     nr = db.Column(db.String(255), nullable=True)
     name = db.Column(db.String(255), nullable=True)
     image = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.CLOB(), nullable=True)
+    description = db.Column(db.CHAR(), nullable=True)
     release_date = db.Column(db.DateTime(), nullable=True)
     last_mod = db.Column(db.DateTime(), default=datetime.now())
 

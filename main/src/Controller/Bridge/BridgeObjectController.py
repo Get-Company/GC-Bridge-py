@@ -43,7 +43,9 @@ class BridgeObjectController:
                  dataset_field_title,
                  dataset_field_img,
                  class_name,
-                 dataset_lang=0):
+                 entity,
+                 dataset_lang=0
+                 ):
         """
         :param dataset: object Dataset
         :param last_sync_date: object BridgeSynchronizeEntity.*the field for this name*
@@ -61,6 +63,7 @@ class BridgeObjectController:
         self.dataset_field_gspkz_must_be = dataset_field_gspkz_must_be
         self.dataset_field_title = dataset_field_title
         self.dataset_field_img = dataset_field_img
+        self.entity = entity
         self.class_name = class_name
 
         if not dataset_lang:

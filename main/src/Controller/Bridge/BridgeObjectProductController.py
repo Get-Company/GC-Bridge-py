@@ -8,6 +8,7 @@ from main.src.Entity.Bridge.BridgeSynchronizeEntity import *
 from main.src.Controller.ERP.ERPController import *
 # Functions
 import uuid
+import re
 
 
 class BridgeObjectProductController(BridgeObjectController):
@@ -30,15 +31,18 @@ class BridgeObjectProductController(BridgeObjectController):
         self.amount_categories = 10  # Since we have 10 Slots in the product db of ERP
         self.dataset_field_categories = "ArtKat"  # Like ArtKat1, ArtKat2....
         self.class_name = "A-BOProdC"
-        super().__init__(self.dataset,
-                         self.last_sync_date_field,
-                         self.dataset_field_ltzaend,
-                         self.dataset_field_gspkz,
-                         self.dataset_field_gspkz_must_be,
-                         self.dataset_field_title,
-                         self.dataset_field_img,
-                         self.class_name,
-                         self.dataset_lang)
+        self.entity = BridgeProductEntity
+        super().__init__(dataset=self.dataset,
+                         last_sync_date_field=self.last_sync_date_field,
+                         dataset_field_ltzaend=self.dataset_field_ltzaend,
+                         dataset_field_gspkz=self.dataset_field_gspkz,
+                         dataset_field_gspkz_must_be=self.dataset_field_gspkz_must_be,
+                         dataset_field_title=self.dataset_field_title,
+                         dataset_field_img=self.dataset_field_img,
+                         class_name=self.class_name,
+                         entity=self.entity,
+                         dataset_lang=self.dataset_lang
+                         )
 
     def dataset_save_to_db(self, dataset):
         self.print_method_info(self.class_name)
@@ -60,6 +64,10 @@ class BridgeObjectProductController(BridgeObjectController):
         # 4 Upsert the categories
         print('Entity Inserted for Categories: "%s" ' % entity_inserted.id)
         self.dataset_upsert_categories(dataset, entity_inserted)
+
+        # 5 Upsert the tax
+        print("Entity has tax?: %s" % entity_inserted.tax)
+        self.dataset_upsert_tax(dataset, entity_inserted)
 
     def dataset_map_to_db(self, dataset):
         """
@@ -179,6 +187,25 @@ class BridgeObjectProductController(BridgeObjectController):
             else:
                 return
 
+    def dataset_upsert_tax(self, dataset, product_entity):
+        self.print_method_info("A-BOProdC")
+        print('Upsert "%s" Tax for Product "%s"' % (self.amount_categories, product_entity.name))
+        tax_entity = BridgeTaxEntity
+        tax_entity_db = BridgeProductEntity
+
+        dataset_tax_steuer_schluessel = dataset.Fields.Item("StSchl").AsString
+        # The string we get is like: 20 Mehrwertsteuer 29%. we just need the first Digit -> 20
+        pattern = "(\d{1,})"
+        print("Suche nach Steuerschlüssel in %s" % dataset_tax_steuer_schluessel)
+        match = re.search(pattern, dataset_tax_steuer_schluessel)
+
+        tax_entity_db = tax_entity.query.filter_by(steuer_schluessel=match.group(1)).first()
+        if tax_entity_db:
+            product_entity.tax.add(tax_entity_db)
+            db.session.commit()
+        else:
+            return
+
     def dataset_upsert_price(self, dataset, product_entity, language):
         pass
 
@@ -217,4 +244,7 @@ class BridgeObjectProductController(BridgeObjectController):
 
         return images_json
 
-
+    def dataset_get_by_artikel_number(self, artikel_number="204013"):
+        dataset = self.dataset
+        erp_get_dataset_by_id(dataset, "Nr", artikel_number)
+        return dataset

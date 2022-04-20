@@ -28,18 +28,22 @@ class BridgeObjectAddressController(BridgeObjectController):
         self.dataset_field_title = "AdrNr"
         self.dataset_field_img = None
         self.img_file = None
+        self.entity = BridgeAdressenEntity
         self.class_name = "A-BOAddressC"
         self.adrnr = None
         self.re_ansnr = None
         self.li_ansnr = None
-        super().__init__(self.dataset,
-                         self.last_sync_date_field,
-                         self.dataset_field_ltzaend,
-                         self.dataset_field_gspkz,
-                         self.dataset_field_gspkz_must_be,
-                         self.dataset_field_title,
-                         self.dataset_field_img,
-                         self.class_name)
+        super().__init__(
+            dataset=self.dataset,
+            last_sync_date_field=self.last_sync_date_field,
+            dataset_field_ltzaend=self.dataset_field_ltzaend,
+            dataset_field_gspkz=self.dataset_field_gspkz,
+            dataset_field_gspkz_must_be=self.dataset_field_gspkz_must_be,
+            dataset_field_title=self.dataset_field_title,
+            dataset_field_img=self.dataset_field_img,
+            entity=self.entity,
+            class_name=self.class_name
+        )
 
     def quick_sync_test(self):
 

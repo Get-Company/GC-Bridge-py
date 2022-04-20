@@ -15,7 +15,7 @@ class BridgeCategoryEntity(db.Model):
     api_idparent = db.Column(db.CHAR(36), nullable=True)
     title = db.Column(db.String(255), nullable=True)
     image = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.CLOB(), nullable=True)
+    description = db.Column(db.CHAR(), nullable=True)
     erp_ltz_aend = db.Column(db.DateTime(), default=datetime.now())
     # Translation for Category
     translations = db.relationship('BridgeCategoryTranslationEntity', backref='category')
@@ -59,7 +59,7 @@ class BridgeCategoryTranslationEntity(db.Model):
     language_iso = db.Column(db.String(5), nullable=False)
     title = db.Column(db.String(255), nullable=True)
     image = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.CLOB(), nullable=True)
+    description = db.Column(db.CHAR(), nullable=True)
     erp_ltz_aend = db.Column(db.DateTime(), default=datetime.now())
     # Translation for Category
     category_id = db.Column(db.Integer, db.ForeignKey('bridge_category_entity.id'))

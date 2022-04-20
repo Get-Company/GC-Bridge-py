@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 from sqlalchemy import update
 from main.src.Entity.Mappei.MappeiProductEntity import MappeiProductEntity, association_mappei_classei
+from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
 from main.src.Repository.functions_repository import parse_european_number_to_float
 
 # Many-To-Many for Product/Category
@@ -25,7 +26,7 @@ class BridgeProductEntity(db.Model):
     api_id = db.Column(db.CHAR(36), nullable=False)
     name = db.Column(db.String(255), nullable=True)
     image = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.CLOB(), nullable=True)
+    description = db.Column(db.CHAR(), nullable=True)
     price = db.Column(db.Float(), nullable=True)
     price_rebate = db.Column(db.Float, nullable=True)
     stock = db.Column(db.Integer(), nullable=False)
@@ -52,6 +53,9 @@ class BridgeProductEntity(db.Model):
         back_populates='classei',
         lazy='dynamic',
         cascade="all, delete")
+
+    tax_id = db.Column(db.Integer, db.ForeignKey('bridge_tax_entity.id'))
+    tax = db.relationship('BridgeTaxEntity')
 
     def __repr__(self):
         return f"Product Entity {self.name}({self.erp_nr})"
@@ -113,9 +117,9 @@ def map_product_erp_to_bridge_db(dataset, img=None):
         stock=99999,
         price=parse_european_number_to_float(dataset.Fields.Item("Vk0.Preis").AsString),
         price_rebate=parse_european_number_to_float(dataset.Fields("Vk0.Rab0.Pr").AsString),
-        factor=dataset.Fields.Item("Sel16").AsInteger,
-        min_purchase=dataset.Fields.Item("Sel10").AsInteger,
-        purchase_unit=dataset.Fields.Item("Sel11").AsInteger
+        factor=dataset.Fields.Item("Sel6").AsString,
+        min_purchase=dataset.Fields.Item("Sel10").AsString,
+        purchase_unit=dataset.Fields.Item("Sel11").AsString
     )
     print('This is the "ArtKat1" : "%s"' % dataset.Fields.Item("ArtKat1").AsInteger)
 
@@ -130,7 +134,7 @@ class BridgeProductTranslationEntity(db.Model):
     language_iso = db.Column(db.String(5), nullable=False)
     name = db.Column(db.String(255), nullable=True)
     image = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.CLOB(), nullable=True)
+    description = db.Column(db.CHAR(), nullable=True)
     erp_ltz_aend = db.Column(db.DateTime(), default=datetime.now())
 
     # Translation for Product

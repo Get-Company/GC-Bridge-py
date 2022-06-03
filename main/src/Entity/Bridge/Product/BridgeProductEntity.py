@@ -25,9 +25,10 @@ class BridgeProductEntity(db.Model):
     erp_nr = db.Column(db.String(255), nullable=True)
     api_id = db.Column(db.CHAR(36), nullable=False)
     name = db.Column(db.String(255), nullable=True)
-    image = db.Column(db.String(255), nullable=True)
+    image = db.Column(db.JSON(), nullable=True)
     description = db.Column(db.CHAR(), nullable=True)
     price = db.Column(db.Float(), nullable=True)
+    price_rebate_amount = db.Column(db.Integer(), nullable=True)
     price_rebate = db.Column(db.Float, nullable=True)
     stock = db.Column(db.Integer(), nullable=False)
     factor = db.Column(db.Integer(), nullable=True)
@@ -54,8 +55,9 @@ class BridgeProductEntity(db.Model):
         lazy='dynamic',
         cascade="all, delete")
 
+    # Tax Product Relation one - to - many
     tax_id = db.Column(db.Integer, db.ForeignKey('bridge_tax_entity.id'))
-    tax = db.relationship('BridgeTaxEntity')
+    tax = db.relationship("BridgeTaxEntity", back_populates="products")
 
     def __repr__(self):
         return f"Product Entity {self.name}({self.erp_nr})"
@@ -72,6 +74,7 @@ class BridgeProductEntity(db.Model):
         self.image = entity.image
         self.description = entity.description
         self.price = entity.price
+        self.price_rebate_amount = entity.price_rebate_amount
         self.price_rebate = entity.price_rebate
         self.stock = entity.stock
         self.factor = entity.factor
@@ -99,6 +102,17 @@ class BridgeProductEntity(db.Model):
         else:
             return prod_cat
 
+    def get_price(self, amount):
+        if int(amount) < int(self.price_rebate_amount):
+            price = int(amount) * float(self.price)
+        elif int(amount) >= int(self.price_rebate_amount):
+            price = int(amount) * float(self.price_rebate)
+
+        if self.factor >= 1:
+            price = float(price) / int(self.factor)
+
+        return float(price)
+
 
 def map_product_erp_to_bridge_db(dataset, img=None):
     """
@@ -112,10 +126,11 @@ def map_product_erp_to_bridge_db(dataset, img=None):
         erp_nr=dataset.Fields.Item("ArtNr").AsString,
         api_id=0,
         name=dataset.Fields.Item("KuBez1").AsString,
-        image=json.dumps(img),  # JSON Object Like {"Bild1": "/some/path/to/image/image1.jpg", ...}
-        description=dataset.Fields.Item("Bez1").Text,
+        image=img,  # JSON Object Like {"Bild1": "/some/path/to/image/image1.jpg", ...}
+        description=dataset.Fields.Item("Bez5").Text,
         stock=99999,
         price=parse_european_number_to_float(dataset.Fields.Item("Vk0.Preis").AsString),
+        price_rebate_amount=dataset.Fields.Item("Vk0.Rab0.Mge").AsString,
         price_rebate=parse_european_number_to_float(dataset.Fields("Vk0.Rab0.Pr").AsString),
         factor=dataset.Fields.Item("Sel6").AsString,
         min_purchase=dataset.Fields.Item("Sel10").AsString,

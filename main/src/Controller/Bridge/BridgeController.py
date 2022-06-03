@@ -30,10 +30,10 @@ from main.src.Controller.Amazon.AmazonController import *
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
 
 
-def sync_all_continuously():
-    # Set the max recursion limit to
+def sync_all_continuously(connect=True):
     # 1. Create Connection to ERP
-    # erp_connect()
+    if connect:
+        erp_connect()
 
     while True:
         # Sync the categories
@@ -82,61 +82,86 @@ def sync_all_continuously():
         ''')
         Adresse().dataset_save_changed_to_db()
 
-        # Last
-        # erp_close()
-
-        # Call Loop
-        # sync_all_continuously()
+        if connect:
+            erp_close()
 
         return True
 
 
-def sync_all_to_db():
-    sync_all_categories()
-    sync_all_products()
-    sync_all_addresses()
+def sync_all_to_db(connect=True):
+    sync_all_categories(connect)
+    sync_all_products(connect)
+    sync_all_addresses(connect)
 
 
-def sync_all_categories():
-    erp_connect()
+def sync_all_categories(connect=True):
+    if connect:
+        erp_connect()
+
     Category().dataset_save_all_to_db()
-    erp_close()
+
+    if connect:
+        erp_close()
 
 
-def sync_all_changed_categories():
-    erp_connect()
+def sync_all_changed_categories(connect=True):
+    if connect:
+        erp_connect()
+
     Category().dataset_save_changed_to_db()
-    erp_close()
+
+    if connect:
+        erp_close()
 
 
-def sync_all_products():
-    erp_connect()
+def sync_all_products(connect=True):
+    if connect:
+        erp_connect()
+
     Product().dataset_save_all_to_db()
-    erp_close()
+
+    if connect:
+        erp_close()
 
 
-def sync_all_changed_products():
-    erp_connect()
+def sync_all_changed_products(connect=True):
+    if connect:
+        erp_connect()
+
     Product().dataset_save_changed_to_db()
-    erp_close()
+
+    if connect:
+        erp_close()
 
 
-def sync_all_addresses():
-    erp_connect()
+def sync_all_addresses(connect=True):
+    if connect:
+        erp_connect()
+
     Adresse().dataset_save_all_to_db()
-    erp_close()
+
+    if connect:
+        erp_close()
 
 
-def sync_all_changed_addresses():
-    erp_connect()
+def sync_all_changed_addresses(connect=True):
+    if connect:
+        erp_connect()
+
     Adresse().dataset_save_changed_to_db()
-    erp_close()
 
-def sync_all_tax():
-    erp_connect()
+    if connect:
+        erp_close()
+
+
+def sync_all_tax(connect=True):
+    if connect:
+        erp_connect()
+
     Tax().dataset_save_all_to_db()
-    erp_close()
 
+    if connect:
+        erp_close()
 
 
 """

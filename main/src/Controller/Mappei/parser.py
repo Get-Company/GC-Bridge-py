@@ -26,11 +26,8 @@ def is_product(content):
 def get_article_price(content):
     is_staffel = content.find_class('product-block-prices')
     if is_staffel:
-        results = len(content.xpath('//tbody / tr[@class="product-block-prices-row"]'))
-        # price_highest = get_itemprop_att(content, 'meta', 'price', 'content', 0)
         price_highest = get_itemprop_att(content, 'meta', 'highPrice', 'content')
         price_lowest_amount = get_itemprop_att(content, 'meta', 'offerCount', 'content')
-        # price_lowest = get_itemprop_att(content, 'meta', 'price', 'content', results-1)
         price_lowest = get_itemprop_att(content, 'meta', 'lowPrice', 'content')
         price = {
             "highest": price_highest,

@@ -11,12 +11,8 @@ class BridgeTaxEntity(db.Model):
     steuer_schluessel = db.Column(db.Integer(), nullable=True)
     description = db.Column(db.String(255), nullable=True)
     satz = db.Column(db.Float(), nullable=True)
-    products = db.relationship(
-        "BridgeProductEntity",
-        back_populates="tax",
-        lazy='dynamic'
-    )
 
+    products = db.relationship("BridgeProductEntity", back_populates="tax")
 
     def __repr__(self):
         return f"Tax {self.description}({self.satz}%)"

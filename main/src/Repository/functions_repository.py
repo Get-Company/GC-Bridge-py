@@ -56,7 +56,7 @@ def get_parent_entity_from_child(parent, child, match):
     return child_return
 
 
-def parse_a_date(date_string="01.01.90", input_format="%d.%m.%y"):
+def parse_a_date(date_string="01.01.90T12:30:00", input_format="%d.%m.%yT%H:%I:%S"):
     """
     Input any string and match the input_format to the string. Now set the output Format as you wish
     :param date_string: string The date string.

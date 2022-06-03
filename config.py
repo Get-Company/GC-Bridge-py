@@ -42,8 +42,8 @@ class ConfShopware6ApiBase(object):
       perform administrative actions and require a user-based authentication
 
     """
-    username: str = ""
-    password: str = ""
+    username: str = "admin"
+    password: str = "shopware"
 
     """
     Admin API:
@@ -67,7 +67,7 @@ class ConfShopware6ApiBase(object):
     ==================
     which grant type to use - can be either 'user_credentials'- or 'resource_owner'
     """
-    grant_type: str = "resource_owner"
+    grant_type: str = "user_credentials"
 
     """
     Store API:

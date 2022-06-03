@@ -191,7 +191,6 @@ class BridgeObjectProductController(BridgeObjectController):
         self.print_method_info("A-BOProdC")
         print('Upsert "%s" Tax for Product "%s"' % (self.amount_categories, product_entity.name))
         tax_entity = BridgeTaxEntity
-        tax_entity_db = BridgeProductEntity
 
         dataset_tax_steuer_schluessel = dataset.Fields.Item("StSchl").AsString
         # The string we get is like: 20 Mehrwertsteuer 29%. we just need the first Digit -> 20
@@ -200,11 +199,12 @@ class BridgeObjectProductController(BridgeObjectController):
         match = re.search(pattern, dataset_tax_steuer_schluessel)
 
         tax_entity_db = tax_entity.query.filter_by(steuer_schluessel=match.group(1)).first()
-        if tax_entity_db:
-            product_entity.tax.add(tax_entity_db)
-            db.session.commit()
-        else:
-            return
+        print("Tax found: %s" % tax_entity_db.description)
+
+        product_entity.tax = tax_entity_db
+        print("Tax relation to product: %s" % product_entity.tax.description)
+
+        db.session.commit()
 
     def dataset_upsert_price(self, dataset, product_entity, language):
         pass

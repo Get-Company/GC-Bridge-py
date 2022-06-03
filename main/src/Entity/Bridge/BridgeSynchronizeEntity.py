@@ -13,6 +13,8 @@ class BridgeSynchronizeEntity(db.Model):
     sw6_category_sync_date = db.Column(db.DateTime(), nullable=True)
     sw6_product_sync_date = db.Column(db.DateTime(), nullable=True)
     sw6_address_sync_date = db.Column(db.DateTime(), nullable=True)
+    # Loop True or false
+    loop_continue = db.Column(db.BOOLEAN, nullable=True)
 
     def __repr__(self):
         return "BridgeSynchronizeEntity Created/Updated"

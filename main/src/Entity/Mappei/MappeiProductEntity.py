@@ -10,7 +10,7 @@ association_mappei_classei = db.Table('mappei_classei_product_entity',
                                       )
 
 
-# Make the category class
+# Make the mappeiProduct class
 class MappeiProductEntity(db.Model):
     __tablename__ = 'mappei_product_entity'
 
@@ -32,6 +32,17 @@ class MappeiProductEntity(db.Model):
         back_populates='mappei',
         lazy='dynamic')
 
-
     def __repr__(self):
-        return f"Product Entity {self.name}({self.nr})"
+        return f"Mappei Product Entity {self.name}({self.nr})"
+
+    def get_price(self, amount):
+        price_high, price_low, price_quantity
+        if int(amount) < int(self.prices.price_quantity):
+            price = int(amount) * float(self.prices_price)
+        elif int(amount) >= int(self.price_rebate_amount):
+            price = int(amount) * float(self.price_rebate)
+
+        if self.factor >= 1:
+            price = float(price) / int(self.factor)
+
+        return float(price)

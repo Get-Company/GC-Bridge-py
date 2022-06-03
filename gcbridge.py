@@ -14,6 +14,9 @@ from main.src.Entity.Bridge.Product.BridgeProductEntity import *
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
 from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import *
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import *
+# Mappei
+from main.src.Entity.Mappei.MappeiProductEntity import MappeiProductEntity
+from main.src.Entity.Mappei.MappeiPriceEntity import MappeiPriceEntity
 
 from main.src.Controller.Mappei.parser import *
 from main.src.Controller.ERP.ERPController import *
@@ -25,9 +28,11 @@ Tests
 #######################
 """
 from main.src.Controller.SW6.SW6CategoryController import *
-from main.src.Entity.Mappei.MappeiProductEntity import *
+from main.src.Controller.SW5.SW5AddressController import *
 import re
 import os
+from main.src.Gui.GcGui import GcGui
+
 """
 ######################
 App Factory
@@ -68,11 +73,14 @@ def main():
     # sync_all_addresses()
     # os.system("shutdown /s /t 1")
 
-
     # All
+    # continuously
     # erp_connect()
-    sync_all_products()
+    # while True:
+    #     sync_all_continuously(False)
     # erp_close()
+
+    # sync_all_to_db()
 
     """
     ######################
@@ -82,6 +90,36 @@ def main():
     # tests()
     # EOF main
 
+    """
+    ######################
+    SW5
+    ######################
+    Get duplicates in Sync. All Adresses from "False" are synced to "Right"
+    """
+    # sw5_sync_duplicates_v2(false_adrnr=12581, right_adrnr=10026)
+    window = GcGui()
+    window.set_title('GC-Bridge')
+    window.add_text("2 Adressnummern miteinander vergleichen und die aktuellste übernehmen", 'head')
+
+    col1 = [[
+        window.get_framwork().Text("Name", key='name')
+    ]]
+    col2 = [[window.get_framwork().InputText("Hans", key='input')]]
+
+    window.add_to_layout(
+        [[
+            window.get_framwork().Column(col1, element_justification='c'),
+            window.get_framwork().Column(col2, element_justification='c')
+        ]]
+    )
+
+    while True:
+        event, values = window.create_window()
+        # End Programm if user closes window or presses a butto
+        if event == "Huhu" or event == window.is_closed():
+            break
+
+    window.do_close()
     """
     ######################
     Mappei
@@ -98,12 +136,31 @@ def main():
     """
 
     # Standard Route for index
-    # @app.route('/')
-    # def index():
-    #     content = "Some filling Text from gcbridge.py"
-    #     # Forward var "content" to the template to read it in the template like {{content}}
-    #     return render_template('index.html', content=content)
+    # @app.route('/product/<erp_nr>')
+    # def index(erp_nr):
+    #     Products = BridgeProductEntity()
+    #     product = Products.query.filter_by(erp_nr=erp_nr).first()
     #
+    #     # Forward var "content" to the template to read it in the template like {{content}}
+    #     return render_template('product.html', product=product)
+    #
+    # Offer compare to Mappei
+    # @app.route('/offer', methods=['POST', 'GET'])
+    # def offer():
+    #     erp_nrs = request.form.getlist('erp[]')
+    #     amounts = request.form.getlist('amount[]')
+    #     Products = BridgeProductEntity
+    #     products = []
+    #
+    #     for erp_nr, amount in zip(erp_nrs, amounts):
+    #         print("ErpNr: %s, Amount: %s" % (erp_nr, amount))
+    #         product = Products.query.filter_by(erp_nr=erp_nr).first()
+    #         product.amount = amount
+    #         product.sum = product.get_price(amount)
+    #         products.append(product)
+    #
+    #     return render_template('offer.html', products=products)
+
     # @app.route('/mappei/match')
     # def mappei_match():
     #     products = BridgeProductEntity.query.order_by(BridgeProductEntity.erp_nr.asc()).limit(10).all()
@@ -140,26 +197,11 @@ def main():
     # db.session.commit()
 
     # erp_connect()
-    # product = erp_get_dataset("Artikel")
-    # mappe = erp_get_dataset_by_id(product, "Nr", "204116")
-    # product_dataset = Bridge
-    # product_dataset.dataset_save_to_db(mappe)
-
-
-
-    # mandant = erp_get_dataset('Mandant')
-    # steuern = mandant.NestedDataSets("Ust")
-    # steuern_count = erp_get_dataset_record_count(steuern)
-    # print("Es gibt %s Steuersätze im Mandanten %s" % (steuern_count, mandant.Fields.Item('MandNr').AsString))
-    # i = 0
-    # while i < steuern_count:
-    #     print("(%s) %s: %s" % (steuern.Fields.Item("StSchl").AsInteger,steuern.Fields.Item("Bez").AsString, steuern.Fields.Item("Sz").AsFloat))
-    #     steuern.Next()
-    #     i += 1
-    #
+    # erp_product = erp_get_dataset("Artikel")
+    # erp_mappe = erp_get_dataset_by_id(erp_product, "Nr", "204116")
+    # ntt_product = Product()
+    # ntt_product.dataset_save_to_db(erp_mappe)
     # erp_close()
-
-
 
 
 """ 
@@ -167,11 +209,10 @@ def main():
 Server
 ######################
 """
-print(__name__)
 # check if we are in the main Script? Thread? Check for __main__
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()
+        # db.create_all()
         main()
     # Run in debug mode and
     # do not restart the server

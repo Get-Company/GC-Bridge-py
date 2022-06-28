@@ -89,6 +89,9 @@ def main():
     """
     # tests()
     # EOF main
+    from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
+    mappe = BridgeProductEntity.query.filter_by(erp_nr='204011').first()
+    print(mappe.tax.satz)
 
     """
     ######################
@@ -96,30 +99,31 @@ def main():
     ######################
     Get duplicates in Sync. All Adresses from "False" are synced to "Right"
     """
-    # sw5_sync_duplicates_v2(false_adrnr=12581, right_adrnr=10026)
-    window = GcGui()
-    window.set_title('GC-Bridge')
-    window.add_text("2 Adressnummern miteinander vergleichen und die aktuellste übernehmen", 'head')
+    # sw5_sync_duplicates_v2(false_adrnr=12680, right_adrnr=49337)
+    # window = GcGui()
+    # window.set_title('GC-Bridge')
+    # window.add_text("2 Adressnummern miteinander vergleichen und die aktuellste übernehmen", 'head')
+    #
+    # col1 = [[
+    #     window.get_framwork().Text("Name", key='name')
+    # ]]
+    # col2 = [[window.get_framwork().InputText("Hans", key='input')]]
+    #
+    # window.add_to_layout(
+    #     [[
+    #         window.get_framwork().Column(col1, element_justification='c'),
+    #         window.get_framwork().Column(col2, element_justification='c')
+    #     ]]
+    # )
+    #
+    # while True:
+    #     event, values = window.create_window()
+    #     # End Programm if user closes window or presses a brutto
+    #     if event == "Huhu" or event == window.is_closed():
+    #         break
+    #
+    # window.do_close()
 
-    col1 = [[
-        window.get_framwork().Text("Name", key='name')
-    ]]
-    col2 = [[window.get_framwork().InputText("Hans", key='input')]]
-
-    window.add_to_layout(
-        [[
-            window.get_framwork().Column(col1, element_justification='c'),
-            window.get_framwork().Column(col2, element_justification='c')
-        ]]
-    )
-
-    while True:
-        event, values = window.create_window()
-        # End Programm if user closes window or presses a butto
-        if event == "Huhu" or event == window.is_closed():
-            break
-
-    window.do_close()
     """
     ######################
     Mappei

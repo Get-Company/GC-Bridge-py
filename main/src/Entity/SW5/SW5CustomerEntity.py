@@ -219,6 +219,9 @@ class SW5CustomerEntity:
     def set_orders(self, data):
         self.orders = data
 
+    def add_orders(self, orders):
+        self.orders.append(orders)
+
     def get_orders(self):
         return self.orders
 
@@ -242,6 +245,10 @@ class SW5CustomerEntity:
     # Addresses
     def set_addresses(self, addresses):
         self.addresses = addresses
+
+    def add_addresses(self, addresses):
+        self.addresses.append(addresses)
+
 
     def get_addresses(self):
         return self.addresses

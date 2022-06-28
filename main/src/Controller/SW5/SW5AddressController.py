@@ -43,24 +43,26 @@ def sw5_sync_duplicates_v2(false_adrnr, right_adrnr):
 
     ###
     # 6. Get orders and change the customer from False to Right
-    if false_customer.get_webshopid() and right_customer.get_orders_ids():
-        right_customer.set_orders(api.get_order_by_customerId(false_customer.get_webshopid()))
+    if false_customer.get_webshopid():
+        right_customer.add_orders(api.get_order_by_customerId(false_customer.get_webshopid()))
 
-    if right_customer.get_webshopid() and false_customer.get_orders_ids():
-        right_customer.set_orders(api.get_order_by_customerId(right_customer.get_webshopid()))
+    if right_customer.get_webshopid():
+        right_customer.add_orders(api.get_order_by_customerId(right_customer.get_webshopid()))
 
     # 7 Set Addresses to right customer
-    if right_customer.get_webshopid() and right_customer.get_addresses_ids():
-        right_customer.set_addresses(api.get_address_by_userId(right_customer.get_webshopid()))
+    if right_customer.get_webshopid():
+        right_customer.add_addresses(api.get_address_by_userId(right_customer.get_webshopid()))
 
-    if false_customer.get_webshopid() and false_customer.get_addresses_ids():
-        right_customer.set_addresses(api.get_address_by_userId(false_customer.get_webshopid()))
+    if false_customer.get_webshopid():
+        right_customer.add_addresses(api.get_address_by_userId(false_customer.get_webshopid()))
 
     print(right_customer)
     print(false_customer)
 
+    return
     updated_right_customer = api.set_customer_addresses_orders_and_credentials(customer=right_customer)
     print("Updated Right Customer: ", updated_right_customer)
+
 
     # Delete false Customer from API
     # If we take the webshopid from false. Do not delete!

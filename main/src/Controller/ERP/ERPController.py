@@ -1,6 +1,7 @@
 import string
 
 import win32com.client as win32
+import logging
 
 # Get ERP
 erp = win32.dynamic.Dispatch('BpNT.Application')

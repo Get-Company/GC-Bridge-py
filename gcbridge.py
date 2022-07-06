@@ -17,9 +17,11 @@ from main.src.Entity.Bridge.BridgeSynchronizeEntity import *
 # Mappei
 from main.src.Entity.Mappei.MappeiProductEntity import MappeiProductEntity
 from main.src.Entity.Mappei.MappeiPriceEntity import MappeiPriceEntity
-
+# Controller
 from main.src.Controller.Mappei.parser import *
 from main.src.Controller.ERP.ERPController import *
+from main.src.Controller.SW5.SW5AddressControllerv2 import SW5AddressController
+
 import pymysql
 
 """
@@ -29,6 +31,8 @@ Tests
 """
 from main.src.Controller.SW6.SW6CategoryController import *
 from main.src.Controller.SW5.SW5AddressController import *
+import win32com.client as win32
+import pythoncom
 import re
 import os
 from main.src.Gui.GcGui import GcGui
@@ -89,9 +93,6 @@ def main():
     """
     # tests()
     # EOF main
-    from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
-    mappe = BridgeProductEntity.query.filter_by(erp_nr='204011').first()
-    print(mappe.tax.satz)
 
     """
     ######################
@@ -99,7 +100,20 @@ def main():
     ######################
     Get duplicates in Sync. All Adresses from "False" are synced to "Right"
     """
-    # sw5_sync_duplicates_v2(false_adrnr=12680, right_adrnr=49337)
+    # sw5_sync_duplicates_v2(false_adrnr=12681, right_adrnr=29624)
+
+    @app.route('/customer/duplicate_customers/<false_adrnr>/<right_adrnr>')
+    def duplicate_customers(false_adrnr, right_adrnr):
+        pythoncom.CoInitialize()
+        erp = win32.dynamic.Dispatch('BpNT.Application')
+        erp.Init('Egon Heimann GmbH', "", 'f.buchner', '')
+        erp.SelectMand('58')
+        dataset_info = erp.DataSetInfos.Item("Artikel")
+        dataset = dataset_info.CreateDataSet()
+        dataset.FindKey("Nr", "204116")
+        erp_mappe = dataset
+        return render_template('customer/duplicate_customers.html', name=erp_mappe.Fields.Item('ArtNr').AsString)
+
     # window = GcGui()
     # window.set_title('GC-Bridge')
     # window.add_text("2 Adressnummern miteinander vergleichen und die aktuellste übernehmen", 'head')
@@ -140,13 +154,13 @@ def main():
     """
 
     # Standard Route for index
-    # @app.route('/product/<erp_nr>')
-    # def index(erp_nr):
-    #     Products = BridgeProductEntity()
-    #     product = Products.query.filter_by(erp_nr=erp_nr).first()
-    #
-    #     # Forward var "content" to the template to read it in the template like {{content}}
-    #     return render_template('product.html', product=product)
+    @app.route('/product/<erp_nr>')
+    def index(erp_nr):
+        Products = BridgeProductEntity()
+        product = Products.query.filter_by(erp_nr=erp_nr).first()
+
+        # Forward var "content" to the template to read it in the template like {{content}}
+        return render_template('product.html', product=product)
     #
     # Offer compare to Mappei
     # @app.route('/offer', methods=['POST', 'GET'])
@@ -216,9 +230,9 @@ Server
 # check if we are in the main Script? Thread? Check for __main__
 if __name__ == "__main__":
     with app.app_context():
-        # db.create_all()
+        db.create_all()
         main()
     # Run in debug mode and
     # do not restart the server
-    #
-    # app.run(debug=True, use_reloader=True)
+    # localhost:5000
+    app.run(port=5000, debug=True, use_reloader=True)

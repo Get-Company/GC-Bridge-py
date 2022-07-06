@@ -10,7 +10,6 @@ Bridge Product - {{product.name}}
 
 {% block body %}
 <h1>{{product.name}}</h1>
-<p>Unser Preis: {{product.price}} € | Mappei Preis: {{product.mappei[0].prices[0].price_high}} €/pro {{product.mappei[0].prices[0].price_quantity}}</p>
+<p>Unser Preis: {{product.price}} € </p>
 <image width="150px" src="https://www.classei.de/images/products/{{product.image['Bild1']}}"></image>
-<image width="150px" src="{{product.mappei[0].image}}"></image>
 {% endblock %}

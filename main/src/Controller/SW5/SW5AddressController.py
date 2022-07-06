@@ -7,73 +7,61 @@ from main.src.Entity.SW5.SW5CustomerEntity import SW5CustomerEntity
 
 from main.src.Repository.functions_repository import parse_a_date
 
+import logging
+logging.basicConfig(filename='logfiles/duplicate_customer/%s.log' % datetime.date.today().strftime("%Y-%m-%d"), encoding='utf-8', level=logging.DEBUG)
+
 
 def sw5_sync_duplicates_v2(false_adrnr, right_adrnr):
     ###
     # 1. Create connection to ERP
     erp_connect('58')
 
+    sw5_api = client_from_env()
     ###
     # 2. Make dict for false and right and create the object (get the dataset)
-    right_customer = SW5CustomerEntity(right_adrnr)
-    false_customer = SW5CustomerEntity(false_adrnr)
+    # Get webshopid, amazonid an email from erp
+    right_customer = SW5CustomerEntity(adrnr=right_adrnr, mandant='58', sw5_api=sw5_api)
+    false_customer = SW5CustomerEntity(adrnr=false_adrnr, mandant='58', sw5_api=sw5_api)
 
+    print("###\nStart Right Customer: \n###\n", right_customer)
+    print("###\nStart False Customer: \n###\n", false_customer)
     ###
     # 3.1 Sync Webshop ID
-    sync_webshop_id(right_customer=right_customer, false_customer=false_customer)
+    # Whether we keep the webshopid or we have to use the false
+    right_customer.sync_webshop_id(false_customer=false_customer)
 
     # 3.2 Sync Amazon ID
-    sync_amazon_id(right_customer=right_customer, false_customer=false_customer)
+    # Whether we keep the amazonid or we have to use the false
+    right_customer.sync_amazon_id(false_customer=false_customer)
 
-    ###
-    # 4. Get Customer from SW5
-    api = client_from_env()
+    # 3.3 Sync login fields
+    # Whether we keep to fields or we have to use the false
+    right_customer.sync_last_login_fields_sw5(false_customer=false_customer)
 
-    # # 4.1 Set the fields like last Login, password hash and password encoder etc... if the customer has a
-    # # webshop ID = ShopAccount
-    if right_customer.get_webshopid():
-        right_customer = sync_fields_from_sw5(customer=right_customer, api=api)
+    right_customer.sync_orders(false_customer=false_customer)
+    right_customer.sync_addresses(false_customer=false_customer)
 
-    if false_customer.get_webshopid():
-        false_customer = sync_fields_from_sw5(customer=false_customer, api=api)
-
-    ###
-    # 5 Set most recent last login, password and password encoder
-    sync_last_login_fields_sw5(right_customer=right_customer, false_customer=false_customer, api=api)
-
-    ###
-    # 6. Get orders and change the customer from False to Right
-    if false_customer.get_webshopid():
-        right_customer.add_orders(api.get_order_by_customerId(false_customer.get_webshopid()))
-
-    if right_customer.get_webshopid():
-        right_customer.add_orders(api.get_order_by_customerId(right_customer.get_webshopid()))
-
-    # 7 Set Addresses to right customer
-    if right_customer.get_webshopid():
-        right_customer.add_addresses(api.get_address_by_userId(right_customer.get_webshopid()))
-
-    if false_customer.get_webshopid():
-        right_customer.add_addresses(api.get_address_by_userId(false_customer.get_webshopid()))
-
-    print(right_customer)
-    print(false_customer)
-
+    print("###\nAddresses and Orders Right Customer: \n###\n", right_customer)
+    print("###\nAddresses and Orders False Customer: \n###\n", false_customer)
     return
-    updated_right_customer = api.set_customer_addresses_orders_and_credentials(customer=right_customer)
-    print("Updated Right Customer: ", updated_right_customer)
+    ###
+    # Deleting/Updating
+    ###
 
+    ###
+    # 1 ERP Delete false customer
+    false_customer.delete_erp_dataset_adresse()
+    # 2 Update right customer
+    right_customer.set_erp_email()
+    right_customer.set_erp_ids()
 
+    # 3 SW5 Delete false customer
     # Delete false Customer from API
     # If we take the webshopid from false. Do not delete!
     if false_customer.get_webshopid() is not right_customer.get_webshopid():
-        api.delete_customer_by_customerId(false_customer.get_webshopid())
+        false_customer.delete_sw5_customer()
 
-    # Delete false_customer from erp
-    false_customer.delete_erp_dataset_adresse()
-
-    # Upload right customer to erp
-    right_customer.set_erp_ids()
+    right_customer.sync_customer_addresses_orders_and_credentials()
 
     # Close ERP Connection!!!!
     erp_close()
@@ -139,22 +127,6 @@ def sync_amazon_id(right_customer: SW5CustomerEntity, false_customer: SW5Custome
         print("No Amazon ID found \n")
         right_customer.set_amazonid(False)
         return False
-
-
-def sync_fields_from_sw5(customer: SW5CustomerEntity, api: APIClient):
-    """
-    Set some fields from SW5 to the customer. Does the right/false customer even have a webshop ID?
-    :param customer: SW%CustomerEntity
-    :param api:
-    :return:
-    """
-    try:
-        customer.set_fields_from_sw5(api.get_customer(customer.get_webshopid()))
-        return customer
-    except:
-        # print("%s - No Customer with ID: %s in SW5 found" % (
-        #     customer.get_adrnr(), customer.get_webshopid()))
-        return customer
 
 
 def sync_last_login_fields_sw5(right_customer: SW5CustomerEntity, false_customer: SW5CustomerEntity, api: APIClient):

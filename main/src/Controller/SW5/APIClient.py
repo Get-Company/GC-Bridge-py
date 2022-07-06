@@ -86,13 +86,14 @@ class APIClient:
         return self._make_request('delete', url, data)
 
     # Address
-    def get_address_by_id(self, id):
+    def get_addresses_by_id(self, id):
         """
         Function to get customer addresses by Address ID
         :param id:
         :return:
         """
-        url = '/addresses/' % id
+        print('get Address from id: %s' % id)
+        url = '/addresses/%s' % id
 
         return self.get(url)['data']
 
@@ -215,13 +216,13 @@ class APIClient:
         return self.delete(url)
 
     # Orders
-    def get_order_by_customerId(self, customerId):
+    def get_orders_by_customerId(self, customerId):
         filter = '?filter[customerId]=%s' % customerId
         url = '/orders' + filter
 
         return self.get(url)['data']
 
-    def set_order_customerId_by_orderId(self, customerId, orderId):
+    def set_orders_customerId_by_orderId(self, customerId, orderId):
         print('Update Order %s to Customer: %s' % (orderId, customerId))
         if type(customerId) is not int:
             customerId = int(customerId)

@@ -6,6 +6,7 @@ from main.src.Entity.Bridge.Product.BridgeProductEntity import *
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import *
 from main.src.Controller.ERP.ERPController import *
+from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
 # Functions
 import uuid
 import re

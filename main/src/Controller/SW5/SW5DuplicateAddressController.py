@@ -3,7 +3,7 @@ from .APIClient import *
 from main.src.Controller.ERP.ERPController import *
 
 
-class SW5AddressController:
+class SW5DuplicateAddressController:
     def __init__(self, false_adrnr, right_adrnr):
         erp_connect('58')
         self.right_adrnr = None

@@ -4,11 +4,15 @@ import pytz
 from .APIClient import *
 from main.src.Controller.ERP.ERPController import *
 from main.src.Entity.SW5.SW5CustomerEntity import SW5CustomerEntity
-
 from main.src.Repository.functions_repository import parse_a_date
+from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import *
 
-import logging
-logging.basicConfig(filename='logfiles/duplicate_customer/%s.log' % datetime.date.today().strftime("%Y-%m-%d"), encoding='utf-8', level=logging.DEBUG)
+
+def sw5_delete_customer(adrnr):
+    customer = SW5CustomerEntity(adrnr=adrnr, sw5_api=client_from_env(), mandant='58')
+    customer.delete_erp_dataset_webshopid()
+    # customer.delete_sw5_customer()
+
 
 
 def sw5_sync_duplicates_v2(false_adrnr, right_adrnr):

@@ -14,7 +14,6 @@ import json
 
 
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
-
 from main.src.Repository.functions_repository import write_log
 
 
@@ -79,7 +78,7 @@ class BridgeObjectController:
 
     def dataset_save_changed_to_db(self):
         """
-        Compare
+        This is heritated to the child classes. Simply call it from a Child.
         :return:
         """
         self.print_method_info(self.class_name)

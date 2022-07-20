@@ -523,6 +523,40 @@ class SW5CustomerEntity:
 
             return False
 
+    def delete_erp_dataset_webshopid(self, connect=False, adrnr=None):
+        if connect:
+            erp_connect(self.mandant)
+
+        adressen = erp_get_dataset('Adressen')
+        erp_get_dataset_by_id(adressen, 'Nr', self.get_adrnr())
+
+        adressen.Edit()
+
+        # WebshopID
+        if self.get_webshopid():
+
+            if type(self.get_webshopid()) is not str:
+                webshopid = str(self.get_webshopid())
+            else:
+                webshopid = self.get_webshopid()
+
+            adressen.Fields("WShopAdrKz").AsBoolean = False
+            adressen.Fields("WShopID").AsString = ''
+
+        try:
+            adressen.Post()
+            adressen.Commit()
+
+            if connect:
+                erp_close()
+
+            return True
+        except:
+            adressen.Cancel()
+            if connect:
+                erp_close()
+            return False
+
     # Set the Webshop ID in ERP for Adresse by Adrnr.
     def set_erp_ids(self, connect=False):
         """

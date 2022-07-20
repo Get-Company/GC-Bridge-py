@@ -9,6 +9,7 @@ from main.src.Controller.Bridge.BridgeController import *
 Models
 ######################
 """
+# Entities
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import *
 from main.src.Entity.Bridge.Product.BridgeProductEntity import *
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
@@ -20,7 +21,8 @@ from main.src.Entity.Mappei.MappeiPriceEntity import MappeiPriceEntity
 # Controller
 from main.src.Controller.Mappei.parser import *
 from main.src.Controller.ERP.ERPController import *
-from main.src.Controller.SW5.SW5AddressControllerv2 import SW5AddressController
+from main.src.Controller.ERP.ERPObjectController import *
+from main.src.Controller.SW5.SW5DuplicateAddressController import *
 
 import pymysql
 
@@ -29,13 +31,19 @@ import pymysql
 Tests
 #######################
 """
+import PySimpleGUI as sg
 from main.src.Controller.SW6.SW6CategoryController import *
 from main.src.Controller.SW5.SW5AddressController import *
+from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
+from main.src.Entity.ERP.ERPArtkelEntity import *
+from main.src.Entity.ERP.ERPArtikelKategorieEntity import *
+from main.src.Entity.ERP.ERPAdressenEntity import *
+# Flask and ERP Test
 import win32com.client as win32
 import pythoncom
+
 import re
 import os
-from main.src.Gui.GcGui import GcGui
 
 """
 ######################
@@ -57,6 +65,22 @@ migrate = Migrate(app, db)
 
 
 def main():
+    """
+    ######################
+    ERP
+    ######################
+    """
+    erp_obj = ERPConnectionEntity(mandant='TEST')
+    erp_obj.connect()
+
+    range_start = datetime.datetime.now() - datetime.timedelta(days=365)
+    range_end = datetime.datetime.now()
+    adressen_range = ERPAdressenEntity(erp_obj=erp_obj, dataset_range=[range_start, range_end, 'LtzAend'])
+    print("Is Ranged?:", adressen_range.is_ranged(), ' - ', adressen_range.range_count())
+    print(adressen_range.get_("AdrNr"), adressen_range.get_('LtzAend'))
+    adressen_range.range_next()
+    print(adressen_range.get_("AdrNr"), adressen_range.get_('LtzAend'))
+
     """
     ######################
     Syncing
@@ -94,6 +118,7 @@ def main():
     # tests()
     # EOF main
 
+
     """
     ######################
     SW5
@@ -102,41 +127,40 @@ def main():
     """
     # sw5_sync_duplicates_v2(false_adrnr=12681, right_adrnr=29624)
 
-    @app.route('/customer/duplicate_customers/<false_adrnr>/<right_adrnr>')
-    def duplicate_customers(false_adrnr, right_adrnr):
-        pythoncom.CoInitialize()
-        erp = win32.dynamic.Dispatch('BpNT.Application')
-        erp.Init('Egon Heimann GmbH', "", 'f.buchner', '')
-        erp.SelectMand('58')
-        dataset_info = erp.DataSetInfos.Item("Artikel")
-        dataset = dataset_info.CreateDataSet()
-        dataset.FindKey("Nr", "204116")
-        erp_mappe = dataset
-        return render_template('customer/duplicate_customers.html', name=erp_mappe.Fields.Item('ArtNr').AsString)
+    # @app.route('/customer/duplicate_customers/<false_adrnr>/<right_adrnr>')
+    # def duplicate_customers(false_adrnr, right_adrnr):
+    #     pythoncom.CoInitialize()
+    #     erp = win32.dynamic.Dispatch('BpNT.Application')
+    #     erp.Init('Egon Heimann GmbH', "", 'f.buchner', '')
+    #     erp.SelectMand('58')
+    #     dataset_info = erp.DataSetInfos.Item("Artikel")
+    #     dataset = dataset_info.CreateDataSet()
+    #     dataset.FindKey("Nr", "204116")
+    #     erp_mappe = dataset
+    #     return render_template('customer/duplicate_customers.html', name=erp_mappe.Fields.Item('ArtNr').AsString)
 
-    # window = GcGui()
-    # window.set_title('GC-Bridge')
-    # window.add_text("2 Adressnummern miteinander vergleichen und die aktuellste übernehmen", 'head')
-    #
-    # col1 = [[
-    #     window.get_framwork().Text("Name", key='name')
-    # ]]
-    # col2 = [[window.get_framwork().InputText("Hans", key='input')]]
-    #
-    # window.add_to_layout(
-    #     [[
-    #         window.get_framwork().Column(col1, element_justification='c'),
-    #         window.get_framwork().Column(col2, element_justification='c')
-    #     ]]
-    # )
-    #
+    # sg.theme("Dark")
+    # layout = [
+    #     [sg.Text('Try ERP', size=(15,1))],
+    #     [sg.Button('Connect ERP', key='connect')],
+    #     [sg.Text("Delete Customer from SW5")],
+    #     [sg.Button("Delete", key='customer.delete')]
+    # ]
+    # window = sg.Window("ERP-Test", layout)
     # while True:
-    #     event, values = window.create_window()
+    #     event, values = window.read()
     #     # End Programm if user closes window or presses a brutto
-    #     if event == "Huhu" or event == window.is_closed():
+    #     if event == sg.WIN_CLOSED:
+    #         erp_obj.close()
     #         break
+    #     if event == 'connect':
+    #         erp_obj = ERPObjectController(mandant='58')
+    #     if event == 'customer.delete':
+    #         erp_connect('58')
+    #         sw5_delete_customer(51828)
+    #         erp_close()
     #
-    # window.do_close()
+    # window.close()
 
     """
     ######################
@@ -154,13 +178,13 @@ def main():
     """
 
     # Standard Route for index
-    @app.route('/product/<erp_nr>')
-    def index(erp_nr):
-        Products = BridgeProductEntity()
-        product = Products.query.filter_by(erp_nr=erp_nr).first()
-
-        # Forward var "content" to the template to read it in the template like {{content}}
-        return render_template('product.html', product=product)
+    # @app.route('/product/<erp_nr>')
+    # def index(erp_nr):
+    #     Products = BridgeProductEntity()
+    #     product = Products.query.filter_by(erp_nr=erp_nr).first()
+    #
+    #     # Forward var "content" to the template to read it in the template like {{content}}
+    #     return render_template('product.html', product=product)
     #
     # Offer compare to Mappei
     # @app.route('/offer', methods=['POST', 'GET'])
@@ -230,9 +254,9 @@ Server
 # check if we are in the main Script? Thread? Check for __main__
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()
+        # db.create_all()
         main()
     # Run in debug mode and
     # do not restart the server
     # localhost:5000
-    app.run(port=5000, debug=True, use_reloader=True)
+    # app.run(port=5000, debug=True, use_reloader=True)

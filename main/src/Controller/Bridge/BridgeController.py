@@ -4,30 +4,11 @@ This controller takes care of all the actions
 http://www.kammerl.de/ascii/AsciiSignature.php
 
 """
-import collections
-import uuid
-import sys
-import time
-
-from sqlalchemy.orm import joinedload
-import inspect
-
-from datetime import datetime, timedelta
 from main.src.Controller.ERP.ERPController import *
 from main.src.Controller.Bridge.BridgeObjectProductController import BridgeObjectProductController as Product
 from main.src.Controller.Bridge.BridgeObjectCategoryController import BridgeObjectCategoryController as Category
 from main.src.Controller.Bridge.BridgeObjectAddressController import BridgeObjectAddressController as Adresse
 from main.src.Controller.Bridge.BridgeObjectTaxController import BridgeObjectTaxController as Tax
-# from main.src.Controller.SW6.SW6Controller import *
-# Testing
-from main.src.Entity.Mappei.MappeiProductEntity import *
-from main.src.Entity.Mappei.MappeiPriceEntity import *
-from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
-from datetime import datetime, timedelta
-from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import *
-from main.src.Controller.Mappei.MappeiController import *
-from main.src.Controller.Amazon.AmazonController import *
-from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
 
 
 def sync_all_continuously(connect=True):

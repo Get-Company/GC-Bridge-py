@@ -14,6 +14,8 @@ class ERPConnectionEntity:
         self.max_reconnections = 3
         self.count_reconnects = 0
 
+        self.auto_vorgang = None
+
         self.dataset = None
 
         # loggin setup
@@ -52,6 +54,7 @@ class ERPConnectionEntity:
         """
         if self.erp:
             return self.erp
+
 
     # Mandant
     def set_mandant(self, mandant):
@@ -123,22 +126,3 @@ class ERPConnectionEntity:
 
     def set_cursor_to_field_value(self, field, value):
         self.dataset.FindKey(field, value)
-
-    """
-    ##########################
-    Artikel
-    ##########################
-    """
-    def get_artikel_by_artnr(self, artnr):
-        self.set_dataset('Artikel')
-        self.set_cursor_to_field_value('Nr', artnr)
-        artikel = ERPArtikelEntity(self.get_dataset())
-
-        return artikel.map_fields_to_object()
-
-    def get_artikel_in_range_by_artnr(self, start_artnr, end_artnr):
-        self.set_dataset('Artikel')
-        self.dataset.SetRange('Nr', start_artnr, end_artnr)
-        self.dataset.ApplyRange()
-        self.dataset.First()
-        return self.dataset

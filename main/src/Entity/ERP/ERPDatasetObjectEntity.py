@@ -1,21 +1,9 @@
-"""
-Examples:
-
-    # get Adress with AdrNr 10026
-    adresse = ERPAdressenEntity(erp_obj=erp_obj, id_value='10026')
-    print(adresse.get_('AdrNr'))
-
-    # Get Range WShopID from 13470 - 13480
-    adressen_range = ERPAdressenEntity(erp_obj=erp_obj, dataset_range=['13470', '13480', 'WShopID'])
-    print("Is Ranged?:", adressen_range.is_ranged(), ' - ', adressen_range.range_count())
-    print(adressen_range.get_('AdrNr'))
-    adressen_range.range_next()
-    print(adressen_range.get_('AdrNr'))
-
-"""
 import datetime
 import logging
 import string
+import json
+import yaml
+
 
 from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
 from main.src.Repository.functions_repository import parse_a_date
@@ -38,7 +26,9 @@ class ERPDatasetObjectEntity(object):
                  dataset_name,
                  dataset_id_field,
                  dataset_id_value,
-                 dataset_range):
+                 dataset_range,
+                 prefill_json_directory
+                 ):
 
         """ Needed attributes """
         self.erp_obj = erp_obj
@@ -50,6 +40,8 @@ class ERPDatasetObjectEntity(object):
         self.dataset_id_value = dataset_id_value
         self.dataset_fields = dict()
         self.nested_datasets = dict()
+        """ For the templates for customers, orders aso. Is filled in the child """
+        self.prefill_json_directory = prefill_json_directory
         """ Dict FieldTypes and their translation/mapping """
         self.field_types = {
             'WideString': 'AsString',
@@ -58,27 +50,48 @@ class ERPDatasetObjectEntity(object):
             'Date': 'AsDatetime',
             'DateTime': 'AsDatetime',
             'Integer': 'AsInteger',
-            'Boolean': 'AsBoolean'
+            'Boolean': 'AsBoolean',
+            'Byte': 'AsInteger'
 
         }
         """ The fields of the dataset and their values """
         self.fields_list = dict()
-        """ Functions that need to be called in __init__ """
+
+        """ These functions must be called for creating the dataset """
         self.set_dataset_infos()    # <-----|
         #                                   |-- Creating the Dataset!!
         self.set_created_dataset()  # <-----|
 
-        """ Check the parameter if we got a range and also set the id field if given """
+        """ Check the parameter if we need to 1 a range or none """
+        # Range check
         if dataset_range:  # Check iwe got a range and then set start and end
             self.dataset_range_start = dataset_range[0]
             self.dataset_range_end = dataset_range[1]
-            # Set the id field, if given. ex AdrNr in Adresse
+
+            # Set the id field, if given. ex: AdrNr in Adresse
             if dataset_range[2]:
                 self.set_dataset_id_field(dataset_range[2])
+
+            # OK now set the range
             self.set_range(self.dataset_range_start, self.dataset_range_end)
-        else:
+
+            # Check for nested datasets
+            # Since we use CreateDataSetEx, we have all realted dbs included!
+            # Delete - not used since 27.07.2022?
+            # self.set_nested_datasets()  # Read the nested datasets
+
+        # One dataset check
+        elif self.dataset_id_field and self.dataset_id_value:  # Check if we got field and value for a search
             self.set_dataset_cursor_to_field_value()  # Find the given Field and Value
-        self.set_nested_datasets()  # Read the nested datasets
+            # Check for nested datasets
+            # Since we use CreateDataSetEx, we have all realted dbs included!
+            # Delete - not used since 27.07.2022?
+            # self.set_nested_datasets()  # Read the nested datasets
+
+        # None check
+        else:
+            # No need to do anything
+            pass
 
     def __repr__(self):
         for k, v in self.fields_list.items():
@@ -120,12 +133,16 @@ class ERPDatasetObjectEntity(object):
         :param value: string the value for the field
         :return: dict self.fields_list
         """
-        self.edit_dataset()
+        self.edit_()
+        self.fields_list[field] = value
+        self.helper_set_value_of(field, value)
+
+    def create_(self, field, value):
         self.fields_list[field] = value
         self.helper_set_value_of(field, value)
 
     def delete_(self, check_delete=True):
-        self.edit_dataset()
+        self.edit_()
         if check_delete:
             self.delete_check_dataset()
         else:
@@ -133,8 +150,23 @@ class ERPDatasetObjectEntity(object):
 
         self.post_dataset()
 
-    def edit_dataset(self):
+    def copy_(self):
+        """ Child classes need to take care of this """
+        pass
+
+    def edit_(self):
+        """ To edit a give dataset """
+        self.startTransaction()
         self.created_dataset.Edit()
+
+    def append_(self):
+        """ To create a Dataset """
+        self.startTransaction()
+        self.created_dataset.Append()
+
+    def startTransaction(self):
+        """ the table is locked until commit!"""
+        self.created_dataset.StartTransaction()
 
     def delete_dataset(self):
         self.created_dataset.Delete()
@@ -144,7 +176,7 @@ class ERPDatasetObjectEntity(object):
         This can be used to check whether the selected record should be deleted. The user is shown a separate
         window with queries about this deletion process.
         """
-        self.created_dataset.CheckDelete()
+        self.created_dataset.CheckDelete(True, True)
 
     def post_dataset(self):
         try:
@@ -152,7 +184,8 @@ class ERPDatasetObjectEntity(object):
             self.created_dataset.Commit()
         except:
             self.created_dataset.RollBack()
-            logging.warning("Post/Commit could execute. Rollback was called. Regarding Dataset: %s" %
+            self.created_dataset.Cancel()
+            logging.warning("Post/Commit could not execute. Rollback was called. Regarding Dataset: %s" %
                             self.get_dataset_name())
 
     """ ERP """
@@ -160,6 +193,10 @@ class ERPDatasetObjectEntity(object):
         self.erp_obj = erp_obj
 
     """ Dataset """
+    def create_dataset(self):
+        """ This function must be called when this object is created but with no id_value """
+        self.set_dataset_infos()
+
     def set_dataset_name(self, dataset_name):
         self.dataset_name = dataset_name
 
@@ -222,11 +259,12 @@ class ERPDatasetObjectEntity(object):
         Get the content of the fields by calling CreateDataset()
         :return:
         """
-        self.created_dataset = self.get_dataset_infos().CreateDataSet()
+        self.created_dataset = self.get_dataset_infos().CreateDataSetEx()
 
     def get_created_dataset(self):
         return self.created_dataset
 
+    """ Nested datasets """
     def set_nested_datasets(self):
         for nested in self.get_created_dataset().NestedDataSets:
             self.nested_datasets[nested.Name] = nested
@@ -242,8 +280,23 @@ class ERPDatasetObjectEntity(object):
 
     """ Positioning/Finding/Filtering """
     def set_dataset_cursor_to_field_value(self):
-        print("Find %s:'%s'" % (self.dataset_id_field, self.dataset_id_value))
         self.created_dataset.FindKey(self.dataset_id_field, self.dataset_id_value)
+
+    def find_(self, field=None, value=None):
+        """
+        Just find by standard field and value ex: Artikel field='ArtNr', value='204116'
+        or find with the given field and value
+        :param field: str the field for the search
+        :param value: str the value for the field to search
+        :return: None
+        """
+        if field:
+            self.set_dataset_id_field(field)
+        if value:
+            self.set_dataset_id_value(value)
+
+        self.set_dataset_cursor_to_field_value()
+
 
     """ Range """
     def set_range(self, start, end, field=None):
@@ -279,7 +332,7 @@ class ERPDatasetObjectEntity(object):
     def is_ranged(self):
         return(self.created_dataset.IsRanged())
 
-    """ Helper reading the Field Types """
+    """ Helper """
     def helper_get_value_of(self, field):
         """
         Eval interprets a string as code.
@@ -297,7 +350,6 @@ class ERPDatasetObjectEntity(object):
             print("We got the not known Type '%s' for field '%s' " % (field_type, field))
             return False
 
-    """ Helper setting the Field Types """
     def helper_set_value_of(self, field, value):
         """
         Eval interprets a string as code.
@@ -322,6 +374,19 @@ class ERPDatasetObjectEntity(object):
             print("We got the not known Type '%s' for field '%s' " % (field_type, field))
             return False
 
-    def helper_format_date_object(self, date_to_format: object):
-        pass
+    """ New Dataset """
+    def prefill_from_file(self, file=None):
+        if not file:
+            raise FileNotFoundError
+        else:
+            with open(self.prefill_json_directory + file, 'r') as f:
+                print("Open file for prefill: ", self.prefill_json_directory + file)
+                # data = json.load(f)
+                try:
+                    data = yaml.safe_load(f)
+                    for key, value in data.items():
+                        print("Creating fields for prefill:", key, value)
+                        self.create_(key, value)
+                except yaml.YAMLError as exc:
+                    print(exc)
 

@@ -11,6 +11,7 @@ from main.src.Controller.Bridge.BridgeObjectAddressController import BridgeObjec
 from main.src.Controller.Bridge.BridgeObjectTaxController import BridgeObjectTaxController as Tax
 
 
+
 def sync_all_continuously(connect=True):
     # 1. Create Connection to ERP
     if connect:

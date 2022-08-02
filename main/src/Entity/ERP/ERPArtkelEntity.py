@@ -12,6 +12,7 @@ class ERPArtikelEntity(ERPDatasetObjectEntity):
         self.dataset_id_field = 'ArtNr'
         self.dataset_id_value = id_value
         self.dataset_range = dataset_range
+        self.prefill_json_directory = None
 
         # Need to call the __init_of the super class
         super().__init__(
@@ -19,7 +20,12 @@ class ERPArtikelEntity(ERPDatasetObjectEntity):
             dataset_name=self.dataset_name,
             dataset_id_field=self.dataset_id_field,
             dataset_id_value=self.dataset_id_value,
-            dataset_range=self.dataset_range
+            dataset_range=self.dataset_range,
+            prefill_json_directory=self.prefill_json_directory
         )
+
+    def get_einheit(self, artnr):
+        self.find_(value=artnr)
+        return self.get_('Einh')
 
 

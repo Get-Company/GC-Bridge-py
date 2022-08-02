@@ -38,6 +38,8 @@ from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
 from main.src.Entity.ERP.ERPArtkelEntity import *
 from main.src.Entity.ERP.ERPArtikelKategorieEntity import *
 from main.src.Entity.ERP.ERPAdressenEntity import *
+from main.src.Entity.ERP.ERPVorgangEntity import *
+
 # Flask and ERP Test
 import win32com.client as win32
 import pythoncom
@@ -70,17 +72,6 @@ def main():
     ERP
     ######################
     """
-    erp_obj = ERPConnectionEntity(mandant='TEST')
-    erp_obj.connect()
-
-    range_start = datetime.datetime.now() - datetime.timedelta(days=365)
-    range_end = datetime.datetime.now()
-    adressen_range = ERPAdressenEntity(erp_obj=erp_obj, dataset_range=[range_start, range_end, 'LtzAend'])
-    print("Is Ranged?:", adressen_range.is_ranged(), ' - ', adressen_range.range_count())
-    print(adressen_range.get_("AdrNr"), adressen_range.get_('LtzAend'))
-    adressen_range.range_next()
-    print(adressen_range.get_("AdrNr"), adressen_range.get_('LtzAend'))
-
     """
     ######################
     Syncing
@@ -98,7 +89,7 @@ def main():
     # sync_all_products()
 
     # Adressen
-    # sync_all_addresses()
+    sync_all_addresses()
     # os.system("shutdown /s /t 1")
 
     # All

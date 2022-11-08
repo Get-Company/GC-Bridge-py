@@ -7,7 +7,8 @@ import logging
 
 
 class ERPConnectionEntity:
-    def __init__(self, mandant="Test"):
+    def __init__(self, mandant="58"):
+        print
         self.mandant = None
         self.erp = None
         self.mand_state = None
@@ -18,11 +19,13 @@ class ERPConnectionEntity:
 
         self.dataset = None
 
+        self.logging = logging
+
         # loggin setup
-        logging.basicConfig(
+        self.logging.basicConfig(
             filename="logfiles/ERPObjectEntity.log"
         )
-        logging.info("Log Initialized")
+        self.logging.info("Log Initialized")
 
         # functions
         self.set_erp()
@@ -30,12 +33,11 @@ class ERPConnectionEntity:
         # self.connect()
 
     def __del__(self):
-        logging.info("The destructor __del__ was called, which calls the function close()")
         self.close()
 
     """
-       Getter & Setter
-       """
+    Getter & Setter
+    """
 
     # ERP
     def set_erp(self):
@@ -44,7 +46,7 @@ class ERPConnectionEntity:
         """
         pythoncom.CoInitialize()
         self.erp = win32.dynamic.Dispatch("BpNT.Application")
-        logging.info("BpNT is dispatched")
+        self.logging.info("BpNT is dispatched")
 
     def get_erp(self):
         """
@@ -64,7 +66,7 @@ class ERPConnectionEntity:
         if self.mandant:
             return self.mandant
         else:
-            logging.warning("No mandant available")
+            self.logging.warning("No mandant available")
             return False
 
     def set_mandant_state(self):
@@ -79,7 +81,7 @@ class ERPConnectionEntity:
 
     def get_mandant_state(self):
         if self.mand_state:
-            logging.info(
+            self.logging.info(
                 "Getting Mandant State: %s \n 0=ok, 1=Tageswechsel durchgeführt, 2=Parameteränderung durchgeführt" % self.mand_state)
             return self.mand_state
 
@@ -88,22 +90,22 @@ class ERPConnectionEntity:
     """
     Functions
     """
-
-    def connect(self):
+    def connect(self, firma="Egon Heimann GmbH", benutzer="GC-Autosync"):
         """
         The connection with the given credentials will be established. The fields are:
         Firmenname, Solution Partner ID (bleibt Leer), Anmeldename, Passwort
+
         :return:
         """
         # 1 Check if erp is available. Avoid duplicate connections
         try:
             self.get_erp()
-        except UnboundLocalError:
-            logging.warning("No ERP to connect. Did you created it? self.set_erp")
+        except UnboundLocalError as e:
+            self.logging.warning("No ERP to connect. Did you created it? self.set_erp")
         else:
-            self.erp.Init('Egon Heimann GmbH', "", 'f.buchner', '')
+            self.erp.Init(f'{firma}', "", f'{benutzer}', '')
             self.erp.SelectMand(self.get_mandant())
-            print("ERP is connected")
+            print("ERP is connected to:", self.get_mandant(), "with user:", benutzer)
         finally:
             print("Connect: This is ERP: %s" % self.get_erp())
 
@@ -116,10 +118,10 @@ class ERPConnectionEntity:
         try:
             self.erp.DeInit()
             self.erp = None
-        except AttributeError:
-            logging.warning("Cannot DeInit. Object is NoneType")
+        except:
+            self.logging.warning("Cannot DeInit. Object is NoneType")
         else:
-            logging.info("ERP is closed")
+            self.logging.info("ERP is closed")
             return True
         finally:
             print("Close: This is ERP: %s" % self.get_erp())

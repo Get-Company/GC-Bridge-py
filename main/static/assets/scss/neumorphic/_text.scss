@@ -1,0 +1,24 @@
+.display {
+    @for $i from 1 through 6 {
+      &-#{$i} {
+        text-shadow: -2px -2px 1px rgb(255 255 255 / 55%), 2px 2px 1px rgb(0 0 0 / 25%);
+        color: $neumorphic-bg;
+        font-weight: 700;
+        letter-spacing: 0.5rem;
+      }
+    }
+  &-5 {
+    text-shadow: -2px -2px 1px rgb(255 255 255 / 55%), 2px 2px 1px rgb(0 0 0 / 25%)
+  }
+  &-6 {
+    text-shadow: -1px -1px 2px rgb(255 255 255 / 100%), 1px 1px 2px rgb(0 0 0 / 50%);
+  }
+  /* Again or all the colors */
+  @each $name, $color in $colors {
+    @for $i from 1 through 6 {
+      &-#{$i}.#{$name} {
+        color: $color;
+      }
+    }
+  }
+}

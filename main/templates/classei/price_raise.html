@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}GeCo - Mappei{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th scope="col">Artikelnummer</th>
+          <th scope="col">Preis</th>
+          <th scope="col">VPE</th>
+          <th scope="col">Rabattpreis</th>
+          <th scope="col">Preiseinheit</th>
+          <th scope="col">Erhöhen um %</th>
+          <th scope="col">Preis</th>
+          <th scope="col">Manueller Preis</th>
+          <th scope="col">Rabattpreis</th>
+          <th scope="col">Manueller Rabattpreis</th>
+          <th scope="col">Mappei Artnr.</th>
+          <th scope="col">Mappei Preis</th>
+          <th scope="col">Mappei Rabattpreis</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for classei in classei_products %}
+          <tr>
+            <th scope="row">{{classei.erp_nr}}</th>
+            <td>{{classei.preis}}</td>
+            <td>{{classei.purchase_unit}}</td>
+            <td>{{classei.price_rebate}}</td>
+            <td>{{classei.price_rebate_amount}}</td>
+            <td>5</td>
+            <td>{{classei.price}}</td>
+            <td>{{classei.price}}</td>
+            <td>{{classei.price_rebate}}</td>
+            <td>{{classei.price_rebate}}</td>
+
+            {% if classei.mappei[0] %}
+
+              <td>{{classei.mappei[0].nr}}</td>
+              <td>{{classei.mappei[0].prices[0].price_high}}</td>
+              <td>{{classei.mappei[0].prices[0].price_low}}</td>
+
+            {% else %}
+
+              <td colspan="3">Leider keine Mappei Zuordnung</td>
+
+            {% endif %}
+
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

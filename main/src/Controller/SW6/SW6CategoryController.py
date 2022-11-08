@@ -1,7 +1,7 @@
 from functools import lru_cache
 
 from main.src.Controller.SW6.SW6ObjectController import *
-from lib_shopware6_api import Shopware6AdminAPIClientBase, ConfShopware6ApiBase, dal
+# from lib_shopware6_api import Shopware6AdminAPIClientBase, ConfShopware6ApiBase, dal
 
 from main.src.Entity.SW6.SW6CategoryEntity import *
 

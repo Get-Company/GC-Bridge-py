@@ -1,10 +1,13 @@
 import string
 
 import win32com.client as win32
+import pythoncom
 import logging
 
 # Get ERP
+pythoncom.CoInitialize()
 erp = win32.dynamic.Dispatch('BpNT.Application')
+
 
 
 # erp = win32.gencache.EnsureDispatch('BpNT.Application')

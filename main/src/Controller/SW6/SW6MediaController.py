@@ -50,6 +50,7 @@ class SW6MediaController(SW6ObjectController):
                 ))
                 position += 10
 
+
         self.api_sub_instance_product.upsert_product_pictures(
             product_number=ntt.erp_nr,
             l_product_pictures=pictures

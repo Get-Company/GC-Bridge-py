@@ -16,6 +16,9 @@ def set_classei_mappei_relation(classei_nr, mappei_nr, ):
     if mappei in classei.mappei:
         print('Found "%s(%s)" is already bound to "%s(%s)"' % (mappei.name, mappei.id, classei.name, classei.id))
         classei.mappei.remove(mappei)
+        return
+
+    print("Set relation between", classei_nr, 'and', mappei_nr)
 
     classei.mappei.append(mappei)
     db.session.add(classei)

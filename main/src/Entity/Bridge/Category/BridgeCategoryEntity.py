@@ -1,7 +1,10 @@
+import uuid
+
 from main import db
 from datetime import datetime
 # Categories Products Relation many - to - many
-from main.src.Entity.Bridge.Product.BridgeProductEntity import product_category
+from main.src.Entity.Bridge.Product.BridgeProductEntity import *
+from main.src.Entity.ERP.ERPArtikelKategorieEntity import *
 
 
 # Make the category class
@@ -15,14 +18,16 @@ class BridgeCategoryEntity(db.Model):
     api_idparent = db.Column(db.CHAR(36), nullable=True)
     title = db.Column(db.String(255), nullable=True)
     image = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.CHAR(), nullable=True)
-    erp_ltz_aend = db.Column(db.DateTime(), default=datetime.now())
+    description = db.Column(db.Text(), nullable=True)
+    erp_ltz_aend = db.Column(db.DateTime(), default=datetime.datetime.now())
+    created_at = db.Column(db.DateTime(), nullable=True, default=datetime.datetime.now())
     # Translation for Category
     translations = db.relationship('BridgeCategoryTranslationEntity', backref='category')
     # Products Relation many-to-many
 
     def __repr__(self):
-        return f"Category {self.title}({self.erp_nr}) was created"
+        # return f"Category {self.title}({self.erp_nr}) was created with id:{self.id} and API-ID:{self.api_id}"
+        return f"Category {self.title} created"
 
     # Categories Products Relation many - to - many
     products = db.relationship(
@@ -30,6 +35,20 @@ class BridgeCategoryEntity(db.Model):
         secondary=product_category,
         back_populates='categories',
         lazy='dynamic')
+
+    def map_erp_to_db(self, erp_category: ERPArtikelKategorieEntity):
+        self.erp_nr = erp_category.get_('Nr'),
+        # Always keep api_ids
+        if not self.api_id:
+            self.api_id = uuid.uuid4().hex
+        self.erp_nr_parent = erp_category.get_('ParentNr'),
+        self.api_idparent = 0,
+        self.title = erp_category.get_('Bez'),
+        self.image = None,
+        self.description = erp_category.get_('Info'),
+        self.erp_ltz_aend = erp_category.get_('LtzAend'),
+
+        return self
 
     def update_entity(self, entity):
         self.erp_nr = entity.erp_nr
@@ -48,7 +67,7 @@ class BridgeCategoryEntity(db.Model):
         self.title = entity.title
         self.image = entity.image
         self.description = entity.description
-        return True
+        return self
 
 
 # Make the translation class
@@ -59,8 +78,8 @@ class BridgeCategoryTranslationEntity(db.Model):
     language_iso = db.Column(db.String(5), nullable=False)
     title = db.Column(db.String(255), nullable=True)
     image = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.CHAR(), nullable=True)
-    erp_ltz_aend = db.Column(db.DateTime(), default=datetime.now())
+    description = db.Column(db.Text(), nullable=True)
+    erp_ltz_aend = db.Column(db.DateTime(), default=datetime.datetime.now())
     # Translation for Category
     category_id = db.Column(db.Integer, db.ForeignKey('bridge_category_entity.id'))
 

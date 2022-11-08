@@ -20,6 +20,7 @@ Example:
 """
 import logging
 from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
+from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
 import datetime
 
 
@@ -57,7 +58,7 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
         self.created_dataset = self.order.Dataset
         self.prefill_from_file("shopware6/rechnung/germany.yaml")
 
-    def add_position(self, quantity, unit, artnr):
+    def add_position(self, quantity, artnr):
         """
         Adds a new row to self.order
         :param quantity: int Menge ex: 100
@@ -65,8 +66,10 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
         :param artnr: str Artikelnummer ex: "204116"
         :return:
         """
-        print("Add Position: ", quantity, unit, artnr)
-        self.order.Positionen.Add(quantity, unit, artnr)
+        print("Add Position: ", quantity, artnr)
+        artikel = ERPArtikelEntity(erp_obj=self.erp_obj, id_value=artnr)
+        self.order.Positionen.Add(quantity, artikel.get_('Einh'), artnr)
+        artikel = None
 
     def post_dataset(self):
         try:

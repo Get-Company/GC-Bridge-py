@@ -1,0 +1,30 @@
+.btn{
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  color: $gray-600;
+  font-weight: bold;
+
+  @each $name, $color in $colors {
+    &.btn-#{$name} {
+      box-shadow: var(--gc-neumorphic-shadow);
+      background: linear-gradient(145deg, lighten($color, 10%), $color);
+      // background: $color;
+      color: $gray-600;
+      //border: $neumorphic-border;
+      &:hover {
+          background: linear-gradient(145deg, $color, lighten($color, 5%));
+          //border: $neumorphic-border
+      }
+      &:active {
+        box-shadow: var(--gc-neumorphic-shadow-pressed);
+        //border: 3px solid $neumorphic-bg;
+      }
+    }
+
+    &.btn-outline-#{$name} {
+      //border: solid 1px darken($color, 10%);
+    }
+  } // EOF each
+
+} // EOF btn

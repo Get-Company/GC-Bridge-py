@@ -9,7 +9,7 @@ class ERPArtikelEntity(ERPDatasetObjectEntity):
 
         self.erp_obj = erp_obj
         self.dataset_name = 'Artikel'
-        self.dataset_id_field = 'ArtNr'
+        self.dataset_id_field = 'Nr'
         self.dataset_id_value = id_value
         self.dataset_range = dataset_range
         self.prefill_json_directory = None
@@ -24,8 +24,15 @@ class ERPArtikelEntity(ERPDatasetObjectEntity):
             prefill_json_directory=self.prefill_json_directory
         )
 
-    def get_einheit(self, artnr):
-        self.find_(value=artnr)
+    """ Special Queries """
+    def get_einheit(self):
+        self.find_(value=self.dataset_id_value)
+        print("Get Einheit:", self.get_('Einh'))
         return self.get_('Einh')
 
+    def get_artkel_nummer(self):
+        return self.get_('ArtNr')
+
+    def get_title(self):
+        return self.get_('Bez1')
 

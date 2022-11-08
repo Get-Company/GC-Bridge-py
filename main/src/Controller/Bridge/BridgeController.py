@@ -10,6 +10,8 @@ from main.src.Controller.Bridge.BridgeObjectCategoryController import BridgeObje
 from main.src.Controller.Bridge.BridgeObjectAddressController import BridgeObjectAddressController as Adresse
 from main.src.Controller.Bridge.BridgeObjectTaxController import BridgeObjectTaxController as Tax
 
+from main.src.Controller.SW6.SW6InitController import SW6InitController
+from main.src.Controller.SW6.SW6UpdatingController import SW6UpdatingController
 
 
 def sync_all_continuously(connect=True):
@@ -17,57 +19,56 @@ def sync_all_continuously(connect=True):
     if connect:
         erp_connect()
 
-    while True:
-        # Sync the categories
-        print('''
+    # Sync the categories
+    print('''
 -----------------------------------------------------------    
-  _____        _                             _            
- / ____|      | |                           (_)           
+_____        _                             _            
+/ ____|      | |                           (_)           
 | |      __ _ | |_  ___   __ _   ___   _ __  _   ___  ___ 
 | |     / _` || __|/ _ \ / _` | / _ \ | '__|| | / _ \/ __|
 | |____| (_| || |_|  __/| (_| || (_) || |   | ||  __/\__ ]
- \_____|\__,_| \__|\___| \__, | \___/ |_|   |_| \___||___/
-                          __/ |                           
-                         |___/                            
-    ''')
+\_____|\__,_| \__|\___| \__, | \___/ |_|   |_| \___||___/
+                      __/ |                           
+                     |___/                            
+''')
 
-        Category().dataset_save_changed_to_db()
-        print('''
+    Category().dataset_save_changed_to_db()
+    print('''
 -----------------------------------------------------------
 -----------------------------------------------------------
-    ''')
+''')
 
-        print('''
+    print('''
 
- _____                  _               _        
+_____                  _               _        
 |  __ \                | |             | |       
 | |__) |_ __  ___    __| | _   _   ___ | |_  ___ 
 |  ___/| '__|/ _ \  / _` || | | | / __|| __|/ __|
 | |    | |  | (_) || (_| || |_| || (__ | |_ \__ ]
 |_|    |_|   \___/  \__,_| \__,_| \___| \__||___/
-                                                    
+                                                
+''')
+    Product().dataset_save_changed_to_db()
+    print('''
+-----------------------------------------------------------
+-----------------------------------------------------------
     ''')
-        Product().dataset_save_changed_to_db()
-        print('''
------------------------------------------------------------
------------------------------------------------------------
-        ''')
 
-        print('''
-             _                             
-    /\      | |                            
-   /  \   __| |_ __ ___  ___ ___  ___  ___ 
-  / /\ \ / _` | '__/ _ \/ __/ __|/ _ \/ __|
- / ____ \ (_| | | |  __/\__ \__ \  __/\__ |
+    print('''
+         _                             
+/\      | |                            
+/  \   __| |_ __ ___  ___ ___  ___  ___ 
+/ /\ \ / _` | '__/ _ \/ __/ __|/ _ \/ __|
+/ ____ \ (_| | | |  __/\__ \__ \  __/\__ |
 /_/    \_\__,_|_|  \___||___/___/\___||___/
-                                                   
-        ''')
-        Adresse().dataset_save_changed_to_db()
+                                               
+    ''')
+    Adresse().dataset_save_changed_to_db()
 
-        if connect:
-            erp_close()
+    SW6UpdatingController().sync_changed_to_sw()
 
-        return True
+    if connect:
+        erp_close()
 
 
 def sync_all_to_db(connect=True):
@@ -146,39 +147,10 @@ def sync_all_tax(connect=True):
         erp_close()
 
 
-"""
-From this line on, TESTS
-"""
+def sync_sw6_changed():
+    SW6UpdatingController().sync_changed_to_sw()
 
 
-def tests():
-    # SW6_test()
-    erp_connect()
-    category = erp_get_dataset('ArtikelKategorien')
-    erp_get_dataset_by_id(category, 'Nr', '2')
+def sync_sw6_all():
+    SW6InitController().init_all()
 
-    output(category)
-
-    erp_close()
-
-
-def output(dataset):
-    print(''
-          'Name: %s; '
-          'Nr: %s; '
-          'Index: %s; '
-          'KatID: %s; '
-          'ParentNr: %s; '
-          'NrPath: %s; '
-          'KatIDPath :%s'
-          %
-          (
-              dataset.Fields.Item("Bez").AsString,
-              dataset.Fields.Item("Nr").AsInteger,
-              dataset.Fields.Item("Index").AsInteger,
-              dataset.Fields.Item("KatID").AsString,
-              dataset.Fields.Item("ParentNr").AsString,
-              dataset.Fields.Item("NrPath").AsString,
-              dataset.Fields.Item("KatIDPath").AsString
-          )
-          )

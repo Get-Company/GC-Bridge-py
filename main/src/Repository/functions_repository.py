@@ -56,7 +56,18 @@ def get_parent_entity_from_child(parent, child, match):
     return child_return
 
 
-def parse_a_date(date_string="01.01.90T12:30:00", input_format="%d.%m.%yT%H:%I:%S"):
+def parse_a_date(date_string="01.01.90", input_format="%d.%m.%y"):
+    """
+    Input any string and match the input_format to the string. Now set the output Format as you wish
+    :param date_string: string The date string.
+    :param input_format: string The format of the date string
+    :return: obj datetime Object
+    """
+    datetime_obj = datetime.datetime.strptime(date_string, input_format)
+    return datetime_obj
+
+
+def parse_a_date_time(date_string="01.01.90T12:30:00", input_format="%d.%m.%yT%H:%I:%S"):
     """
     Input any string and match the input_format to the string. Now set the output Format as you wish
     :param date_string: string The date string.
@@ -78,7 +89,7 @@ def parse_european_number_to_float(number):
         return
     else:
         decmark_reg = re.compile('(?<=\d),(?=\d)')
-        number_float_english = decmark_reg.sub('.', number)
+        number_float_english = decmark_reg.sub('.', str(number))
         return number_float_english
 
 

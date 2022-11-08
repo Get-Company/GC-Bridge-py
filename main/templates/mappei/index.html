@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}GeCo - Mappei{% endblock %}
+
+{% block body %}
+<textarea cols="100">nr;price_quantity;price_high;price_low;land
+{% for product in mappei_products %}{{product.nr}};{{product.prices[0].price_quantity}};{{product.prices[0].price_high | replace(".", ",")}};{{product.prices[0].price_low | replace(".", ",")}};{{product.prices[0].land}}
+{% endfor %}}
+</textarea>
+
+
+
+{% endblock %}

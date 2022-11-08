@@ -1,0 +1,17 @@
+$primary: #ff9933;
+
+// Neumorphic
+//$neumorphic-bg: #e8ecf2;
+$neumorphic-bg: #d9d9d9;
+$neumorphic-color: $neumorphic-bg;
+$neumorphic-border: 5px solid $neumorphic-bg;
+
+// Body
+$body-bg: $neumorphic-bg;
+
+// Buttons
+$btn-border-radius: 10px;
+
+// Cards
+$card-border-radius: 10px;
+$card-height: 100%;

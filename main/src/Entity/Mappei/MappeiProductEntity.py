@@ -46,3 +46,9 @@ class MappeiProductEntity(db.Model):
             price = float(price) / int(self.factor)
 
         return float(price)
+
+    def get_normal_price(self):
+        return self.prices[0].price_high
+
+
+

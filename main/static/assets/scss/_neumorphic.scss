@@ -1,0 +1,47 @@
+/* lighten the Colors */
+$primary: lighten($primary, 30%);
+$secondary: lighten($secondary, 45%);
+$success: lighten($success, 65%);
+$danger: lighten($danger, 45%);
+$warning: lighten($warning, 45%);
+$info: lighten($info, 45%);
+$light: $neumorphic-bg;
+$dark: lighten($dark, 50%);
+
+body{
+    background-image: url("../img/paper_bg_seamless_128x128.jpg");
+    background-repeat: repeat;
+}
+
+$gc-neumorphic-light_top: #ffffff;
+$gc-neumorphic-light_bottom: #000000;
+
+.gc-neumorphic-shadow-neutral{
+    box-shadow: -5px -5px 5px rgba(255, 255, 255, 0.35), 5px 5px 10px -3px rgba(0, 0, 0, 0.25),
+    inset -2px -2px 5px rgba(255, 255, 255, 1), inset 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.gc-neumorphic-frame-neutral {
+    @extend .gc-neumorphic-shadow-neutral;
+    border: $neumorphic-border;
+}
+
+.gc-neumorphic-textshadow-neutral{
+    text-shadow: -3px -3px 3px rgba(255, 255, 255, 0.8), 3px 3px 3px rgba(0, 0, 0, 0.25);
+}
+
+$colors: (
+        "primary": $primary,
+        "secondary": $secondary,
+        "success": $success,
+        "warning": $warning,
+        "danger": $danger,
+        "info": $info,
+        "light": $light,
+        "dark": $dark
+);
+
+
+@import "neumorphic/buttons";
+@import "neumorphic/text";
+@import "neumorphic/cards";

@@ -43,6 +43,7 @@ class BridgeObjectCategoryController(BridgeObjectController):
             dataset_lang=self.dataset_lang
         )
 
+
     def dataset_save_to_db(self, dataset):
         self.print_method_info(self.class_name)
         #  2.1 Map dataset to entity

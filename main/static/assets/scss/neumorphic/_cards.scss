@@ -1,0 +1,18 @@
+@each $name, $color in $colors {
+  .card.bg-#{$name} {
+    @extend .gc-neumorphic-frame-neutral;
+    background-color: lighten($color, 0.1) !important;
+
+    .card-header {
+      box-shadow: 0px 5px 10px -2px rgb(0 0 0 / 22%);
+    }
+
+    .card-footer {
+      box-shadow: 0px -5px 10px -2px rgb(0 0 0 / 22%);
+    }
+  }
+}
+
+// Equal height of cards //
+$card-height: 100%;
+$card-border-radius: 50px;

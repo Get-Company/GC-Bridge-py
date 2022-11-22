@@ -11,7 +11,7 @@ from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
-
+from loguru import logger
 from datetime import datetime
 
 
@@ -61,6 +61,7 @@ class Bridge2ObjectCustomerContactController(Bridge2ObjectController):
             return False
 
     def is_in_db(self):
+        logger.debug("Datenbank für Duplikate kontrolle: ")
         """
         Check if the entity is in db. Use the standard ERP id field = 'ArtNr' and standard DB id field = erp_nr for Artikel
         The code example would look like:
@@ -83,11 +84,13 @@ class Bridge2ObjectCustomerContactController(Bridge2ObjectController):
                     erp_ansnr=self.erp_entity.get_("AnsNr")).filter_by(
                     erp_aspnr=self.erp_entity.get_("AspNr")).one_or_none()
                 if in_db:
+                    logger.debug("Gefunden: ", in_db.id)
                     print(" - - - # Found")
                     print(" - - - #", in_db.id)
                     print(" - - - ##########")
                     return in_db
                 else:
+                    logger.debug("Nothing Found")
                     print(" - - - # Nothing Found")
                     print(" - - - ##########")
                     return None

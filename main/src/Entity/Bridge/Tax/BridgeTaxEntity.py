@@ -26,7 +26,7 @@ class BridgeTaxEntity(db.Model):
         self.satz = entity.satz
         return True
 
-    def map_erp_to_db(self, erp_tax: ERPTaxEntity, img=None):
+    def map_erp_to_db(self, erp_tax: ERPTaxEntity):
         self.steuer_schluessel = erp_tax.get_("StSchl"),
         self.description = erp_tax.get_("Bez"),
         self.satz = erp_tax.get_("Sz")
@@ -34,14 +34,3 @@ class BridgeTaxEntity(db.Model):
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
         return self
-
-
-def map_tax_erp_to_bridge_db(dataset):
-    # Mapping the entity
-    entity = BridgeTaxEntity(
-        steuer_schluessel=dataset.Fields.Item("StSchl").AsInteger,
-        description=dataset.Fields.Item("Bez").AsString,
-        satz=dataset.Fields.Item("Sz").AsFloat
-    )
-
-    return entity

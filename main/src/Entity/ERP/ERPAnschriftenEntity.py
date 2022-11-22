@@ -5,6 +5,7 @@ Examples:
 """
 import logging
 from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
+from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
 import datetime
 
 
@@ -30,6 +31,11 @@ class ERPAnschriftenEntity(ERPDatasetObjectEntity):
             prefill_json_directory=self.prefill_json_directory
         )
 
+    def get_ansprechpartner(self):
+        ansprechpartner_ntt = ERPAnsprechpartnerEntity(erp_obj=self.erp_obj)
+        ansprechpartner_ntt.set_range(field='AdrNrAnsNrAspNr', start=[self.get_("AdrNr"), self.get_("AnsNr")])
+        ansprechpartner_ntt.range_first()
+        return ansprechpartner_ntt
 
     """ Special Queries """
     def get_special_standard_address_fields(self):

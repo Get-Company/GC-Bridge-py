@@ -6,9 +6,10 @@ from datetime import datetime
 from main.src.Entity.ERP.ERPAdressenEntity import ERPAdressenEntity
 from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
+
 # Relations
-from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
+from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
 
 
 # Is DataSet Adressen in ERP
@@ -37,18 +38,19 @@ class BridgeCustomerEntity(db.Model):
         """
         return self.erp_nr
 
+    def update_entity(self, entity):
+        self.erp_nr = entity.erp_nr
+
+        return self
+
     def map_erp_to_db(self, erp_entity: ERPAdressenEntity):
         self.erp_nr = erp_entity.get_('AdrNr')
         self.erp_ltz_aend = erp_entity.get_('LtzAend')
-        # Always keep api_ids
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
-        """
-        Get all addresses and their contacts
-        map the objects to the customer object
-        """
-        # Get ERP Addresses
-        erp_obj = erp_entity.get_erp_obj()
-        erp_addresses = ERPAnschriftenEntity(erp_obj=erp_obj)
 
         return self
+
+    def __repr__(self):
+        text = f"BridgeCustomerEntity: {self.id} - {self.erp_nr}"
+        return text

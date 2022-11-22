@@ -1,12 +1,9 @@
 # Github Repository
 # https://github.com/bitranox/lib_shopware6_api
 from lib_shopware6_api import Shopware6API
-from lib_shopware6_api_base import Shopware6AdminAPIClientBase
 
-from config import ConfShopware6ApiBase
+from main.config import ConfShopware6ApiBase
 
-from main.src.Entity.Bridge.Product.BridgeProductEntity import *
-from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
 from main.src.Controller.SW6_old_but_gold.SW6CategoryController import *
 
 

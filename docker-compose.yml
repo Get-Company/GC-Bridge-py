@@ -3,22 +3,20 @@ version: '3.3'
 services:
 
   database:
-    image: mysql:latest
+    image: mysql:latest # was 8.0.31 when created
     restart: always
     environment:
-      MYSQL_DATABASE: 'gc-bridge_db'
-      MYSQL_USER: 'user'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_DATABASE: gc-bridge_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
     ports:
-      - '3306:3306'
-    expose:
-      - '3306'
+      - 3306:3306
     volumes:
       - db-volume:/var/lib/msql
 
   adminer:
-    image: adminer:latest
+    image: adminer:latest # was 4.8.1 when created
     restart: always
     environment:
       ADMINER_DEFAULT_SERVER: database
@@ -27,7 +25,3 @@ services:
 
 volumes:
   db-volume:
-
-
-
-

@@ -2,7 +2,8 @@ from main import create_app
 from flask import render_template
 from flask_migrate import Migrate
 import sys
-
+from sqlalchemy import and_
+from loguru import logger
 """
 ######################
 Entities
@@ -21,6 +22,7 @@ from main.src.Entity.ERP.ERPArtikelKategorieEntity import ERPArtikelKategorieEnt
 # Customer
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity, BridgeCustomerAddressEntity, BridgeCustomerContactEntity
 from main.src.Entity.ERP.ERPAdressenEntity import ERPAdressenEntity, ERPAnschriftenEntity, ERPAnsprechpartnerEntity
+from main.src.Entity.ERP.NestedDataSets.ERPUmsatzEntity import ERPUmsatzEntity
 
 # Product
 from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
@@ -36,6 +38,7 @@ from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
 # Controller
 from main.src.Controller.Mappei.parser import *
 
+
 """
 ######################
 Controller
@@ -44,7 +47,11 @@ Controller
 from main.src.Controller.Bridge2.Bridge2ObjectTaxController import Bridge2ObjectTaxController
 from main.src.Controller.Bridge2.Bridge2ObjectCategoryController import Bridge2ObjectCategoryController
 from main.src.Controller.Bridge2.Bridge2ObjectProductController import Bridge2ObjectProductController
-from main.src.Controller.Bridge2.Bridge2ObjectAdressController import Bridge2ObjectAddressController
+from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerController import Bridge2ObjectCustomerController
+from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerContactController import \
+    Bridge2ObjectCustomerContactController
+from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerAddressController import \
+    Bridge2ObjectCustomerAddressController
 
 """
 ######################
@@ -58,8 +65,11 @@ App Factory
 The context has to be pushed to app, to grant access to the db's
 ######################
 """
+logger.add("logs\cg-bridge.log", retention="10 days")
+logger.debug("App gestartet")
 app = create_app()
 app.app_context().push()
+
 
 """
 ######################
@@ -68,66 +78,26 @@ ERP Connection
 erp_obj = ERPConnectionEntity()
 erp_obj.connect()
 
-contact = ERPAnsprechpartnerEntity(erp_obj=erp_obj)
-# contact.find_('AdrNrAnsNrAspNr', [10026, 1])
-contact.set_range(field='AdrNrAnsNrAspNr', start=[10026, 0], end=[10029, 10])
-while not contact.range_eof():
-    print(
-        "AdrNr:",
-        contact.get_("AdrNr"),
-        contact.get_("Anr"),
-        contact.get_("VNa"),
-        contact.get_("NNa")
-    )
-    contact.range_next()
 
-# erp_customer = ERPAdressenEntity(erp_obj=erp_obj, id_value=10026)
-#
-# db_customer = BridgeCustomerEntity()
-# db_customer.map_erp_to_db(erp_customer)
-#
-# erp_addresses = ERPAnschriftenEntity(erp_obj=erp_obj)
-# erp_addresses.set_range(start=10026, end=10026, field="AdrNrAnsNr")
-# print("Start Loop Addresses:", erp_addresses.get_("AdrNr"))
-# while not erp_addresses.range_eof():
-#     db_address = BridgeCustomerAddressEntity()
-#     db_address.map_erp_to_db(erp_addresses)
-#
-#     erp_contacts = ERPAnsprechpartnerEntity(erp_obj=erp_obj)
-#     erp_contacts.set_range('AdrNrAnsNrAspNr', ['10026', erp_addresses.get_("AnsNr")])
-#     print(" - AnsNr:", erp_addresses.get_("AnsNr"), erp_addresses.get_("Na1"), erp_addresses.get_("Na2"), erp_addresses.get_("Na3"))
-#     print(" - Start Loop Contacts:")
-#     while not erp_contacts.range_eof():
-#         db_contact = BridgeCustomerContactEntity()
-#         db_contact.map_erp_to_db(erp_contacts)
-#         # db_address.contacts.append(erp_contacts)
-#         print(" - - AspNr:", erp_contacts.get_("Anr"), erp_contacts.get_("VNa"), erp_contacts.get_("NNa"))
-#         erp_contacts.range_next()
-#
-#     db_customer.addresses.append(db_address)
-#     erp_addresses.range_next()
-#
-# print(db_customer.addresses[0].na2)
+# Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
+# Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()  # OK!
+# Bridge2ObjectProductController(erp_obj=erp_obj).sync_range(start=581000, end=581021)  # OK!
 
+# Schwule Scheiße
+Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 
-# buchner_contacts = ERPAnsprechpartnerEntity(erp_obj=erp_obj)
-# buchner_contacts.set_range(start=10026, end=10026, field="AdrNrAnsNrAspNr")
-#
-# while not buchner_addresses.range_eof():
-#     db_customer_address = BridgeCustomerAddressEntity()
-#     db_customer_address.map_erp_to_db(buchner_addresses)
-#     print(db_customer_address)
-#     buchner_addresses.range_next()
-
-
-# Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()
-# Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()
-# Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()
-# Bridge2ObjectAddressController(erp_obj=erp_obj).sync_one('10026')
-
+# Atti Zeugs - geht eigentlich ganz gut! Is ok...
 # SW6UpdatingController().sync_changed_to_sw('category')
 # SW6UpdatingController().sync_changed_to_sw('product')
 
+tab = BridgeProductEntity().query.filter_by(erp_nr=581000).first()
+print("#########################")
+print('\033[95m###### Test Prints ######\033[0m')
+print("#########################")
+print("Tab 581000 Tax:", tab.tax.description, "Category:", tab.categories[0].title)
+print("#########################")
 """
 ######################
 Threaded 
@@ -160,7 +130,7 @@ def initialize_new():
     Steps to do for initializing everything at first start
     :return:
     """
-        # - create all the tables:
+    # - create all the tables:
     # db.create_all()
     # - Set the dates on bridge_sync
     # sync = BridgeSynchronizeEntity().get_entity_by_id_1()
@@ -272,8 +242,10 @@ Server
 # check if we are in the main Script? Thread? Check for __main__
 if __name__ == "__main__":
     with app.app_context():
+
         db.create_all()
         main()
+
     # localhost:5000
     # !IMPORTANT! Do not use reloader on Threaded Tasks, for it will use up erp licenses
     # app.run(port=5000, debug=True, use_reloader=True)

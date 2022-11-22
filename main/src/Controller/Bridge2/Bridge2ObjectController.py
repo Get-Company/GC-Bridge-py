@@ -1,6 +1,7 @@
 from main.src.Controller.ControllerObject import ControllerObject
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
+from sqlalchemy import inspect
 
 from main import db
 import uuid
@@ -41,9 +42,11 @@ class Bridge2ObjectController(ControllerObject):
         :return:
         """
         if self.filter_expression:
+            print("Filter is set:", self.filter_expression)
             self.erp_entity.filter_expression(self.filter_expression)
             self.erp_entity.filter_set()
         else:
+            print("No Filter is set")
             pass
 
     def set_bridge_entity(self):
@@ -85,13 +88,21 @@ class Bridge2ObjectController(ControllerObject):
             return True
 
     def sync_one(self, value):
-        self.erp_entity.set_range(value, value)
+        self.erp_entity.set_range(start=value)
         self.apply_filter()
         self.upsert()
         return True
     
-    def sync_range(self, start, end):
-        self.erp_entity.set_range(start, end)
+    def sync_range(self, start, end, field=None):
+        """
+        !Important!
+        When setting the range from (10026, 10030) only 10026-10029 is considered!!
+        :param start: value, int, str
+        :param end: value, int, str !! The last one is not considered!
+        :param field:
+        :return:
+        """
+        self.erp_entity.set_range(start=start, end=end, field=field)
         self.apply_filter()
         self.upsert()
         return True
@@ -103,23 +114,28 @@ class Bridge2ObjectController(ControllerObject):
         """
         self.erp_entity.range_first()
         while not self.erp_entity.range_eof():
-            print("Upsert %s: %s" % (self.entity_name, self.erp_entity.get_(self.erp_entity_index_field)))
+
             # Always get a new instance of Bridge_Entity
             self.set_bridge_entity()
+
             entity_mapped_to_db = self.bridge_entity.map_erp_to_db(self.erp_entity)
             entity_in_db = self.is_in_db()
+
             # Is in DB - Update
             if entity_in_db:
-                print("Update")
+                # logger.add("Update: ", entity_in_db)
+                print("Update", entity_in_db)
                 entity_in_db.update_entity(entity_mapped_to_db)
-                # All relations must be removed and added
-                # entity_in_db = self.reset_relations(entity_in_db)
-                self.db.session.add(entity_in_db)
+                entity_to_insert = self.reset_relations(entity_in_db)
 
             # Is not in DB - Insert
-            else:
-                self.db.session.add(entity_mapped_to_db)
+            elif entity_in_db is None:
+                print("Insert", entity_mapped_to_db)
+                entity_to_insert = self.reset_relations(entity_mapped_to_db)
 
+            else:
+                return False
+            self.db.session.add(entity_to_insert)
             self.erp_entity.range_next()
 
         # Here we set the attribute/field of dataset_NAME_sync_date by the entity_name
@@ -129,7 +145,7 @@ class Bridge2ObjectController(ControllerObject):
         self.db.session.add(self.bridge_synchronize_entity)
 
         # Commit everything
-        self.db.session.commit()
+        self.commit_session()
 
     def is_in_db(self):
         """
@@ -143,11 +159,34 @@ class Bridge2ObjectController(ControllerObject):
         bridge_entity_index_field = self.bridge_entity_index_field
         if bridge_entity_index_field:
             in_db = eval(
-                'self.bridge_entity.query.filter_by(erp_nr=self.erp_entity.get_(self.erp_entity_index_field)).first()')
+                'self.bridge_entity.query.filter_by(' + self.bridge_entity_index_field + '=self.erp_entity.get_(self.erp_entity_index_field)).first()')
             return in_db
         else:
             return None
 
+    def reset_relations(self, bridge_entity):
+        """
+        After the entity was either updated&mapped (in db) or just mapped (new) all the relations must be set.
+        This is done in the child, depending on the relations
+        :param bridge_entity:
+        :return: BridgeEntity updated
+        """
+        return bridge_entity
+
     def get_erp_entity(self):
         if self.erp_entity:
             return self.erp_entity
+
+    def upsert_relations(self, entity):
+        """
+        Until now, this is only needed for the customer, addresses and contacts.
+        The .upsert function does a while loop. All relations should be upserted before .upsert.
+        :return:
+        """
+        pass
+
+    def commit_session(self):
+        try:
+            self.db.session.commit()
+        except:
+            print("Error Commit Session")

@@ -27,7 +27,7 @@ class BridgeCategoryEntity(db.Model):
 
     def __repr__(self):
         # return f"Category {self.title}({self.erp_nr}) was created with id:{self.id} and API-ID:{self.api_id}"
-        return f"Category {self.title} created"
+        return f"Category {self.title} id:{self.id} erp_nr:{self.erp_nr}"
 
     # Categories Products Relation many - to - many
     products = db.relationship(
@@ -38,15 +38,14 @@ class BridgeCategoryEntity(db.Model):
 
     def map_erp_to_db(self, erp_category: ERPArtikelKategorieEntity):
         self.erp_nr = erp_category.get_('Nr'),
-        # Always keep api_ids
-        if not self.api_id:
-            self.api_id = uuid.uuid4().hex
         self.erp_nr_parent = erp_category.get_('ParentNr'),
         self.api_idparent = 0,
         self.title = erp_category.get_('Bez'),
         self.image = None,
         self.description = erp_category.get_('Info'),
-        self.erp_ltz_aend = erp_category.get_('LtzAend'),
+        self.erp_ltz_aend = erp_category.get_('LtzAend'),# Always keep api_ids
+        if not self.api_id:
+            self.api_id = uuid.uuid4().hex
 
         return self
 
@@ -67,7 +66,7 @@ class BridgeCategoryEntity(db.Model):
         self.title = entity.title
         self.image = entity.image
         self.description = entity.description
-        return self
+        return True
 
 
 # Make the translation class

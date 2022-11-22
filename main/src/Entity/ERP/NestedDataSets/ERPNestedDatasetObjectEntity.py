@@ -108,7 +108,7 @@ class ERPNestedDatasetObjectEntity(ERPDatasetObjectEntity):
 
     """ Range """
 
-    def set_nested_range(self, start, end, field=None):
+    def set_nested_range(self, start, end=None, field=None):
         if field is None:
             field = self.nested_dataset_id_field
 

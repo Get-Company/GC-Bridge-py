@@ -111,6 +111,7 @@ class ERPDatasetObjectEntity(object):
 
         if field not in self.fields_list:
         """
+        # field = 'AdrNr'
         self.set_(field)
         return self.fields_list[field]
 
@@ -267,10 +268,11 @@ class ERPDatasetObjectEntity(object):
 
     """ Range """
 
-    def set_range(self, start, end, field=None):
+    def set_range(self, start, end=None, field=None):
         """
         Set a range by the give field with a list of indexes.
-        Dates must be
+        !Important!
+        When setting the range from (10026, 10030) only 10026-10029 is considered!!
         Example
         Adressen:
             set_range(start=10026, end=10027, field='Nr')
@@ -289,6 +291,10 @@ class ERPDatasetObjectEntity(object):
 
         if field is None:
             field = self.dataset_id_field
+
+        if end is None:
+            end = start
+
         # Check if range is date
         if isinstance(start, datetime.datetime) and isinstance(end, datetime.datetime):
             self.created_dataset.SetRange(
@@ -308,12 +314,11 @@ class ERPDatasetObjectEntity(object):
         if self.range_count() == 0:
             print("Nothing in given range", start, end)
             return False
-
         # set the cursor to the first entry
         else:
-            print("Found", self.range_count(), self.dataset_name, "between", start, end)
-        self.created_dataset.First()
-        return self
+            # print("Found", self.range_count(), self.dataset_name, "between", start, end)
+            self.created_dataset.First()
+            return self
 
     def range_next(self):
         self.created_dataset.Next()

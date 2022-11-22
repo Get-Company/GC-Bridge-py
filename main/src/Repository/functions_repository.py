@@ -127,8 +127,9 @@ def parse_english_number_to_european(number):
     if not number or number == '':
         return
     else:
+        num = str(number)
         decmark_reg = re.compile('(?<=\d)\.(?=\d)')
-        number_float_eu = decmark_reg.sub('.', number)
+        number_float_eu = decmark_reg.sub('.', num)
         return number_float_eu
 
 
@@ -186,3 +187,20 @@ def add_url_params(url, params):
     ).geturl()
 
     return new_url
+
+
+class bcolors:
+    """
+    Colors for the print output
+    Example Header
+    print('\033[95m', Header/Title, '\033[0m')
+    """
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'

@@ -7,10 +7,14 @@ class Config:
     DEBUG = True
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
     #     os.path.join(BASE_DIR, 'db/gc-bridge_python.db')
+
     #  XAMPP Mysql DB
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost:3306/gc-bridge_python'
-    #  Docker localhost:3307
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://user:password@localhost:3306/gc-bridge_db'
+
+    #  Docker localhost:3306
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:password@localhost:3306/gc-bridge_db'
+
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

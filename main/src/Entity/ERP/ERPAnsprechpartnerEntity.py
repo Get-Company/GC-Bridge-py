@@ -13,7 +13,7 @@ class ERPAnsprechpartnerEntity(ERPDatasetObjectEntity):
 
         self.erp_obj = erp_obj
         self.dataset_name = 'Ansprechpartner'
-        self.dataset_id_field = 'AdrNrAnsNrAspNr' # Adress- und Anschriftennummer
+        self.dataset_id_field = 'AdrNrAnsNrAspNr'
         self.dataset_id_value = id_value
         self.dataset_range = dataset_range
 

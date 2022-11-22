@@ -2,7 +2,7 @@ import re
 from lxml import etree
 import datetime
 import os
-from config import MappeiConfig, BASE_DIR
+from main.config import MappeiConfig
 import requests
 import gzip
 import shutil

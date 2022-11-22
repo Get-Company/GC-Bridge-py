@@ -34,10 +34,6 @@ class Bridge2ObjectCategoryController(Bridge2ObjectController):
         """
         self.bridge_entity = BridgeCategoryEntity()
 
-    def reset_relations(self, entity_db):
-        """ The relations should be set in the product so nothing to do here"""
-        return entity_db
-
     def set_sync_all_range(self):
         self.erp_entity.set_range("0", "999999", "Nr")
 
@@ -50,6 +46,3 @@ class Bridge2ObjectCategoryController(Bridge2ObjectController):
             return True
         else:
             return False
-
-
-

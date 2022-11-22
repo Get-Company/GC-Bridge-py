@@ -121,10 +121,21 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
     def get_special_orgaplan_without_turnover(self):
         """ We want all customers from Orgaplan without a turnover"""
         # We are searching for SuchBegriff ORGCL
-        self.set_index('SuchBeg', 'SuchBeg')
-        self.set_range('ORGCL', 'ORGCL')
+        self.set_range(start='ORGCL', end='ORGCL', field='SuchBeg')
         # Filter all by Erstumsatz > 1899 which is the standard value in büro+
         self.filter_expression("ErstUmsDat<'31.12.1900'")
+        # Set the filter and set to first query of range
+        self.filter_set()
+        self.range_first()
+
+    """ Special Queries """
+
+    def get_special_orgaplan_with_turnover(self):
+        """ We want all customers from Orgaplan without a turnover"""
+        # We are searching for SuchBegriff ORGCL
+        self.set_range(start='ORGCL', end='ORGCL', field='SuchBeg')
+        # Filter all by Erstumsatz > 1899 which is the standard value in büro+
+        self.filter_expression("ErstUmsDat>'31.12.1900'")
         # Set the filter and set to first query of range
         self.filter_set()
         self.range_first()
@@ -186,6 +197,12 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         }
 
         return anschriften
+
+    def get_anschriften(self):
+        anschriften_ntt = ERPAnschriftenEntity(erp_obj=self.erp_obj)
+        anschriften_ntt.set_range(field='AdrNrAnsNr', start=self.get_('AdrNr'))
+        anschriften_ntt.range_first()
+        return anschriften_ntt
 
     def get_special_standard_billing_address(self):
         """

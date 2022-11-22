@@ -35,15 +35,19 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
         Necessary for each child, since the sync loop needs to set the entity on each run
         :return:
         """
+        self.bridge_entity = None
         self.bridge_entity = BridgeProductEntity()
 
-    def reset_relations(self, entity_db):
+    def reset_relations(self, bridge_entity):
         """
         Reset all relations and define them new
+        all changes - even deleting a relation - will sync with the db
+        :param: BridgeEntity
+        :return: Updated Bridge Entity
         """
-
+        print("Reset relations - Category", bridge_entity)
         # 1. Categories
-        entity_db.categories = []
+        bridge_entity.categories = []
         # Since we have 10 Kategorien we need all between 1 and 11!
         for i in range(1, 11):
             search = "self.erp_entity.get_('ArtKat" + str(i) + "')"
@@ -51,11 +55,14 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
             # Categories must be in db, error
             if cat_id > 0:
                 cat_db = BridgeCategoryEntity().query.filter_by(erp_nr=cat_id).first()
-                entity_db.categories.append(cat_db)
+                bridge_entity.categories.append(cat_db)
 
         # 2. Tax
+        print("Reset relations - Tax", bridge_entity)
+        tax = BridgeTaxEntity().query.filter_by(steuer_schluessel=self.erp_entity.get_('StSchl')).first()
+        bridge_entity.tax = tax
 
-        return entity_db
+        return bridge_entity
 
     def set_sync_all_range(self):
         self.erp_entity.set_range("000", "ZZZ")
@@ -70,3 +77,5 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
             return True
         else:
             return False
+
+

@@ -9,6 +9,7 @@ from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
 from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
 from main.src.Repository.functions_repository import parse_european_number_to_float
 
+
 # Many-To-Many for Product/Category
 product_category = db.Table('bridge_product_category_entity',
                             db.Column('product_id', db.Integer, db.ForeignKey('bridge_product_entity.id'),
@@ -86,7 +87,8 @@ class BridgeProductEntity(db.Model):
         self.purchase_unit = entity.purchase_unit
         self.unit = entity.unit
         self.wshopkz = entity.wshopkz
-        return True
+
+        return self
 
     def get_entity_id_field(self):
         """
@@ -95,43 +97,21 @@ class BridgeProductEntity(db.Model):
         """
         return self.erp_nr
 
-    def map_erp_to_db(self, erp_product: ERPArtikelEntity, img=None):
-        self.erp_nr = erp_product.get_("ArtNr"),
+    def map_erp_to_db(self, erp_entity: ERPArtikelEntity, img=None):
+        self.erp_nr = erp_entity.get_("ArtNr"),
+        self.name = erp_entity.get_("KuBez1"),
+        self.image = img,  # JSON Object Like {"Bild1": "/some/path/to/image/image1.jpg", ...}
+        self.description = erp_entity.get_("Bez5"),
+        self.stock = 99999,
+        self.price = parse_european_number_to_float(erp_entity.get_("Vk0.Preis")),
+        self.price_rebate_amount = erp_entity.get_("Vk0.Rab0.Mge"),
+        self.price_rebate = parse_european_number_to_float(erp_entity.get_("Vk0.Rab0.Pr")),
+        self.created_at = datetime.now(),
         # Always keep api_ids
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
-        self.name = erp_product.get_("KuBez1"),
-        self.image = img,  # JSON Object Like {"Bild1": "/some/path/to/image/image1.jpg", ...}
-        self.description = erp_product.get_("Bez5"),
-        self.stock = 99999,
-        self.price = parse_european_number_to_float(erp_product.get_("Vk0.Preis")),
-        self.price_rebate_amount = erp_product.get_("Vk0.Rab0.Mge"),
-        self.price_rebate = parse_european_number_to_float(erp_product.get_("Vk0.Rab0.Pr")),
-        self.created_at = datetime.now()
 
-        """
-        Also reset all relations and set them anew
-        """
-        # Categories
-        if 'BridgeCategoryEntity' not in sys.modules:
-            from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
-        self.categories = []
-        for i in range(1, 11):
-            search = "erp_product.get_('ArtKat" + str(i) + "')"
-            cat_id = eval(search)
-            # Categories must be in db, error
-            if cat_id > 0:
-                try:
-                    cat_db = BridgeCategoryEntity().query.filter_by(erp_nr=cat_id).first()
-                    self.categories.append(cat_db)
-                except:
-                    print("A Problem with cat_nr: %s for prod_nr: %s" % (cat_id, self.erp_nr))
-                    db.session.rollback()
-                    pass
-
-        # Tax
-        tax = BridgeTaxEntity().query.filter_by(steuer_schluessel=erp_product.get_('StSchl')).first()
-        self.tax = tax
+        # Relations are set in the Bridge2ObjectProductController
 
         return self
 

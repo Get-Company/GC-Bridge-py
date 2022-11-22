@@ -46,20 +46,3 @@ class Bridge2ObjectTaxController(Bridge2ObjectController):
             return True
         else:
             return False
-
-    def is_in_db(self):
-        """
-        Check if the entity is in db. Use the standard ERP id field = 'ArtNr' and standard DB id field = erp_nr for Artikel
-        The code example would look like:
-        self.bridge_entity.query.filter_by(erp_nr=104014).first()
-        erp=104014:
-            bridge_entity_index_field = self.erp_entity.get_(self.erp_entity_index_field))
-        :return: object
-        """
-        bridge_entity_index_field = self.bridge_entity_index_field
-        if bridge_entity_index_field:
-            in_db = eval(
-                'self.bridge_entity.query.filter_by(steuer_schluessel=self.erp_entity.get_(self.erp_entity_index_field)).first()')
-            return in_db
-        else:
-            return None

@@ -66,10 +66,11 @@ The context has to be pushed to app, to grant access to the db's
 ######################
 """
 logger.add("logs\cg-bridge.log", retention="10 days")
-logger.debug("App gestartet")
+logger.debug("App get")
 app = create_app()
 app.app_context().push()
 
+# Hallo Atti
 
 """
 ######################
@@ -77,7 +78,6 @@ ERP Connection
 """
 erp_obj = ERPConnectionEntity()
 erp_obj.connect()
-
 
 # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
 # Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()  # OK!

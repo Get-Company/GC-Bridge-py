@@ -8,8 +8,8 @@ class SW6InitController:
         # entity = SW6MediaInitEntity("media")
         # entity.init_entity()
 
-        # entity = SW6MediaInitEntity("categegory")
-        # entity.init_entity()
+        entity = SW6InitEntity("category")
+        entity.init_entity()
         #
         # entity = SW6MediaInitEntity("media")
         # entity.init_entity()
@@ -17,9 +17,9 @@ class SW6InitController:
         # entity = SW6MediaInitEntity("media")
         # entity.init_entity()
 
-        for parameter in ["product"]:
-             controller = SW6InitEntity(parameter)
-             controller.init_entity()
+        # for parameter in ["category"]:
+        #      controller = SW6InitEntity(parameter)
+        #      controller.init_entity()
 
 
 

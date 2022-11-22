@@ -3,6 +3,8 @@ from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEnti
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
 from sqlalchemy import inspect
 
+from loguru import logger
+
 from main import db
 import uuid
 from datetime import datetime
@@ -16,7 +18,8 @@ class Bridge2ObjectController(ControllerObject):
                  bridge_entity,
                  bridge_entity_index_field,
                  entity_name,
-                 filter_expression=None
+                 filter_expression=None,
+
                  ):
 
         self.erp_obj = erp_obj
@@ -33,6 +36,8 @@ class Bridge2ObjectController(ControllerObject):
         self.entity_name = entity_name
 
         self.filter_expression = filter_expression
+
+        self.logger = logger
 
         super().__int__(erp_obj)
 
@@ -136,6 +141,7 @@ class Bridge2ObjectController(ControllerObject):
             else:
                 return False
             self.db.session.add(entity_to_insert)
+
             self.erp_entity.range_next()
 
         # Here we set the attribute/field of dataset_NAME_sync_date by the entity_name

@@ -83,10 +83,12 @@ erp_obj.connect()
 # Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()  # OK!
 # Bridge2ObjectProductController(erp_obj=erp_obj).sync_range(start=581000, end=581021)  # OK!
 
-# Schwule Scheiße
-Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+# Funktioniert no ned ganz
+# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+# Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
-Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+# Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 
 # Atti Zeugs - geht eigentlich ganz gut! Is ok...
 # SW6UpdatingController().sync_changed_to_sw('category')

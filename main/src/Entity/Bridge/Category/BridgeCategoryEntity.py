@@ -43,7 +43,8 @@ class BridgeCategoryEntity(db.Model):
         self.title = erp_category.get_('Bez'),
         self.image = None,
         self.description = erp_category.get_('Info'),
-        self.erp_ltz_aend = erp_category.get_('LtzAend'),# Always keep api_ids
+        self.erp_ltz_aend = erp_category.get_('LtzAend'),
+        # Always keep api_ids
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
 

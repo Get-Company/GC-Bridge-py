@@ -1,3 +1,4 @@
+
 from main.src.Controller.Bridge2.Bridge2ObjectController import Bridge2ObjectController
 import sqlalchemy
 
@@ -79,6 +80,7 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
 
             addresses_erp.range_next()
 
+        self.logger.debug("Reset Relations", bridge_entity.addresses)
         return bridge_entity
 
     def is_in_db(self):

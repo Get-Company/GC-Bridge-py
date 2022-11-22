@@ -1,11 +1,7 @@
-from functools import lru_cache
-
 from main.src.Controller.SW6.SW6ObjectController import *
 # from lib_shopware6_api import Shopware6AdminAPIClientBase, ConfShopware6ApiBase, dal
-
-from main.src.Entity.SW6.SW6CategoryEntity import *
-
-from datetime import datetime
+from loguru import logger
+from main.src.Entity.SW6.Archiv_Entitys.SW6CategoryEntity import *
 
 
 class SW6CategoryController(SW6ObjectController):
@@ -36,11 +32,13 @@ class SW6CategoryController(SW6ObjectController):
         # 1. Sync without parent. Just simply add all the categories to sw6
         categories_in_db = BridgeCategoryEntity.query.all()
         print("First Sync without parent.")
+        logger.debug("First Sync without parent.")
         for category in categories_in_db:
             self.upsert_ntt(category, add_parent=False)
 
         # 2. Sync but with the parent. Now we get all the relations
-        print("Second Sync with the parent")
+        logger.debug("Second Sync with the parent.")
+        print("Second Sync with the parent.")
         for category in categories_in_db:
             self.upsert_ntt(category, add_parent=True)
 

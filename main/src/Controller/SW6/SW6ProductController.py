@@ -1,25 +1,14 @@
 # API
 from main.src.Controller.SW6.extended.SubMedia import SubMedia
-from main.src.Controller.SW6.extended.SubProduct import SubProduct, SubProductPicture
+from main.src.Controller.SW6.extended.SubProduct import SubProduct
 # Controller
 from main.src.Controller.SW6.SW6ObjectController import SW6ObjectController
 from main.src.Controller.SW6.SW6MediaController import SW6MediaController
 # Entity
 from main.src.Entity.Bridge.Product import BridgeProductEntity
-from functools import lru_cache
 
-
-from lib_shopware6_api_base import Shopware6AdminAPIClientBase, ShopwareAPIError, ConfShopware6ApiBase, PayLoad
-from lib_shopware6_api_base import lib_shopware6_api_base_criteria as dal
-from main.src.Entity.SW6.SW6ProductEntity import *
 from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
-from main.src.Entity.SW6.SW6ProductEntity import SW6ProductEntity
-from datetime import datetime
-from pathlib import Path
-from main.src.Repository.functions_repository import add_url_params
-
-from typing import Any, Dict, List, Optional, Tuple, Union
-import json
+from main.src.Entity.SW6.Archiv_Entitys.SW6ProductEntity import SW6ProductEntity
 
 
 class SW6ProductController(SW6ObjectController):

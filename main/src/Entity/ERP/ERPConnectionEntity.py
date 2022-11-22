@@ -8,7 +8,7 @@ import logging
 
 class ERPConnectionEntity:
     def __init__(self, mandant="58"):
-        print
+
         self.mandant = None
         self.erp = None
         self.mand_state = None

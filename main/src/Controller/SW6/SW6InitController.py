@@ -1,5 +1,5 @@
 from main.src.Entity.SW6.SW6InitEntity import SW6InitEntity
-from main.src.Entity.SW6.SW6MediaInitEntity import SW6MediaInitEntity
+#from main.src.Entity.SW6.SW6MediaInitEntity import SW6MediaInitEntity
 
 
 class SW6InitController:
@@ -17,7 +17,7 @@ class SW6InitController:
         # entity = SW6MediaInitEntity("media")
         # entity.init_entity()
 
-        # for parameter in ["category"]:
+        # for parameter in ["products"]:
         #      controller = SW6InitEntity(parameter)
         #      controller.init_entity()
 

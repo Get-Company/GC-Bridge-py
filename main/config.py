@@ -1,6 +1,28 @@
 import os
 # Make the path to Project/db
 BASE_DIR = os.path.dirname(os.path.abspath(__name__))
+import configparser
+
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+"""
+Database configuration variables from config.ini
+"""
+database_server = config['DATABASE']['Server']
+database_database = config['DATABASE']['Database']
+database_user = config['DATABASE']['User']
+database_password = config['DATABASE']['Password']
+database_port = config['DATABASE']['Port']
+"------------------------------------------------"
+"""
+Shopware configuration variables from config.ini
+"""
+shopware_url = config['SHOPWARE']['ShopwareURL']
+shopware_user = config['SHOPWARE']['User']
+shopware_password = config['SHOPWARE']['Password']
+
 
 
 class Config:
@@ -12,7 +34,7 @@ class Config:
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost:3306/gc-bridge_python'
 
     #  Docker localhost:3306
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:password@localhost:3306/gc-bridge_db'
+    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{database_user}:{database_password}@{database_server}:{database_port}/{database_database}'
 
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -35,10 +57,8 @@ from attrs import validators
 
 @attrs.define
 class ConfShopware6ApiBase(object):
-    # the api url, like : 'https://shop.yourdomain.com/api'
-    shopware_admin_api_url: str = "https://localhost/api"
-    # the storefront api url, like : 'https://shop.yourdomain.com/store-api'
-    shopware_storefront_api_url: str = ""
+    shopware_admin_api_url: str = f"{shopware_url}"
+    shopware_storefront_api_url: str = f"{shopware_url}"
 
     """
     Admin API:
@@ -49,8 +69,8 @@ class ConfShopware6ApiBase(object):
       perform administrative actions and require a user-based authentication
 
     """
-    username: str = "admin"
-    password: str = "shopware"
+    username: str = f"{shopware_user}"
+    password: str = f"{shopware_password}"
 
     """
     Admin API:

@@ -5,7 +5,7 @@ from main.src.Controller.SW6.SW6UpdatingController import SW6UpdatingController
 
 
 """
-Pull test du dumme dumme dumm123312123312312231
+Hallo Flori!
 """
 # app = create_app()
 # app.app_context().push()

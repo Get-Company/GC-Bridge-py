@@ -84,13 +84,13 @@ class Bridge2ObjectCustomerContactController(Bridge2ObjectController):
                     erp_ansnr=self.erp_entity.get_("AnsNr")).filter_by(
                     erp_aspnr=self.erp_entity.get_("AspNr")).one_or_none()
                 if in_db:
-                    logger.debug("Gefunden: ", in_db.id)
+                    logger.debug("Found: ", in_db.id)
                     print(" - - - # Found")
                     print(" - - - #", in_db.id)
                     print(" - - - ##########")
                     return in_db
                 else:
-                    logger.debug("Nothing Found")
+                    logger.debug("Nothing Found!")
                     print(" - - - # Nothing Found")
                     print(" - - - ##########")
                     return None

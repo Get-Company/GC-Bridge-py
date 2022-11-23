@@ -60,23 +60,23 @@ class PayloadEntity:
             for category in db_row.categories:
                 payload["categories"].append({"id": category.api_id})
 
-            medias = []
-            relation_rows = BridgeMediaRelations.query.where(BridgeMediaRelations.product_id == db_row.id).all()
-            for row in relation_rows:
-                medias.append(
-                    {
-                        # "id": row.media.sw6_uuid,
-                        "mediaId": row.media.sw6_uuid,
-                        # "position": 1
-                    }
-                )
-            if len(medias):
-                payload["media"] = medias
-
-        elif self._type == "media":
-            payload = {
-                "url": f"{db_row.media.media_path}{db_row.media.media_name}"
-            }
+        #     medias = []
+        #     relation_rows = BridgeMediaRelations.query.where(BridgeMediaRelations.product_id == db_row.id).all()
+        #     for row in relation_rows:
+        #         medias.append(
+        #             {
+        #                 # "id": row.media.sw6_uuid,
+        #                 "mediaId": row.media.sw6_uuid,
+        #                 # "position": 1
+        #             }
+        #         )
+        #     if len(medias):
+        #         payload["media"] = medias
+        #
+        # elif self._type == "media":
+        #     payload = {
+        #         "url": f"{db_row.media.media_path}{db_row.media.media_name}"
+        #     }
 
         elif self._type == "customer":
             customer_id = db_row.adrnr

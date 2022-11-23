@@ -10,14 +10,14 @@ from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntit
 # Relations
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
-
+#from main.src.Entity.Bridge.Orders.BridgeOrderEntity import BridgeOrderEntity
 
 # Is DataSet Adressen in ERP
 class BridgeCustomerEntity(db.Model):
     __tablename__ = 'bridge_customer_entity'
 
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
-    api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
+    api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex, )
     erp_nr = db.Column(db.Integer(), nullable=False)
     erp_ltz_aend = db.Column(db.DateTime(), nullable=True)
     created_at = db.Column(db.DateTime(), default=datetime.now())
@@ -29,6 +29,11 @@ class BridgeCustomerEntity(db.Model):
     addresses = db.relationship(
         'BridgeCustomerAddressEntity',
         back_populates="customer")
+    # Relation one - to -many
+    orders = db.relationship(
+        'BridgeOrderEntity',
+        back_populates="customer")
+
 
     def get_entity_id_field(self):
         """

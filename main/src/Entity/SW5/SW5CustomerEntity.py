@@ -250,8 +250,8 @@ class SW5CustomerEntity:
         return True
 
     def sync_orders(self, false_customer):
-        if false_customer.get_orders():
-            self.add_orders(false_customer.get_orders())
+        if false_customer.get_orders:
+            self.add_orders(false_customer.get_orders)
             return True
         else:
             return False

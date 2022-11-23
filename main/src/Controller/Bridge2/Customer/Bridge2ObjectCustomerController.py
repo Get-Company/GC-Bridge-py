@@ -75,12 +75,16 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
             ).filter_by(
                 erp_ansnr=ans_nr
             ).one_or_none()
-            if address_erp:
+            print(address_erp)
+
+            if address_erp is not None:
                 bridge_entity.addresses.append(address_erp)
+            else:
+                pass
 
             addresses_erp.range_next()
 
-        self.logger.debug("Reset Relations", bridge_entity.addresses)
+        # self.logger.debug("Reset Relations", bridge_entity.addresses)
         return bridge_entity
 
     def is_in_db(self):
@@ -93,23 +97,14 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
         :return: object
         """
         bridge_entity_index_field = self.bridge_entity_index_field
-        print("##########")
-        print("# Find Customer in db")
-        print("##########")
-        print(" - Customer:", 'erp_nr =', self.erp_entity.get_("AdrNr"))
         if bridge_entity_index_field:
             try:
                 in_db = self.bridge_entity.query.filter_by(
                     erp_nr=self.erp_entity.get_("AdrNr")).one_or_none()
 
                 if in_db:
-                    print(" - - - # Found")
-                    print(" - - - #", in_db.id)
-                    print(" - - - ##########")
                     return in_db
                 else:
-                    print(" - - - # Nothing Found")
-                    print(" - - - ##########")
                     return None
 
             except sqlalchemy.exc.MultipleResultsFound:

@@ -1,13 +1,6 @@
 import os
 # Make the path to Project/db
 BASE_DIR = os.path.dirname(os.path.abspath(__name__))
-import configparser
-
-
-config = configparser.ConfigParser()
-config.read('config.ini')
-print(config['DATABASE']['Server'])     # -> "/path/name/"
-database_server = config['DATABASE']['Server']
 
 
 class Config:
@@ -19,7 +12,7 @@ class Config:
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost:3306/gc-bridge_python'
 
     #  Docker localhost:3306
-    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://root:@localhost:3306/gc-bridge_db'
+    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://root:password@localhost:3306/gc-bridge_db'
 
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False

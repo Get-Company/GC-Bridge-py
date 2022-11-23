@@ -4,6 +4,7 @@ from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEnti
 # For relations
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
+from main.src.Entity.Bridge.Media.BridgeMediaEntity import BridgeMediaEntity
 
 from datetime import datetime
 
@@ -62,6 +63,24 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
         tax = BridgeTaxEntity().query.filter_by(steuer_schluessel=self.erp_entity.get_('StSchl')).first()
         bridge_entity.tax = tax
 
+        # 3. Media
+        bridge_entity.medias = []
+
+        # 3.1 Check if media in db - update or insert
+        media_in_db = BridgeMediaEntity().query
+        # 3.2 Query Media
+
+        # 3.3 Append Media to Entity
+        new_image_1 = BridgeMediaEntity()
+        new_image_string = self.erp_entity.get_("Bild")
+
+        new_image_1.filename = new_image_string
+        new_image_1.filetype = "jpg"
+        new_image_1.description = bridge_entity.description
+        new_image_1.path = "https://www.classei.de/images/products/"
+
+        bridge_entity.medias.append(new_image_1)
+
         return bridge_entity
 
     def set_sync_all_range(self):
@@ -77,5 +96,6 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
             return True
         else:
             return False
+
 
 

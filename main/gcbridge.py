@@ -1,5 +1,7 @@
+import sqlalchemy
+
 from main import create_app
-from flask import render_template
+from flask import render_template, redirect
 from flask_migrate import Migrate
 import sys
 from sqlalchemy import and_
@@ -30,6 +32,9 @@ from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
 
 # Tax
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
+
+# Media
+from main.src.Entity.Bridge.Media.BridgeMediaEntity import BridgeMediaEntity
 
 # Connection
 from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
@@ -65,8 +70,6 @@ App Factory
 The context has to be pushed to app, to grant access to the db's
 ######################
 """
-logger.add("logs\cg-bridge.log", retention="10 days")
-logger.debug("App get")
 app = create_app()
 app.app_context().push()
 
@@ -79,27 +82,28 @@ ERP Connection
 erp_obj = ERPConnectionEntity()
 erp_obj.connect()
 
+
+
 # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
 # Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()  # OK!
-# Bridge2ObjectProductController(erp_obj=erp_obj).sync_range(start=581000, end=581021)  # OK!
+Bridge2ObjectProductController(erp_obj=erp_obj).sync_range(start=581000, end=581010)  # OK!
 
-# Funktioniert no ned ganz
-# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
-# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
-# Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
-Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
-# Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+# Funktioniert doch, oder?
+# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+# Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+# Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+
 
 # Atti Zeugs - geht eigentlich ganz gut! Is ok...
 # SW6UpdatingController().sync_changed_to_sw('category')
 # SW6UpdatingController().sync_changed_to_sw('product')
 
-tab = BridgeProductEntity().query.filter_by(erp_nr=581000).first()
-print("#########################")
-print('\033[95m###### Test Prints ######\033[0m')
-print("#########################")
-print("Tab 581000 Tax:", tab.tax.description, "Category:", tab.categories[0].title)
-print("#########################")
+# tab = BridgeProductEntity().query.filter_by(erp_nr=581000).first()
+# print("#########################")
+# print('\033[95m###### Test Prints ######\033[0m')
+# print("#########################")
+# print("Tab 581000 Tax:", tab.tax.description, "Category:", tab.categories[0].title)
+# print("#########################")
 """
 ######################
 Threaded 
@@ -129,7 +133,7 @@ migrate = Migrate(app, db)
 
 def initialize_new():
     """
-    Steps to do for initializing everything at first start
+    Steps to take for initializing everything at first start
     :return:
     """
     # - create all the tables:
@@ -221,6 +225,14 @@ def main():
         mappei_products = MappeiProductEntity.query.all()
         print(mappei_products)
         return render_template('mappei/index.html', mappei_products=mappei_products)
+
+    @app.route('/customer/<adrnr>')
+    def show_customer(adrnr):
+        try:
+            customer = BridgeCustomerEntity().query.filter_by(erp_nr=adrnr).one_or_none()
+            return render_template("classei/show_customer.html", customer=customer)
+        except sqlalchemy.exc.MultipleResultsFound:
+            return redirect("/dashborad")
 
     @app.route('/classei/price_raise')
     def show_classei_products():

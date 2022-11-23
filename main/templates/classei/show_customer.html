@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Show Customer - {{customer.erp_nr}} {{customer.addresses[0].na1}} {{customer.addresses[0].na2}} {{customer.addresses[0].na3}}{% endblock %}
+
+{% block body %}
+<h1>{{customer.erp_nr}} {{customer.addresses[0].na1}} {{customer.addresses[0].na2}} {{customer.addresses[0].na3}}</h1>
+
+<div class="container">
+    {% for address in customer.addresses %}
+    <div class="row">
+        <div class="col">
+            <h2> Address {{address.erp_ansnr}}:</h2>
+            <table class="table table-dark table-sm">
+                <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                </tr>
+                <tr>
+                    <td>{{address.na1}} {{address.na2}} {{address.na3}}</td>
+                    <td>{{address.str}} {{address.plz}}-{{address.city}}<br>{{address.land}}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col"></div>
+        <div class="col"></div>
+    </div>
+    {% for contact in address.contacts %}
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <h3>Contact {{contact.erp_aspnr}}:</h3>
+            <table class="table table-dark table-sm">
+                <tr>
+                    <th>Name</th>
+                </tr>
+                <tr>
+                    <td>{{contact.first_name}} {{contact.last_name}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="col"></div>
+    {% endfor %}
+    {% endfor %}
+</div>
+
+
+{%endblock%}

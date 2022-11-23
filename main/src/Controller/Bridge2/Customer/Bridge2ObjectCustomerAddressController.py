@@ -91,11 +91,6 @@ class Bridge2ObjectCustomerAddressController(Bridge2ObjectController):
         :return: object
         """
         bridge_entity_index_field = self.bridge_entity_index_field
-        print("##########")
-        print("# Find Address in db")
-        print("##########")
-        print(" - - Adress:", 'erp_nr =', self.erp_entity.get_("AdrNr"))
-        print(" - - Adress:", 'erp_ansnr = ', self.erp_entity.get_("AnsNr"))
         if bridge_entity_index_field:
             try:
                 in_db = BridgeCustomerAddressEntity().query.filter_by(
@@ -103,13 +98,8 @@ class Bridge2ObjectCustomerAddressController(Bridge2ObjectController):
                     erp_ansnr=self.erp_entity.get_("AnsNr")).one_or_none()
 
                 if in_db:
-                    print(" - - - # Found")
-                    print(" - - - #", in_db.id)
-                    print(" - - - ##########")
                     return in_db
                 else:
-                    print(" - - - # Nothing Found")
-                    print(" - - - ##########")
                     return None
 
             except sqlalchemy.exc.MultipleResultsFound:

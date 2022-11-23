@@ -4,6 +4,8 @@ from main import db
 from datetime import datetime
 import json
 from sqlalchemy import update
+
+from main.src.Entity.Bridge.Media.BridgeMediaEntity import *
 from main.src.Entity.Mappei.MappeiProductEntity import MappeiProductEntity, association_mappei_classei
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
 from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
@@ -66,6 +68,13 @@ class BridgeProductEntity(db.Model):
     tax_id = db.Column(db.Integer, db.ForeignKey('bridge_tax_entity.id'))
     tax = db.relationship('BridgeTaxEntity')
 
+    # Media Products Relation many - to - many
+    medias = db.relationship(
+        'BridgeMediaEntity',
+        secondary=media_product,
+        back_populates='products',
+        lazy='dynamic')
+
     def __repr__(self):
         return f"Product Entity {self.name}({self.erp_nr})"
 
@@ -101,7 +110,7 @@ class BridgeProductEntity(db.Model):
         self.erp_nr = erp_entity.get_("ArtNr"),
         self.name = erp_entity.get_("KuBez1"),
         self.image = img,  # JSON Object Like {"Bild1": "/some/path/to/image/image1.jpg", ...}
-        self.description = erp_entity.get_("Bez5"),
+        self.description = erp_entity.get_("KuBez5"),
         self.stock = 99999,
         self.price = parse_european_number_to_float(erp_entity.get_("Vk0.Preis")),
         self.price_rebate_amount = erp_entity.get_("Vk0.Rab0.Mge"),

@@ -45,7 +45,7 @@ class ERPDatasetObjectEntity(object):
         self.field_types = {
             'WideString': 'AsString',
             'Float': 'AsFloat',
-            'Blob': 'Text',
+            'Blob': 'GetEditObject(4).LinkFileName',
             'Date': 'AsDatetime',
             'DateTime': 'AsDatetime',
             'Integer': 'AsInteger',
@@ -390,6 +390,7 @@ class ERPDatasetObjectEntity(object):
         :param field:
         :return:
         """
+
         if not dataset:
             dataset = self.get_created_dataset()
 

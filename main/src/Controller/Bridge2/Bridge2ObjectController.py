@@ -97,7 +97,7 @@ class Bridge2ObjectController(ControllerObject):
         self.apply_filter()
         self.upsert()
         return True
-    
+
     def sync_range(self, start, end, field=None):
         """
         !Important!
@@ -118,6 +118,8 @@ class Bridge2ObjectController(ControllerObject):
         :return:
         """
         self.erp_entity.range_first()
+        print(self.erp_entity.is_ranged(), self.erp_entity.range_eof())
+        i = 0
         while not self.erp_entity.range_eof():
 
             # Always get a new instance of Bridge_Entity
@@ -142,6 +144,15 @@ class Bridge2ObjectController(ControllerObject):
                 return False
             self.db.session.add(entity_to_insert)
 
+            if i >= 50:
+                print(f"Commit Session - Buffer full: {i}")
+                self.commit_session()
+                i = 0
+                print(f"Reset Buffer Counter to {i}=0")
+            else:
+                print(f"Fill Session Buffer {i}/50")
+
+            i = i+1
             self.erp_entity.range_next()
 
         # Here we set the attribute/field of dataset_NAME_sync_date by the entity_name
@@ -162,6 +173,7 @@ class Bridge2ObjectController(ControllerObject):
             bridge_entity_index_field = self.erp_entity.get_(self.erp_entity_index_field))
         :return: object
         """
+        print("Parent is_in_db")
         bridge_entity_index_field = self.bridge_entity_index_field
         if bridge_entity_index_field:
             in_db = eval(
@@ -196,3 +208,5 @@ class Bridge2ObjectController(ControllerObject):
             self.db.session.commit()
         except:
             print("Error Commit Session")
+
+

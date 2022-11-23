@@ -73,26 +73,13 @@ class Bridge2ObjectCustomerContactController(Bridge2ObjectController):
         bridge_entity_index_field = self.bridge_entity_index_field
         if bridge_entity_index_field:
             try:
-                print(" - - - ##########")
-                print(" - - - # Find Contact in db")
-                print(" - - - ##########")
-                print(" - - - Contact:", 'erp_nr =', self.erp_entity.get_("AdrNr"))
-                print(" - - - Contact:", 'erp_ansnr = ', self.erp_entity.get_("AnsNr"))
-                print(" - - - Contact:", 'erp_aspnr = ', self.erp_entity.get_("AspNr"))
                 in_db = BridgeCustomerContactEntity().query.filter_by(
                     erp_nr=self.erp_entity.get_("AdrNr")).filter_by(
                     erp_ansnr=self.erp_entity.get_("AnsNr")).filter_by(
                     erp_aspnr=self.erp_entity.get_("AspNr")).one_or_none()
                 if in_db:
-                    logger.debug("Found: ", in_db.id)
-                    print(" - - - # Found")
-                    print(" - - - #", in_db.id)
-                    print(" - - - ##########")
                     return in_db
                 else:
-                    logger.debug("Nothing Found!")
-                    print(" - - - # Nothing Found")
-                    print(" - - - ##########")
                     return None
 
             except sqlalchemy.exc.MultipleResultsFound:

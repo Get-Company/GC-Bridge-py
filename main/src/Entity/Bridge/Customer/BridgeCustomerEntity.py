@@ -28,8 +28,7 @@ class BridgeCustomerEntity(db.Model):
     # Relation one - to -many
     addresses = db.relationship(
         'BridgeCustomerAddressEntity',
-        back_populates="customer",
-        cascade="all, delete-orphan")
+        back_populates="customer")
 
     def get_entity_id_field(self):
         """
@@ -40,6 +39,7 @@ class BridgeCustomerEntity(db.Model):
 
     def update_entity(self, entity):
         self.erp_nr = entity.erp_nr
+        self.erp_ltz_aend = entity.erp_ltz_aend
 
         return self
 

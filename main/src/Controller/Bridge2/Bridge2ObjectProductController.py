@@ -6,6 +6,7 @@ from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryE
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
 from main.src.Entity.Bridge.Media.BridgeMediaEntity import BridgeMediaEntity
 
+
 from datetime import datetime
 
 
@@ -65,21 +66,27 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
 
         # 3. Media
         bridge_entity.medias = []
+        images_array = self.erp_entity.get_images()
 
-        # 3.1 Check if media in db - update or insert
-        media_in_db = BridgeMediaEntity().query
-        # 3.2 Query Media
+        if images_array:
+            for img in images_array:
+                # 3.1 Check if media in db - update or insert
+                media_in_db = BridgeMediaEntity().query.filter_by(filename=img["name"]).one_or_none()
 
-        # 3.3 Append Media to Entity
-        new_image_1 = BridgeMediaEntity()
-        new_image_string = self.erp_entity.get_("Bild")
+                # 3.2 Query Media
+                if media_in_db is None:
+                    media_to_insert = BridgeMediaEntity()
+                else:
+                    media_to_insert = media_in_db
 
-        new_image_1.filename = new_image_string
-        new_image_1.filetype = "jpg"
-        new_image_1.description = bridge_entity.description
-        new_image_1.path = "https://www.classei.de/images/products/"
+                media_to_insert.filename = img["name"]
+                media_to_insert.filetype = img["type"]
+                media_to_insert.description = bridge_entity.description
+                media_to_insert.path = 'https://www.classei.de/images/products/'
 
-        bridge_entity.medias.append(new_image_1)
+                bridge_entity.medias.append(media_to_insert)
+        else:
+            pass
 
         return bridge_entity
 

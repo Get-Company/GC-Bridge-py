@@ -10,7 +10,6 @@ from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntit
 # Relations
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
-#from main.src.Entity.Bridge.Orders.BridgeOrderEntity import BridgeOrderEntity
 
 # Is DataSet Adressen in ERP
 class BridgeCustomerEntity(db.Model):
@@ -29,6 +28,7 @@ class BridgeCustomerEntity(db.Model):
     addresses = db.relationship(
         'BridgeCustomerAddressEntity',
         back_populates="customer")
+
     # Relation one - to -many
     orders = db.relationship(
         'BridgeOrderEntity',

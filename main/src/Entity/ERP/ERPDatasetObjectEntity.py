@@ -4,6 +4,9 @@ import string
 import json
 import yaml
 
+# Tools
+from main.src.Repository.functions_repository import find_image_filename_in_path
+
 
 class ERPDatasetObjectEntity(object):
     """
@@ -45,7 +48,7 @@ class ERPDatasetObjectEntity(object):
         self.field_types = {
             'WideString': 'AsString',
             'Float': 'AsFloat',
-            'Blob': 'GetEditObject(4).LinkFileName',
+            'Blob': 'Text',
             'Date': 'AsDatetime',
             'DateTime': 'AsDatetime',
             'Integer': 'AsInteger',
@@ -114,6 +117,87 @@ class ERPDatasetObjectEntity(object):
         # field = 'AdrNr'
         self.set_(field)
         return self.fields_list[field]
+
+    def get_images(self):
+        """
+        Gets the images by the Special COM Query GetEditObject(4).LinkFilename
+        Removes the path
+        splits the image_file into name and type
+        :return: array with objects image.name, image.type
+        # Todo: Make it nicer and maybe use DataSet: Bilder ?
+        """
+        dataset = self.get_created_dataset()
+        images = []
+
+        image_path = dataset.Fields.Item("Bild").GetEditObject(4).LinkFileName
+        if image_path:
+            image_file = find_image_filename_in_path(image_path)
+            image_array = image_file.split('.', 1)
+
+            images.append(
+                {"name": image_array[0],
+                 "type": image_array[1]
+                 }
+            )
+        else:
+            pass
+
+        image_path = dataset.Fields.Item("Bild2").GetEditObject(4).LinkFileName
+        if image_path:
+            image_file = find_image_filename_in_path(image_path)
+            image_array = image_file.split('.', 1)
+
+            images.append(
+                {"name": image_array[0],
+                 "type": image_array[1]
+                 }
+            )
+        else:
+            pass
+
+        image_path = dataset.Fields.Item("Bild3").GetEditObject(4).LinkFileName
+        if image_path:
+            image_file = find_image_filename_in_path(image_path)
+            image_array = image_file.split('.', 1)
+
+            images.append(
+                {"name": image_array[0],
+                 "type": image_array[1]
+                 }
+            )
+        else:
+            pass
+
+        image_path = dataset.Fields.Item("Bild4").GetEditObject(4).LinkFileName
+        if image_path:
+            image_file = find_image_filename_in_path(image_path)
+            image_array = image_file.split('.', 1)
+
+            images.append(
+                {"name": image_array[0],
+                 "type": image_array[1]
+                 }
+            )
+        else:
+            pass
+
+        image_path = dataset.Fields.Item("Bild5").GetEditObject(4).LinkFileName
+        if image_path:
+            image_file = find_image_filename_in_path(image_path)
+            image_array = image_file.split('.', 1)
+
+            images.append(
+                {"name": image_array[0],
+                 "type": image_array[1]
+                 }
+            )
+        else:
+            pass
+
+        if images:
+            return images
+        else:
+            return None
 
     def update_(self, field, value):
         """

@@ -117,11 +117,8 @@ Everything is fine!
 Nicht app.run starten!
 Die FLASK_APP env variable muss auf das Hauptprogramm gesetzt werden, da hier alles zusammenläuft. PyCharm oder WindowsPowershell
 
-    $env:FLASK_APP = "gcbridge.py"
-
-Terminal CMD
-
-    set FLASK_APP=gcbridge.py
+    $env:FLASK_APP = "main/gcbridge.py"
+    set FLASK_APP=main/gcbridge.py
 
 https://flask.palletsprojects.com/en/2.0.x/cli/
 

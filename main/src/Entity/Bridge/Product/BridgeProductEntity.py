@@ -68,12 +68,12 @@ class BridgeProductEntity(db.Model):
     tax_id = db.Column(db.Integer, db.ForeignKey('bridge_tax_entity.id'))
     tax = db.relationship('BridgeTaxEntity')
 
-    # Media Products Relation many - to - many
+    # Media Relation many - to - many
     medias = db.relationship(
         'BridgeMediaEntity',
-        secondary=media_product,
-        back_populates='products',
-        lazy='dynamic')
+        secondary=media_prod,
+        back_populates="products"
+    )
 
     def __repr__(self):
         return f"Product Entity {self.name}({self.erp_nr})"

@@ -5,6 +5,7 @@ from datetime import datetime
 # Categories Products Relation many - to - many
 from main.src.Entity.Bridge.Product.BridgeProductEntity import *
 from main.src.Entity.ERP.ERPArtikelKategorieEntity import *
+# from main.src.Entity.Bridge.Media.BridgeMediaEntity import *
 
 
 # Make the category class
@@ -23,6 +24,7 @@ class BridgeCategoryEntity(db.Model):
     created_at = db.Column(db.DateTime(), nullable=True, default=datetime.datetime.now())
     # Translation for Category
     translations = db.relationship('BridgeCategoryTranslationEntity', backref='category')
+
     # Products Relation many-to-many
 
     def __repr__(self):
@@ -35,6 +37,13 @@ class BridgeCategoryEntity(db.Model):
         secondary=product_category,
         back_populates='categories',
         lazy='dynamic')
+
+    # Media Relation many - to - many
+    medias = db.relationship(
+        'BridgeMediaEntity',
+        secondary=media_cat,
+        back_populates="categories"
+    )
 
     def map_erp_to_db(self, erp_category: ERPArtikelKategorieEntity):
         self.erp_nr = erp_category.get_('Nr'),
@@ -55,8 +64,8 @@ class BridgeCategoryEntity(db.Model):
         if entity.api_id:
             self.api_id = entity.api_id
         try:
-            parent = self.query.\
-                filter_by(erp_nr=entity.erp_nr_parent).\
+            parent = self.query. \
+                filter_by(erp_nr=entity.erp_nr_parent). \
                 first()
             if parent:
                 self.erp_nr_parent = parent.erp_nr
@@ -106,7 +115,6 @@ def map_category_erp_to_bridge_db(dataset, img=None, language_array=None):
         description=dataset.Fields.Item("Info").Text
     )
 
-
     # Check if we got an array of language codes
     if isinstance(language_array, list):  # isinstance checks if array is list
         for lang in language_array:
@@ -131,6 +139,3 @@ def map_category_erp_to_bridge_db(dataset, img=None, language_array=None):
         )
         entity.translations.append(translation)
     return entity
-
-
-

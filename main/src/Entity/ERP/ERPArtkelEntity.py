@@ -35,4 +35,3 @@ class ERPArtikelEntity(ERPDatasetObjectEntity):
 
     def get_title(self):
         return self.get_('Bez1')
-

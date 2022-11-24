@@ -9,32 +9,34 @@ from loguru import logger
 """
 ######################
 Entities
-make sure all entities are imported, due to circular imports for example:
-- BridgeProductEntity needs BridgeCategoryEntity -
-We can not import Cat again
+make sure all entities are imported, due to circular imports for example
 ######################
 """
 # Synchronize
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
 
+# Tax
+from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
+
 # Category
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
 from main.src.Entity.ERP.ERPArtikelKategorieEntity import ERPArtikelKategorieEntity
-
-# Customer
-from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity, BridgeCustomerAddressEntity, BridgeCustomerContactEntity
-from main.src.Entity.ERP.ERPAdressenEntity import ERPAdressenEntity, ERPAnschriftenEntity, ERPAnsprechpartnerEntity
-from main.src.Entity.ERP.NestedDataSets.ERPUmsatzEntity import ERPUmsatzEntity
 
 # Product
 from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
 from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
 
-# Tax
-from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
+# Customer
+from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity, \
+    BridgeCustomerAddressEntity, BridgeCustomerContactEntity
+from main.src.Entity.ERP.ERPAdressenEntity import ERPAdressenEntity, ERPAnschriftenEntity, ERPAnsprechpartnerEntity
+from main.src.Entity.ERP.NestedDataSets.ERPUmsatzEntity import ERPUmsatzEntity
 
 # Media
 from main.src.Entity.Bridge.Media.BridgeMediaEntity import BridgeMediaEntity
+
+# Order
+from main.src.Entity.Bridge.Orders.BridgeOrderEntity import BridgeOrderEntity
 
 # Connection
 from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
@@ -73,6 +75,14 @@ The context has to be pushed to app, to grant access to the db's
 app = create_app()
 app.app_context().push()
 
+""" 
+######################
+Migration
+######################
+"""
+migrate = Migrate(app, db)
+
+
 # Hallo Atti
 
 """
@@ -82,28 +92,21 @@ ERP Connection
 erp_obj = ERPConnectionEntity()
 erp_obj.connect()
 
-
-
 # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
 # Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()  # OK!
-Bridge2ObjectProductController(erp_obj=erp_obj).sync_range(start=581000, end=581010)  # OK!
+Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()  # OK!
 
 # Funktioniert doch, oder?
-# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
-# Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
-# Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+# Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+# Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 
 
 # Atti Zeugs - geht eigentlich ganz gut! Is ok...
 # SW6UpdatingController().sync_changed_to_sw('category')
 # SW6UpdatingController().sync_changed_to_sw('product')
 
-# tab = BridgeProductEntity().query.filter_by(erp_nr=581000).first()
-# print("#########################")
-# print('\033[95m###### Test Prints ######\033[0m')
-# print("#########################")
-# print("Tab 581000 Tax:", tab.tax.description, "Category:", tab.categories[0].title)
-# print("#########################")
+erp_obj.close()
 """
 ######################
 Threaded 
@@ -122,26 +125,6 @@ def sync_thread():
 t1 = threading.Thread(target=sync_thread)
 t1.start()
 """
-
-""" 
-######################
-Migration
-######################
-"""
-migrate = Migrate(app, db)
-
-
-def initialize_new():
-    """
-    Steps to take for initializing everything at first start
-    :return:
-    """
-    # - create all the tables:
-    # db.create_all()
-    # - Set the dates on bridge_sync
-    # sync = BridgeSynchronizeEntity().get_entity_by_id_1()
-    # sync.dataset_category_sync_date = datetime.now()
-    # ...
 
 
 def main():
@@ -190,6 +173,7 @@ def main():
     """
     # This is just a CLI Version which awaits input
     # get_products_list()
+
     """
     ######################
     Flask Server
@@ -257,6 +241,7 @@ Server
 if __name__ == "__main__":
     with app.app_context():
 
+        # db.drop_all()
         db.create_all()
         main()
 

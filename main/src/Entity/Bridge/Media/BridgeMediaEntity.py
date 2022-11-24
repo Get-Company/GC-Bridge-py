@@ -1,16 +1,25 @@
 from main import db
 from datetime import datetime
-#from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
+
+# from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
+# from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
 
 # Media Entity
 
 
-media_product = db.Table("bridge_media_product_entity",
-                         db.Column("media_id", db.Integer, db.ForeignKey("bridge_media_entity.id"),
-                                   primary_key=False),
-                         db.Column("product_id", db.Integer, db.ForeignKey("bridge_product_entity.id"),
-                                   primary_key=False)
-                         )
+media_prod = db.Table("bridge_media_prod_entity",
+                      db.Column("media_id", db.Integer, db.ForeignKey("bridge_media_entity.id"),
+                                primary_key=True),
+                      db.Column("product_id", db.Integer, db.ForeignKey("bridge_product_entity.id"),
+                                primary_key=True)
+                      )
+
+media_cat = db.Table("bridge_media_cat_entity",
+                     db.Column("media_id", db.Integer, db.ForeignKey("bridge_media_entity.id"),
+                               primary_key=True),
+                     db.Column("category_id", db.Integer, db.ForeignKey("bridge_category_entity.id"),
+                               primary_key=True)
+                     )
 
 
 class BridgeMediaEntity(db.Model):
@@ -24,8 +33,15 @@ class BridgeMediaEntity(db.Model):
 
     products = db.relationship(
         "BridgeProductEntity",
-        secondary=media_product,
-        back_populates="medias")
+        secondary=media_prod,
+        back_populates="medias"
+    )
+
+    categories = db.relationship(
+        "BridgeCategoryEntity",
+        secondary=media_cat,
+        back_populates="medias"
+    )
 
     def update_entity(self, entity):
         """
@@ -38,8 +54,3 @@ class BridgeMediaEntity(db.Model):
         self.description = entity.description
 
         return self
-
-    # categories = db.relationship(
-    #     "BridgeCategoryEntity",
-    #     secondary=media_category,
-    #     back_populates="categories"

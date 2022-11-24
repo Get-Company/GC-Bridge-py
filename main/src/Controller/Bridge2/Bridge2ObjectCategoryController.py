@@ -1,6 +1,8 @@
 from main.src.Controller.Bridge2.Bridge2ObjectController import Bridge2ObjectController
 from main.src.Entity.ERP.ERPArtikelKategorieEntity import ERPArtikelKategorieEntity
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
+# Relations
+from main.src.Entity.Bridge.Media.BridgeMediaEntity import BridgeMediaEntity
 
 from datetime import datetime
 
@@ -46,3 +48,37 @@ class Bridge2ObjectCategoryController(Bridge2ObjectController):
             return True
         else:
             return False
+
+    def reset_relations(self, bridge_entity):
+        """
+        Reset all relations and define them new
+        all changes - even deleting a relation - will sync with the db
+        :param: BridgeEntity
+        :return: Updated Bridge Entity
+        """
+        print("Reset relations - Media", bridge_entity)
+        # 3. Media
+        bridge_entity.medias = []
+
+        img = self.erp_entity.get_images()
+
+        if img:
+            # 3.1 Check if media in db - update or insert
+            media_in_db = BridgeMediaEntity().query.filter_by(filename=img["name"]).one_or_none()
+
+            # 3.2 Query Media
+            if media_in_db is None:
+                media_to_insert = BridgeMediaEntity()
+            else:
+                media_to_insert = media_in_db
+
+            media_to_insert.filename = img["name"]
+            media_to_insert.filetype = img["type"]
+            media_to_insert.description = bridge_entity.title
+            media_to_insert.path = 'https://www.classei.de/images/categories/'
+
+            bridge_entity.medias.append(media_to_insert)
+        else:
+            pass
+
+        return bridge_entity

@@ -144,9 +144,6 @@ def write_log(text):
         f.write(timestamp.strftime("%H:%M:%S - ") + text + '\n')
 
 
-
-
-
 def add_url_params(url, params):
     """ Add GET params to provided URL being aware of existing.
 
@@ -204,3 +201,22 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+
+def find_image_filename_in_path(image_link_or_path):
+    img_link = image_link_or_path
+    if img_link:
+        # Cuts the whole path leaves the image. Like "900000.jpg"
+        pattern = "[\w-]+.(jpg|jpeg|png|gif|webp)"
+        m = re.search(pattern, img_link)
+        if m:
+            img = m.group(0)
+            # print('Image Link found: "%s"' % img)
+        else:
+            img = 0
+            # print('Could not find img in Path: "%s"' % img_link)
+    else:
+        img = 0
+        # print("No Image in erp? Nothing found!")
+
+    return img

@@ -9,13 +9,17 @@ class BridgeOrderEntity(db.Model):
     __tablename__ = "bridge_order_entity"
 
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
-    api_id = db.Column(db.String(255), nullable=False)
-    products = db.Column(db.String(255), nullable=False)
-    order_date = db.Column(db.String(255), nullable=False)
+    api_id = db.Column(db.CHAR(36), nullable=False)
+    purchase_date = db.Column(db.DateTime(), nullable=False)
+    state = db.Column(db.String(255), nullable=True)
     description = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime(), nullable=True, default=datetime.now())
+    edited_at = db.Column(db.DateTime(), nullable=False)
+
     """
     Relations
     """
+
     # Relation many - to -one
     customer = db.relationship(
         "BridgeCustomerEntity",
@@ -29,13 +33,8 @@ class BridgeOrderEntity(db.Model):
         """
         self.id = entity.id
         self.api_id = entity.api_id
-        self.products = entity.products
-        self.order_date = entity.order_date
+        self.state = entity.state
         self.description = entity.description
+        self.edited_at = datetime.now()
 
         return self
-
-    # categories = db.relationship(
-    #     "BridgeCategoryEntity",
-    #     secondary=media_category,
-    #     back_populates="categories"

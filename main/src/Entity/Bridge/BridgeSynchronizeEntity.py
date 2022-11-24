@@ -9,10 +9,12 @@ class BridgeSynchronizeEntity(db.Model):
     dataset_product_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
     dataset_address_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
     dataset_tax_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
+    dataset_order_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
     # SW6 Fields
     sw6_category_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
     sw6_product_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
     sw6_address_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
+    sw6_order_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
     # Loop True or false
     loop_continue = db.Column(db.BOOLEAN, nullable=True)
 

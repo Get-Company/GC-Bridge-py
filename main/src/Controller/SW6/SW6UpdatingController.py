@@ -6,6 +6,7 @@ from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import BridgeAdressenE
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
 from datetime import datetime
 
+
 class SW6UpdatingController:
     def sync_changed_to_sw(self):
         syncEntity = BridgeSynchronizeEntity().get_entity_by_id_1()
@@ -15,7 +16,7 @@ class SW6UpdatingController:
         options = [
             ['category', BridgeCategoryEntity, last_category_update],
             ['product', BridgeProductEntity, last_pruduct_update],
-            #['customer', BridgeAdressenEntity, last_customer_update]
+            # ['customer', BridgeAdressenEntity, last_customer_update]
         ]
         for option in options:
             updateController = SW6UpdatingEntity(option[0], option[1], option[2])

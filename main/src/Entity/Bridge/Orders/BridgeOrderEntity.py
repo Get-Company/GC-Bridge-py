@@ -11,7 +11,6 @@ class BridgeOrderEntity(db.Model):
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
     api_id = db.Column(db.CHAR(36), nullable=False)
     purchase_date = db.Column(db.DateTime(), nullable=False)
-    state = db.Column(db.String(255), nullable=True)
     description = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime(), nullable=True, default=datetime.now())
     edited_at = db.Column(db.DateTime(), nullable=False)
@@ -33,7 +32,6 @@ class BridgeOrderEntity(db.Model):
         """
         self.id = entity.id
         self.api_id = entity.api_id
-        self.state = entity.state
         self.description = entity.description
         self.edited_at = datetime.now()
 

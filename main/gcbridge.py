@@ -45,6 +45,8 @@ from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
 # Controller
 from main.src.Controller.Mappei.parser import *
 
+# SW6
+from main.src.Entity.SW6_2.SW6_2ObjectEntity import SW6_2ObjectEntity
 
 """
 ######################
@@ -59,6 +61,7 @@ from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerContactController
     Bridge2ObjectCustomerContactController
 from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerAddressController import \
     Bridge2ObjectCustomerAddressController
+from main.src.Controller.SW6.SW6UpdatingController import SW6UpdatingController
 
 """
 ######################
@@ -89,12 +92,12 @@ migrate = Migrate(app, db)
 ######################
 ERP Connection
 """
-erp_obj = ERPConnectionEntity()
-erp_obj.connect()
+# erp_obj = ERPConnectionEntity()
+# erp_obj.connect()
 
 # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
 # Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()  # OK!
-Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()  # OK!
+# Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()  # OK!
 
 # Funktioniert doch, oder?
 # Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
@@ -102,11 +105,15 @@ Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()  # OK!
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 
 
+orders_api = SW6_2ObjectEntity()
+orders_api.get_orders()
+
+
+
 # Atti Zeugs - geht eigentlich ganz gut! Is ok...
-# SW6UpdatingController().sync_changed_to_sw('category')
+# sw6controller = SW6UpdatingController().sync_changed_to_sw()
 # SW6UpdatingController().sync_changed_to_sw('product')
 
-erp_obj.close()
 """
 ######################
 Threaded 

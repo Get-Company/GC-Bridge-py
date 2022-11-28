@@ -12,6 +12,10 @@ class SW6UpdatingEntity:
         self.__sw6_entity = entity
         self.__last_update = last_update
 
+    def sync_alle_geaenderte_die_mit_erp_ltz_nummer_in_db_gefunden_wurden_oder_auch_nicht_lade_in_sw_hoch(self):
+        None
+
+
     def update_entity(self):
         try:
             columns = self.__sw6_entity.query.where(self.__sw6_entity.erp_ltz_aend > self.__last_update).statement.columns.keys()

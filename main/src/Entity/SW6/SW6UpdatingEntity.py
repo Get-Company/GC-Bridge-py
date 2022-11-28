@@ -14,8 +14,8 @@ class SW6UpdatingEntity:
 
     def update_entity(self):
         try:
-            # columns = self.__sw6_entity.query.where(self.__sw6_entity.erp_ltz_aend > self.__last_update).statement.columns.keys()
-            # print(columns)
+            columns = self.__sw6_entity.query.where(self.__sw6_entity.erp_ltz_aend > self.__last_update).statement.columns.keys()
+            print(columns)
             rows = self.__sw6_entity.query.where(self.__sw6_entity.erp_ltz_aend > self.__last_update)
             for row in rows:
                 payload = PayloadEntity(self.__type).setting_payload(row)
@@ -28,7 +28,7 @@ class SW6UpdatingEntity:
 
     def __insert_to_sw(self, payload: Dict[str, Any]):
         try:
-            # print(f"/{self.__type}")
+            print(f"/{self.__type}")
             self.__sw6_client.request_post(f"/{self.__type}", payload)
         except Exception as e:
             print(e)
@@ -37,7 +37,7 @@ class SW6UpdatingEntity:
     def __update_to_sw(self, payload: Dict[str, Any]):
         try:
             self.__sw6_client.request_patch(f"/{self.__type}/{payload['id']}", payload)
-            #print(payload['name'])
+            print(payload['name'])
         except Exception as e:
             print(e)
             return None

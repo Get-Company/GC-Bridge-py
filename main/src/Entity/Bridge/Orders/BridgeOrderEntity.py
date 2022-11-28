@@ -1,10 +1,17 @@
 from main import db
 from datetime import datetime
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
+from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
+
+# Many-To-Many for Order/Product
+order_product = db.Table('bridge_order_product_entity',
+                         db.Column('order_id', db.Integer, db.ForeignKey('bridge_order_entity.id'),
+                                   primary_key=True),
+                         db.Column('product_id', db.Integer, db.ForeignKey('bridge_product_entity.id'),
+                                   primary_key=True)
+                         )
 
 # Order Entity
-
-
 class BridgeOrderEntity(db.Model):
     __tablename__ = "bridge_order_entity"
 
@@ -18,12 +25,18 @@ class BridgeOrderEntity(db.Model):
     """
     Relations
     """
-
-    # Relation many - to -one
+    # Relation many - to - one
     customer = db.relationship(
         "BridgeCustomerEntity",
         back_populates="orders")
     customer_id = db.Column(db.Integer(), db.ForeignKey('bridge_customer_entity.id'))
+
+    # Order Products Relation many - to - many
+    products = db.relationship(
+        'BridgeProductEntity',
+        secondary=order_product,
+        back_populates='orders',
+        lazy='dynamic')
 
     def update_entity(self, entity):
         """

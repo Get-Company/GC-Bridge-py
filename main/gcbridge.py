@@ -61,14 +61,15 @@ from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerContactController
     Bridge2ObjectCustomerContactController
 from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerAddressController import \
     Bridge2ObjectCustomerAddressController
+# Atti SW6
 from main.src.Controller.SW6.SW6UpdatingController import SW6UpdatingController
+from main.src.Controller.SW6.SW6InitController import SW6InitController
 
 """
 ######################
 Tests
 #######################
 """
-
 """
 ######################
 App Factory
@@ -92,27 +93,27 @@ migrate = Migrate(app, db)
 ######################
 ERP Connection
 """
-# erp_obj = ERPConnectionEntity()
-# erp_obj.connect()
-
+erp_obj = ERPConnectionEntity()
+erp_obj.connect()
+#
 # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
 # Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()  # OK!
 # Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()  # OK!
-
+#
 # Funktioniert doch, oder?
 # Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 
+# api = SW6_2ObjectEntity()
+# api.delete_all_categories()
 
-orders_api = SW6_2ObjectEntity()
-orders_api.get_orders()
-
-
+# orders_api = SW6_2ObjectEntity()
+# orders_api.get_orders()
+SW6UpdatingController().sync_changed_to_sw()
 
 # Atti Zeugs - geht eigentlich ganz gut! Is ok...
-# sw6controller = SW6UpdatingController().sync_changed_to_sw()
-# SW6UpdatingController().sync_changed_to_sw('product')
+# sw6controller = SW6I
 
 """
 ######################

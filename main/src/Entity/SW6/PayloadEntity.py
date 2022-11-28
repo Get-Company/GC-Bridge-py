@@ -46,7 +46,8 @@ class PayloadEntity:
                 "productNumber": db_row.erp_nr,
                 "stock": db_row.stock,
                 "categories": [],
-                "taxId": "30df9b2306d04d709468d2b918c46c97",
+                "salesChannelId": "dcad80e1040047beb831678b3579aaf6",
+                "taxId": "a131a847f20846bc831a780286578e83",
                 "price": [
                     {
                         "currencyId": "b7d2554b0ce847cd82f3ac9bd1c0dfca",

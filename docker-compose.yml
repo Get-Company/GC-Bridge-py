@@ -3,7 +3,7 @@ version: '3.3'
 services:
 
   database:
-    image: mysql:latest # was 8.0.31 when created
+    image: mysql:8.0.31 # was 8.0.31 when created
     restart: always
     environment:
       MYSQL_DATABASE: gc-bridge_db
@@ -16,7 +16,7 @@ services:
       - db-volume:/var/lib/msql
 
   adminer:
-    image: adminer:latest # was 4.8.1 when created
+    image: adminer:4.8.1 # was 4.8.1 when created
     restart: always
     environment:
       ADMINER_DEFAULT_SERVER: database

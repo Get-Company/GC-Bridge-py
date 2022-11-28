@@ -54,7 +54,7 @@ class SW6InitEntity:
     def __update_to_sw(self, payload: Dict[str, Any]):
         try:
             self.__sw6_client.request_patch(f"/{self.__type.split('_')[0]}/{payload['id']}", payload)
-            #print(payload['name'])
+            print(payload['name'])
         except Exception as e:
             print(e)
             return None

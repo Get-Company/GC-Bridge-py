@@ -1,4 +1,3 @@
-from lib_shopware6_api import EqualsFilter
 from typing import Any, Dict
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity

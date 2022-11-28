@@ -12,9 +12,9 @@ app.app_context().push()
 # migrate = Migrate(app, db)
 #
 def main():
-    #SW6InitController().init_all()
-    get_orders_from_sw6 = Bridge2ObjectOrderController().get_orders_product()
-    pprint(get_orders_from_sw6)
+    SW6InitController().init_all()
+    # get_orders_from_sw6 = Bridge2ObjectOrderController().get_orders_product()
+    # pprint(get_orders_from_sw6)
 
 
 

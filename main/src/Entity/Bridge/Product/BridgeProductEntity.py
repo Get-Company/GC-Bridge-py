@@ -9,8 +9,8 @@ from main.src.Entity.Bridge.Media.BridgeMediaEntity import *
 from main.src.Entity.Mappei.MappeiProductEntity import MappeiProductEntity, association_mappei_classei
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
 from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
+from main.src.Entity.Bridge.Orders.BridgeOrderEntity import *
 from main.src.Repository.functions_repository import parse_european_number_to_float
-
 
 # Many-To-Many for Product/Category
 product_category = db.Table('bridge_product_category_entity',
@@ -72,6 +72,13 @@ class BridgeProductEntity(db.Model):
     medias = db.relationship(
         'BridgeMediaEntity',
         secondary=media_prod,
+        back_populates="products"
+    )
+
+    # Order Relation many - to - many
+    orders = db.relationship(
+        'BridgeOrderEntity',
+        secondary=order_product,
         back_populates="products"
     )
 

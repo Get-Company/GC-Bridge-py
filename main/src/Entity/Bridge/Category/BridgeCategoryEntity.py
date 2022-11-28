@@ -61,12 +61,12 @@ class BridgeCategoryEntity(db.Model):
 
     def update_entity(self, entity):
         self.erp_nr = entity.erp_nr
-        if entity.api_id:
-            self.api_id = entity.api_id
+
         try:
             parent = self.query. \
                 filter_by(erp_nr=entity.erp_nr_parent). \
                 first()
+            print(self.title,"has parent:", parent.title)
             if parent:
                 self.erp_nr_parent = parent.erp_nr
                 self.api_idparent = parent.api_id

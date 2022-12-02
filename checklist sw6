@@ -1,0 +1,31 @@
+How to setup sw6 ready for production
+#####################################
+
+1. Set languages
+    http://localhost/admin#/sw/settings/language/index
+    copy the language id to the config.ini
+
+2. Set Customer Group
+    http://localhost/admin#/sw/settings/customer/group/index
+
+3. Set Currence
+    http://localhost/admin#/sw/settings/currency/index
+
+4. Set Payment Methods
+    http://localhost/admin#/sw/settings/payment/index
+
+5. Set Shipping Methods
+    http://localhost/admin#/sw/settings/shipping/index
+
+6. Set Country ID
+    http://localhost/admin#/sw/settings/country/index
+
+Saleschannel Setup
+##################
+1. Standard Category
+    NavigationCategoryID
+
+
+
+
+

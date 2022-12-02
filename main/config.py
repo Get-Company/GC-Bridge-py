@@ -81,3 +81,21 @@ class ConfShopware6ApiBase(object):
     sw-access-key set in Administration/Sales Channels/API
     """
     store_api_sw_access_key: str = ""
+
+
+class ShopwareConfig:
+
+    LANGUAGE_ID_DE_DE = 'eae7aac7c18f401196face426727954c'
+    LANGUAGE_ID_EN_GB = '2fbb5fe2e29a4d70aa5854ce7ce3e20b'
+    CUSTOMER_GROUP_DE_B2B = 'cfbd5018d38d41d8adca10d94fc8bdd6'
+    CURRENCY_EU = 'b7d2554b0ce847cd82f3ac9bd1c0dfca'
+    PAYMENT_INVOICE_DE = 'cbe26c52514543be850dd524ec715aab'
+    SHIPPING_STANDARD = '3644c4baea6b48a19a9da54af8d07083'
+    COUNTRY_DE = '491b3f1900864d599de28fd5f9283609'
+    NAVIGATION_CATEGORY_ID = 'e1a622b6bf3f41828e89f28e9bbce42e'
+    NAVIGATION_CATEGORY_DEPTH = 2
+    NAME = 'Germany - Deutsch'
+    ACCESS_KEY = 'SWSCN05KUDJUBLRAA0E1QWHPTA'
+    HOME_ENABLED = True
+    ACTIVE = True
+    APIALIAS = 'sales_channel'

@@ -67,6 +67,15 @@ def parse_a_date(date_string="01.01.90", input_format="%d.%m.%y"):
     return datetime_obj
 
 
+def get_current_datetime_and_convert_to_sw6_format():
+    """
+    Takes the current time and formats it to sw6
+    :return: datetime obj
+    """
+    now = datetime.datetime.now()
+    return now.strftime('%d.%m.%yT%H:%I:%S')
+
+
 def parse_a_date_time(date_string="01.01.90T12:30:00", input_format="%d.%m.%yT%H:%I:%S"):
     """
     Input any string and match the input_format to the string. Now set the output Format as you wish

@@ -11,6 +11,7 @@ from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntit
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
 
+
 # Is DataSet Adressen in ERP
 class BridgeCustomerEntity(db.Model):
     __tablename__ = 'bridge_customer_entity'
@@ -34,7 +35,6 @@ class BridgeCustomerEntity(db.Model):
         'BridgeOrderEntity',
         back_populates="customer")
 
-
     def get_entity_id_field(self):
         """
         This is needed in the controller. The controller self.upsert/self.is_in_db looks for the field in the db
@@ -53,8 +53,6 @@ class BridgeCustomerEntity(db.Model):
         self.erp_ltz_aend = erp_entity.get_('LtzAend')
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
-
-        return self
 
     def __repr__(self):
         text = f"BridgeCustomerEntity: {self.id} - {self.erp_nr}"

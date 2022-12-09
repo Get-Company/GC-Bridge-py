@@ -1,0 +1,20 @@
+{
+"active": True,
+"createdAt": "2022-12-08T11:34:57.261+00:00",
+"customerNumber": "10000",
+"defaultBillingAddressId": "7b38b5a5f98543a9bc1820012275873d",
+"defaultPaymentMethodId": "cbe26c52514543be850dd524ec715aab",
+"defaultShippingAddressId": "7b38b5a5f98543a9bc1820012275873d",
+"email": "contact@get-company.com",
+"firstName": "Florian",
+"groupId": "9263c45bfe2e46a0b48c05e14139d4ad",
+"guest": False,
+"id": "fc98adbcab884f1bbd9100fbf2e8c774",
+"languageId": "2fbb5fe2e29a4d70aa5854ce7ce3e20b",
+"lastName": "Buchner",
+"salesChannelId": "cd9a27ea46e840acbf0454e61737cdc4",
+"salutationId": "1676fe16d2a9433c8239c33f671bba33",
+"title": '',
+"updatedAt": "2022-12-08T11:35:47.608+00:00",
+"vatIds": []
+}

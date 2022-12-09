@@ -1,11 +1,16 @@
+from pprint import pprint
+
 import sqlalchemy
 
 from main import create_app
-from flask import render_template, redirect
+from flask import render_template, redirect, request
 from flask_migrate import Migrate
 import sys
 from sqlalchemy import and_
 from loguru import logger
+
+from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import BridgeAdressenEntity
+
 """
 ######################
 Entities
@@ -86,9 +91,6 @@ Migration
 """
 migrate = Migrate(app, db)
 
-
-# Hallo Atti
-
 """
 ######################
 ERP Connection
@@ -106,16 +108,38 @@ ERP Connection
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
 
 api = SW6_2ObjectEntity()
-api.get_saleschannel()
-# api.delete_all_categories()
+# cat_deutsch = BridgeCategoryEntity().query.filter_by(erp_nr=11).one_or_none()
+# api.upsert_category(category=cat_deutsch)
+# katalog1 = api.read_categories(id='c9c5084cd0ed4e2da4a5db50234805f9')
+# pprint(katalog1)
+# lebensmittel = api.read_categories(id='77b959cf66de4c1590c7f9b7da3982f3')
+# pprint(lebensmittel)
 
-# orders_api = SW6_2ObjectEntity()
-# orders_api.get_orders()
-# SW6ProductUpdatingController().sync_changed_to_sw()
+cats = db.session.query(BridgeCategoryEntity).order_by(BridgeCategoryEntity.erp_nr_parent.asc())
+# for cat in cats:
+#     api.delete_category(category=cat)
+#     api.upsert_category(category=cat)
+
+# for cat in cats:
+#     api.upsert_category(category=cat)
+
+for cat in cats:
+    api.upsert_category(category=cat, with_parent=True)
+
+# upsert = api.upsert_category(category=cat_deutsch)
+# pprint(upsert)
+# product = api.get_product('f03694c75251465cae63c0791872a3a4')
+# pprint(product)
+# customer_in_sw6 = api.get_customer(id='fc98adbcab884f1bbd9100fbf2e8c774')
+# pprint(customer_in_sw6)
+# customer = BridgeCustomerEntity().query.filter_by(erp_nr='10028').first()
+# api.upsert_customer(customer=customer)
+
 
 # Atti Zeugs - geht eigentlich ganz gut! Is ok...
 # sw6controller = SW6I
 
+# erp_obj.close()
 """
 ######################
 Threaded 
@@ -238,7 +262,8 @@ def main():
 
         return render_template('/classei/price_raise.html', classei_products=classei_products)
 
-    # EOF main
+
+# EOF main
 
 
 """ 

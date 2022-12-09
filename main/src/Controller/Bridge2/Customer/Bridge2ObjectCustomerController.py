@@ -19,6 +19,7 @@ from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerAddressController
     Bridge2ObjectCustomerAddressController
 from datetime import datetime
 
+import pprint
 
 class Bridge2ObjectCustomerController(Bridge2ObjectController):
     def __init__(self, erp_obj):
@@ -64,7 +65,8 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
 
     def reset_relations(self, bridge_entity: BridgeCustomerEntity):
         # 1. Addresses
-        bridge_entity.addresses = []
+        # print(bridge_entity.addresses)
+        # bridge_entity.addresses = []
         addresses_erp = self.erp_entity.get_anschriften()
         while not addresses_erp.range_eof():
             adr_nr = addresses_erp.get_("AdrNr")

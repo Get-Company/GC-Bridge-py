@@ -54,7 +54,8 @@ class ERPDatasetObjectEntity(object):
             'Integer': 'AsInteger',
             'Boolean': 'AsInteger',  # AsBoolean: True/False | AsInteger: 1/0
             'Byte': 'AsInteger',
-            'Info': 'Text'
+            'Info': 'Text',
+            'String': 'AsString'
 
         }
         """ The fields of the dataset and their values """
@@ -386,6 +387,9 @@ class ERPDatasetObjectEntity(object):
                 str(start.strftime("%d.%m.%Y %H:%M:%S")),
                 str(end.strftime("%d.%m.%Y %H:%M:%S"))
             )
+            print(field,
+                  str(start.strftime("%d.%m.%Y %H:%M:%S")),
+                  str(end.strftime("%d.%m.%Y %H:%M:%S")))
         else:
             if not isinstance(start, list):
                 start = [start]

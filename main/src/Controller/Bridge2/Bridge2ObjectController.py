@@ -113,14 +113,17 @@ class Bridge2ObjectController(ControllerObject):
         return True
 
     def upsert(self):
+
         """
         Checks if the erp_entity is already in the db -> Update or not -> Insert
         :return:
         """
         self.erp_entity.range_first()
-        print(self.erp_entity.is_ranged(), self.erp_entity.range_eof())
+        # print(self.erp_entity.is_ranged(), self.erp_entity.range_eof())
         i = 0
         while not self.erp_entity.range_eof():
+
+            self.before_upsert(current_erp_entity=self.erp_entity)
 
             # Always get a new instance of Bridge_Entity
             self.set_bridge_entity()
@@ -138,7 +141,7 @@ class Bridge2ObjectController(ControllerObject):
             # Is not in DB - Insert
             elif entity_in_db is None:
                 print("Insert", entity_mapped_to_db)
-                entity_to_insert = self.reset_relations(entity_mapped_to_db)
+                entity_to_insert = entity_mapped_to_db
 
             else:
                 return False
@@ -197,7 +200,7 @@ class Bridge2ObjectController(ControllerObject):
 
     def upsert_relations(self, entity):
         """
-        Until now, this is only needed for the customer, addresses and contacts.
+        Until now, this is only needed for the customer_address, addresses and contacts.
         The .upsert function does a while loop. All relations should be upserted before .upsert.
         :return:
         """
@@ -209,4 +212,6 @@ class Bridge2ObjectController(ControllerObject):
         except:
             print("Error Commit Session")
 
+    def before_upsert(self, current_erp_entity):
+        pass
 

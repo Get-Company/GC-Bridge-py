@@ -17,10 +17,15 @@ class BridgeCustomerEntity(db.Model):
     __tablename__ = 'bridge_customer_entity'
 
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
-    api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex, )
-    erp_nr = db.Column(db.Integer(), nullable=False)
-    erp_ltz_aend = db.Column(db.DateTime(), nullable=True)
+    api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
+    erp_nr = db.Column(db.CHAR(10), nullable=True)
+    email = db.Column(db.String(255), nullable=True)
+    ustid = db.Column(db.String(255), nullable=True)
+    erp_reansnr = db.Column(db.Integer(), nullable=True)
+    erp_liansnr = db.Column(db.Integer(), nullable=True)
+    erp_ltz_aend = db.Column(db.DateTime(), nullable=True)  # Delete this and refactor
     created_at = db.Column(db.DateTime(), default=datetime.now())
+    updated_at = db.Column(db.DateTime(), default=datetime.now())
 
     """
     Relations
@@ -42,18 +47,53 @@ class BridgeCustomerEntity(db.Model):
         """
         return self.erp_nr
 
+    def get_default_shipping_address(self):
+        try:
+            shipping_address = self.addresses[self.erp_liansnr]
+            return shipping_address
+
+        except "NoneType":
+            print("Standard Shipping Address not found")
+
+    def get_default_billing_address(self):
+        try:
+            billing_address = self.addresses[self.erp_reansnr]
+            return billing_address
+
+        except AttributeError:
+            print("Standard Billing Address not found")
+
     def update_entity(self, entity):
         self.erp_nr = entity.erp_nr
+        self.ustid = entity.ustid
+        self.erp_reansnr = entity.erp_reansnr
+        self.erp_liansnr = entity.erp_liansnr
         self.erp_ltz_aend = entity.erp_ltz_aend
+        self.updated_at = datetime.now()
 
         return self
 
     def map_erp_to_db(self, erp_entity: ERPAdressenEntity):
         self.erp_nr = erp_entity.get_('AdrNr')
+        self.ustid = erp_entity.get_("UStId")
+        self.erp_reansnr = erp_entity.get_("ReAnsNr")
+        self.erp_liansnr = erp_entity.get_("LiAnsNr")
         self.erp_ltz_aend = erp_entity.get_('LtzAend')
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
 
+        return self
+
+    def map_sw6_to_db(self, customer: dict):
+        self.erp_nr = customer['customerNumber']
+        self.api_id = customer['id']
+        self.ustid = customer['vatIds'][0]
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+
+        return self
+
     def __repr__(self):
-        text = f"BridgeCustomerEntity: {self.id} - {self.erp_nr}"
-        return text
+        # text = f"BridgeCustomerEntity: {self.id} - {self.erp_nr}"
+        # return text
+        return str(vars(self))

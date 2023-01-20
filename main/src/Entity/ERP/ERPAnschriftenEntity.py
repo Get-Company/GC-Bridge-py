@@ -19,7 +19,7 @@ class ERPAnschriftenEntity(ERPDatasetObjectEntity):
         self.dataset_id_value = id_value
         self.dataset_range = dataset_range
 
-        self.prefill_json_directory = "main/src/json/customer/"
+        self.prefill_json_directory = "main/src/json/customer_address/"
 
         # Need to call the __init_of the super class
         super().__init__(
@@ -45,4 +45,8 @@ class ERPAnschriftenEntity(ERPDatasetObjectEntity):
             'Na3': self.get_('Na3')
         }
         return anschrift
+
+    def get_country_name(self):
+        country_name = self.get_("LandBez")
+        return country_name
 

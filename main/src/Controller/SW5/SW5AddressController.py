@@ -11,7 +11,7 @@ from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import *
 def sw5_delete_customer(adrnr):
     customer = SW5CustomerEntity(adrnr=adrnr, sw5_api=client_from_env(), mandant='58')
     customer.delete_erp_dataset_webshopid()
-    # customer.delete_sw5_customer()
+    # customer_address.delete_sw5_customer()
 
 
 
@@ -53,13 +53,13 @@ def sw5_sync_duplicates_v2(false_adrnr, right_adrnr):
     ###
 
     ###
-    # 1 ERP Delete false customer
+    # 1 ERP Delete false customer_address
     false_customer.delete_erp_dataset_adresse()
-    # 2 Update right customer
+    # 2 Update right customer_address
     right_customer.set_erp_email()
     right_customer.set_erp_ids()
 
-    # 3 SW5 Delete false customer
+    # 3 SW5 Delete false customer_address
     # Delete false Customer from API
     # If we take the webshopid from false. Do not delete!
     if false_customer.get_webshopid() is not right_customer.get_webshopid():
@@ -73,7 +73,7 @@ def sw5_sync_duplicates_v2(false_adrnr, right_adrnr):
 
 def sync_webshop_id(right_customer: SW5CustomerEntity, false_customer: SW5CustomerEntity):
     """
-    If right_customer has a webshop ID, keep it. If the right customer has none but false_customer has one. take it.
+    If right_customer has a webshop ID, keep it. If the right customer_address has none but false_customer has one. take it.
     If both have no webshop ID set it to False.
     :param right_customer: SW5CustomerEntity
     :param false_customer: SW5CustomerEntity
@@ -81,7 +81,7 @@ def sync_webshop_id(right_customer: SW5CustomerEntity, false_customer: SW5Custom
     """
     # Case 1: right_customer has Webshop ID:
     if right_customer.get_webshopid():
-        print("%s - Right customer has a Webshop ID. We keep it: %s \n" % (
+        print("%s - Right customer_address has a Webshop ID. We keep it: %s \n" % (
             right_customer.get_adrnr(),
             right_customer.get_webshopid())
               )
@@ -89,7 +89,7 @@ def sync_webshop_id(right_customer: SW5CustomerEntity, false_customer: SW5Custom
 
     # Case 2 : right_customer has no Webshop ID. Has false_customer one?
     elif false_customer.get_webshopid():
-        print("%s - False customer has a Webshop ID. We take it from there: %s\n" % (
+        print("%s - False customer_address has a Webshop ID. We take it from there: %s\n" % (
             false_customer.get_adrnr(),
             false_customer.get_webshopid())
               )
@@ -104,7 +104,7 @@ def sync_webshop_id(right_customer: SW5CustomerEntity, false_customer: SW5Custom
 
 def sync_amazon_id(right_customer: SW5CustomerEntity, false_customer: SW5CustomerEntity):
     """
-        If right customer has an amazon ID, keep it. If the right customer has none but false customer has one. Take it.
+        If right customer_address has an amazon ID, keep it. If the right customer_address has none but false customer_address has one. Take it.
         If both have no amazon ID set it to False.
         :param right_customer: SW5CustomerEntity
         :param false_customer: SW5CustomerEntity
@@ -112,7 +112,7 @@ def sync_amazon_id(right_customer: SW5CustomerEntity, false_customer: SW5Custome
         """
     # Case 1: right_customer has Amazon ID:
     if right_customer.get_amazonid():
-        print("%s - Right customer has a Amazon ID. We keep it: %s\n" % (
+        print("%s - Right customer_address has a Amazon ID. We keep it: %s\n" % (
             right_customer.get_adrnr(),
             right_customer.get_amazonid())
               )
@@ -120,7 +120,7 @@ def sync_amazon_id(right_customer: SW5CustomerEntity, false_customer: SW5Custome
 
     # Case 2 : right_customer has no Amazon ID. Has false_customer one?
     elif false_customer.get_amazonid():
-        print("%s - False customer has a Amazonp ID. We take it from there: %s\n" % (
+        print("%s - False customer_address has a Amazonp ID. We take it from there: %s\n" % (
             false_customer.get_adrnr(),
             false_customer.get_amazonid())
               )
@@ -135,7 +135,7 @@ def sync_amazon_id(right_customer: SW5CustomerEntity, false_customer: SW5Custome
 
 def sync_last_login_fields_sw5(right_customer: SW5CustomerEntity, false_customer: SW5CustomerEntity, api: APIClient):
     """
-    Get the most recent login date and set the password and password encoder to the right customer
+    Get the most recent login date and set the password and password encoder to the right customer_address
     :param right_customer: object SW5CustomerEntity
     :param false_customer:  object SW5CustomerEntity
     :param api: object APIClient
@@ -160,7 +160,7 @@ def sync_last_login_fields_sw5(right_customer: SW5CustomerEntity, false_customer
         return True
     else:
         print(
-            "False was most recently logged in: %s < %s. We need to take the password and the encoder from false customer" % (
+            "False was most recently logged in: %s < %s. We need to take the password and the encoder from false customer_address" % (
                 right_customer.get_last_login(), false_customer.get_last_login()))
         # Set Customer fields in the SW5CustomerEntity
         right_customer.set_last_login(false_customer.get_last_login())
@@ -172,7 +172,7 @@ def sync_last_login_fields_sw5(right_customer: SW5CustomerEntity, false_customer
 
 def sync_orders_sw5(right_customer: SW5CustomerEntity, false_customer: SW5CustomerEntity, api: APIClient):
     """
-    Get the orders for each customer and assign all the false customer orders to the right customer
+    Get the orders for each customer_address and assign all the false customer_address orders to the right customer_address
     :param right_customer: object SW5CustomerEntity
     :param false_customer: object SW5CustomerEntity
     :param api: object APIClient
@@ -182,13 +182,13 @@ def sync_orders_sw5(right_customer: SW5CustomerEntity, false_customer: SW5Custom
     right_customer.set_orders(api.get_order_by_customerId(right_customer.get_webshopid()))
     false_customer.set_orders(api.get_order_by_customerId(false_customer.get_webshopid()))
 
-    # Now set every order of false customer to right customer
+    # Now set every order of false customer_address to right customer_address
     for order in false_customer.get_orders():
         # print("Order Id: %s - CustomerId: %s -> CustomerId: %s" % (
         #     order['id'], order['customerId'], right_customer.get_webshopid()))
         api.set_order_customerId_by_orderId(right_customer.get_webshopid(), order['id'])
 
-    # After setting all the orders in SW5, get them from the api and set them to the customer object
+    # After setting all the orders in SW5, get them from the api and set them to the customer_address object
     # But first empty(clear) all orders, to avoid duplicates
     right_customer.unset_orders()
     right_customer.set_orders(api.get_order_by_customerId(right_customer.get_webshopid()))

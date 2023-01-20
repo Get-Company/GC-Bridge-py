@@ -1,6 +1,12 @@
 How to setup sw6 ready for production
 #####################################
 
+# Create credentials for API
+Edit admin user and add credentials for API. Change language to german
+
+# Create Customer Groups
+SW6_2ControllerObject.create_customer_groups()
+
 1. Set languages
     http://localhost/admin#/sw/settings/language/index
     copy the language id to the config.ini
@@ -20,10 +26,25 @@ How to setup sw6 ready for production
 6. Set Country ID
     http://localhost/admin#/sw/settings/country/index
 
+7. Set the Sales Channel Type
+    Check DB for sales_channel_type
+    SELECT *, HEX(`id`) AS `id`
+    FROM `sales_channel_type`
+    Make the letters small
+
+8. Set Customer Number Prefix
+    http://localhost/admin#/sw/settings/number/range
+    Set Prefix to SW6_
+
 Saleschannel Setup
 ##################
 1. Standard Category
     NavigationCategoryID
+
+Sync
+##############
+ERP->DB
+
 
 
 

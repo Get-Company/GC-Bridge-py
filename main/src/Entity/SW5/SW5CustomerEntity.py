@@ -44,7 +44,7 @@ class SW5CustomerEntity:
         # Get ERP Infos
         self.set_erp_customer_infos()
 
-        # Get webshop customer infos
+        # Get webshop customer_address infos
         if self.get_webshopid():
             # lastlogin, password, encoder
             self.set_sw5_customer_infos()
@@ -57,7 +57,7 @@ class SW5CustomerEntity:
         self.set_dataset_anschrift()
 
     def __repr__(self):
-        return ("This is customer "
+        return ("This is customer_address "
                 "AdrNr: %s, \n"
                 "WebshopId: %s, \n"
                 "AmazonId: %s, \n"
@@ -153,7 +153,7 @@ class SW5CustomerEntity:
 
     def sync_webshop_id(self, false_customer):
         """
-        If rself has a webshop ID, keep it. If the right customer has none but false_customer has one. take it.
+        If rself has a webshop ID, keep it. If the right customer_address has none but false_customer has one. take it.
         If both have no webshop ID set it to False.
         :param right_customer: SW5CustomerEntity
         :param false_customer: SW5CustomerEntity
@@ -161,7 +161,7 @@ class SW5CustomerEntity:
         """
         # Case 1: right_customer has Webshop ID:
         if self.get_webshopid():
-            print("%s - Right customer has a Webshop ID. We keep it: %s \n" % (
+            print("%s - Right customer_address has a Webshop ID. We keep it: %s \n" % (
                 self.get_adrnr(),
                 self.get_webshopid())
                   )
@@ -170,7 +170,7 @@ class SW5CustomerEntity:
         # Case 2 : right_customer has no Webshop ID. Has false_customer one?
         # Take the creden tials
         elif false_customer.get_webshopid():
-            print("%s - False customer has a Webshop ID. We take it from there: %s\n" % (
+            print("%s - False customer_address has a Webshop ID. We take it from there: %s\n" % (
                 false_customer.get_adrnr(),
                 false_customer.get_webshopid())
                   )
@@ -185,7 +185,7 @@ class SW5CustomerEntity:
 
     def sync_amazon_id(self, false_customer):
         """
-            If right customer has an amazon ID, keep it. If the right customer has none but false customer has one. Take it.
+            If right customer_address has an amazon ID, keep it. If the right customer_address has none but false customer_address has one. Take it.
             If both have no amazon ID set it to False.
             :param right_customer: SW5CustomerEntity
             :param false_customer: SW5CustomerEntity
@@ -193,7 +193,7 @@ class SW5CustomerEntity:
             """
         # Case 1: right_customer has Amazon ID:
         if self.get_amazonid():
-            print("%s - Right customer has a Amazon ID. We keep it: %s\n" % (
+            print("%s - Right customer_address has a Amazon ID. We keep it: %s\n" % (
                 self.get_adrnr(),
                 self.get_amazonid())
                   )
@@ -201,7 +201,7 @@ class SW5CustomerEntity:
 
         # Case 2 : right_customer has no Amazon ID. Has false_customer one?
         elif false_customer.get_amazonid():
-            print("%s - False customer has a Amazonp ID. We take it from there: %s\n" % (
+            print("%s - False customer_address has a Amazonp ID. We take it from there: %s\n" % (
                 false_customer.get_adrnr(),
                 false_customer.get_amazonid())
                   )
@@ -215,7 +215,7 @@ class SW5CustomerEntity:
 
     def sync_last_login_fields_sw5(self, false_customer):
         """
-        Get the most recent login date and set the password and password encoder to the right customer
+        Get the most recent login date and set the password and password encoder to the right customer_address
         :param right_customer: object SW5CustomerEntity
         :param false_customer:  object SW5CustomerEntity
         :param api: object APIClient
@@ -240,7 +240,7 @@ class SW5CustomerEntity:
             return True
         else:
             print(
-                "False was most recently logged in: %s < %s. We need to take the password and the encoder from false customer" % (
+                "False was most recently logged in: %s < %s. We need to take the password and the encoder from false customer_address" % (
                     self.get_last_login(), false_customer.get_last_login()))
             # Set Customer fields in the SW5CustomerEntity
             self.set_last_login(false_customer.get_last_login())

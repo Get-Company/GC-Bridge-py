@@ -17,7 +17,7 @@ class SW6InitEntity:
         elif entity_type == "category_with_parent": self._sw6_entity = BridgeCategoryEntity
         elif entity_type == "tax": self._sw6_entity = BridgeTaxEntity
         elif entity_type == "product": self._sw6_entity = BridgeProductEntity
-        elif entity_type == "customer": self._sw6_entity = BridgeAdressenEntity
+        elif entity_type == "customer_address": self._sw6_entity = BridgeAdressenEntity
         else: print(f"Wrong type has been given: {entity_type}")
 
     def init_entity(self):

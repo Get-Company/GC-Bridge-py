@@ -88,7 +88,7 @@ class APIClient:
     # Address
     def get_addresses_by_id(self, id):
         """
-        Function to get customer addresses by Address ID
+        Function to get customer_address addresses by Address ID
         :param id:
         :return:
         """
@@ -99,7 +99,7 @@ class APIClient:
 
     def get_address_by_userId(self, userId):
         """
-        Function to get a customer addresses by WebshopId
+        Function to get a customer_address addresses by WebshopId
         :param userId:
         :return:
         """
@@ -111,7 +111,7 @@ class APIClient:
     def set_address_by_id(self, address_id, user_id):
         print('Update Address: %s to Customer: %s' % (address_id, user_id))
         data = {
-            'customer': int(user_id)
+            'customer_address': int(user_id)
         }
 
         return self.put('/addresses/%s' % address_id, data)['data']
@@ -130,7 +130,7 @@ class APIClient:
                                                last_login,
                                                email: str):
         """
-        Set all fields necessary for the customer. If the password changes there is a chance that the email is also
+        Set all fields necessary for the customer_address. If the password changes there is a chance that the email is also
         wrong - so lets set it. The last_login is a date object, which needs to be converted into a string:
         2022-05-05T16:36:46+0200 -> "%Y-%m-%dT%H:%M:%S+%f"
         (https://www.programiz.com/python-programming/datetime/strptime)
@@ -201,7 +201,7 @@ class APIClient:
 
     def get_customer_filter_by_email_and_not_like_id(self, id, email):
         """
-        Get all customer by email but not with the id
+        Get all customer_address by email but not with the id
         :return:
         """
         url = '/customers?'

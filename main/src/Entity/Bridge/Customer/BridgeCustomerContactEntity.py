@@ -12,15 +12,16 @@ class BridgeCustomerContactEntity(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
     api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
-    erp_nr = db.Column(db.Integer(), nullable=False)
+    erp_nr = db.Column(db.CHAR(10), nullable=True)
     first_name = db.Column(db.String(255), nullable=True)
     last_name = db.Column(db.String(255), nullable=True)
     title = db.Column(db.String(255), nullable=True)
     email = db.Column(db.String(255), nullable=True)
-    erp_ansnr = db.Column(db.Integer(), nullable=False)
-    erp_aspnr = db.Column(db.Integer(), nullable=False)
+    erp_ansnr = db.Column(db.Integer(), nullable=True)
+    erp_aspnr = db.Column(db.Integer(), nullable=True)
     erp_ltz_aend = db.Column(db.DateTime(), nullable=True)
     created_at = db.Column(db.DateTime(), default=datetime.now())
+    updated_at = db.Column(db.DateTime(), default=datetime.now())
 
     """
     Relations
@@ -45,6 +46,7 @@ class BridgeCustomerContactEntity(db.Model):
         self.email = entity.email
         self.erp_ansnr = entity.erp_ansnr
         self.erp_aspnr = entity.erp_aspnr
+        self.updated_at = datetime.now()
 
         return self
 
@@ -62,6 +64,16 @@ class BridgeCustomerContactEntity(db.Model):
 
         return self
 
+    def map_sw6_to_db(self, customer: dict, address: dict=None):
+        self.api_id = address["id"]
+        self.first_name = address["firstName"]
+        self.last_name = address["lastName"]
+        self.title = address["title"]
+        self.email = customer["email"]
+
+        return self
+
     def __repr__(self):
-        text = f"BridgeCustomerContactEntity ID {self.id}: - {self.first_name} {self.last_name} - {self.erp_nr}.{self.erp_ansnr}.{self.erp_aspnr}"
-        return text
+        # text = f"BridgeCustomerContactEntity ID {self.id}: - {self.first_name} {self.last_name} - {self.erp_nr}.{self.erp_ansnr}.{self.erp_aspnr}"
+        # return text
+        return str(vars(self))

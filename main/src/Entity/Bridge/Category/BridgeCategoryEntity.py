@@ -3,9 +3,9 @@ import uuid
 from main import db
 from datetime import datetime
 # Categories Products Relation many - to - many
-from main.src.Entity.Bridge.Product.BridgeProductEntity import *
+from main.src.Entity.Bridge.Product.BridgeProductEntity import product_category
 from main.src.Entity.ERP.ERPArtikelKategorieEntity import *
-# from main.src.Entity.Bridge.Media.BridgeMediaEntity import *
+from main.src.Entity.Bridge.Media.BridgeMediaEntity import media_cat
 
 
 # Make the category class

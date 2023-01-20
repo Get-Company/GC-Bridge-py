@@ -21,7 +21,7 @@ class SW6CustomerController:
                  '7a771bf222394a7fa9b9ad3d08b38d6c']
 
         """
-        result_dict_order = self.__sw6_client.request_get("/customer")
+        result_dict_order = self.__sw6_client.request_get("/customer_address")
         customers = []
         for element in result_dict_order["data"]:
             customers.append(element)

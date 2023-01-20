@@ -26,7 +26,7 @@ Examples:
     Anschriften:
     Index: AdrNrAnsNr - Adressnummer
         IndexField:AdrNr - Adressnummer
-        IndexField:AnsNr - Anschriftennummer
+        IndexField:AnsNr - Anschriftennummer1
     Index: 'AdrNrAnsNr', [Indexfield1: AdrNr, Indexfield2: AnsNr]
     Beispiel:
     anschriften_ntt.find_('AdrNrAnsNr', [self.get_('AdrNr'), self.get_('LiAnsNr')])
@@ -52,7 +52,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         self.dataset_id_value = str(id_value)  # Needs to be a string
         self.dataset_range = dataset_range
 
-        self.prefill_json_directory = "main/src/json/customer/"
+        self.prefill_json_directory = "main/src/json/customer_address/"
 
         # Need to call the __init_of the super class
         super().__init__(
@@ -72,12 +72,14 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         print("In Child! EX called")
         self.created_dataset = self.get_dataset_infos().CreateDataSetEx()
 
+    """ Special Queries """
     def get_next_free_adrnr(self):
+        self.edit_()
         return self.created_dataset.SetupNr("")
 
     def create_new_customer(self, file="webshop.yaml", fields=None):
         """
-        Complete function for creating a new customer . Just add a dict of fields, and give the
+        Complete function for creating a new customer_address . Just add a dict of fields, and give the
         path to the prefill file.
         """
         # Create the new dataset
@@ -117,7 +119,6 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
         self.post_()
 
-    """ Special Queries """
     def get_special_orgaplan_without_turnover(self):
         """ We want all customers from Orgaplan without a turnover"""
         # We are searching for SuchBegriff ORGCL
@@ -127,8 +128,6 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         # Set the filter and set to first query of range
         self.filter_set()
         self.range_first()
-
-    """ Special Queries """
 
     def get_special_orgaplan_with_turnover(self):
         """ We want all customers from Orgaplan without a turnover"""

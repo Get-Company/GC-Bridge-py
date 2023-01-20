@@ -63,10 +63,10 @@ class ConfShopware6ApiBase(object):
     or directly via URL : https://<fqdn>/admin#/sw/integration/index
     were <fqdn> is the fully qualified domain name, like https://myshop.mydomain.com/admin#/sw/integration/index
     """
-    # the client ID, setup at Web Administration Interface > settings > system > integration > access_id
-    client_id: str = "SWIAULNLAXJXSVRMVEZYCW91WG"
+    # the client key ID, setup at Web Administration Interface > settings > system > integration > access_id
+    client_id: str = "SWIAZMPJQW1JWGLYSMJTWXLWTA"
     # the client secret, setup at Web Administration Interface > settings > system > integration > access_secret
-    client_secret: str = "d0tXeDJCY3lJYnVHQjd0SEV5NlRUSW1Hckp6Y3BRck1qZ2pIRUU"
+    client_secret: str = "dFNOT3F5dFRremhETFc3TWdrN00zZVBtdFBQQVZYTmFhWGxKYzA"
 
     """
     Admin API:
@@ -85,17 +85,19 @@ class ConfShopware6ApiBase(object):
 
 class ShopwareConfig:
 
+    SCName = 'Kunden DE B2B'
     LANGUAGE_ID_DE_DE = 'eae7aac7c18f401196face426727954c'
     LANGUAGE_ID_EN_GB = '2fbb5fe2e29a4d70aa5854ce7ce3e20b'
-    CUSTOMER_GROUP_DE_B2B = 'cfbd5018d38d41d8adca10d94fc8bdd6'
+    CUSTOMER_GROUP_DE_B2B = '4e2ea6b1c8cf474cb05bebf4c6a7da26'
     CURRENCY_EU = 'b7d2554b0ce847cd82f3ac9bd1c0dfca'
     PAYMENT_INVOICE_DE = 'cbe26c52514543be850dd524ec715aab'
     SHIPPING_STANDARD = '3644c4baea6b48a19a9da54af8d07083'
     COUNTRY_DE = '491b3f1900864d599de28fd5f9283609'
-    NAVIGATION_CATEGORY_ID = 'e1a622b6bf3f41828e89f28e9bbce42e'
-    NAVIGATION_CATEGORY_DEPTH = 2
+    NAVIGATION_CATEGORY_ID = 'eb53e2dac7e843dc91a2766e22a6a49f'
+    NAVIGATION_CATEGORY_DEPTH = 3
     NAME = 'Germany - Deutsch'
-    ACCESS_KEY = 'SWSCN05KUDJUBLRAA0E1QWHPTA'
+    ACCESS_KEY = 'SWIAZMPJQW1JWGLYSMJTWXLWTA'
     HOME_ENABLED = True
     ACTIVE = True
     APIALIAS = 'sales_channel'
+    TYPE_ID = '8a243080f92e4c719546314b577cf82b'

@@ -1,3 +1,4 @@
+import time
 from pprint import pprint
 
 import sqlalchemy
@@ -22,6 +23,7 @@ from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEnti
 
 # Tax
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
+from main.src.Entity.ERP.NestedDataSets.ERPNestedDatasetObjectEntity import ERPNestedDatasetObjectEntity
 
 # Category
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
@@ -42,6 +44,9 @@ from main.src.Entity.Bridge.Media.BridgeMediaEntity import BridgeMediaEntity
 
 # Order
 from main.src.Entity.Bridge.Orders.BridgeOrderEntity import BridgeOrderEntity
+
+# History
+from main.src.Entity.ERP.ERPHistoryEntity import ERPHistoryEntity
 
 # Connection
 from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
@@ -70,6 +75,13 @@ from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerAddressController
 from main.src.Controller.SW6.SW6UpdatingController import SW6UpdatingController
 from main.src.Controller.SW6.SW6InitController import SW6InitController
 
+# Amazon
+from main.src.Controller.Amazon.AmazonController import AmazonController
+
+# SW6_2
+from main.src.Controller.SW6_2.SW6_2ControllerObject import SW6_2ControllerObject
+
+
 """
 ######################
 Tests
@@ -97,49 +109,46 @@ ERP Connection
 """
 # erp_obj = ERPConnectionEntity()
 # erp_obj.connect()
+
+# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10026)
+# Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10026)
+# Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
+# Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_changed()
+
+# SW6 Flo
+# SW6_2ControllerObject().create_saleschannels()
+# SW6_2ControllerObject().insert_init()
+# SW6_2ControllerObject().upsert_taxes()
+# SW6_2ControllerObject().upsert_categories()
+# SW6_2ControllerObject().upsert_products()
+# SW6_2ControllerObject().sync_customers(erp_obj=erp_obj)
+# SW6_2ControllerObject().upsert_customer_address(10026)
+# SW6_2ControllerObject().sync_orders()
+
+# synchronize_bridge = BridgeSynchronizeEntity().get_entity_by_id_1()
+# synchronize_bridge.dataset_address_sync_date
+# records = BridgeCustomerEntity.query.filter(
+#     (BridgeCustomerEntity.erp_nr == 10030) &
+#     (BridgeCustomerEntity.erp_nr <= 10050) &
+#     ((BridgeCustomerEntity.created_at < synchronize_bridge.dataset_address_sync_date) &
+#      (BridgeCustomerEntity.updated_at < synchronize_bridge.dataset_address_sync_date))
+# ).all()
 #
-# Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
-# Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()  # OK!
-# Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()  # OK!
-#
-# Funktioniert doch, oder?
-# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
-# Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
-# Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+# pprint(records)
 
-api = SW6_2ObjectEntity()
-# cat_deutsch = BridgeCategoryEntity().query.filter_by(erp_nr=11).one_or_none()
-# api.upsert_category(category=cat_deutsch)
-# katalog1 = api.read_categories(id='c9c5084cd0ed4e2da4a5db50234805f9')
-# pprint(katalog1)
-# lebensmittel = api.read_categories(id='77b959cf66de4c1590c7f9b7da3982f3')
-# pprint(lebensmittel)
-
-cats = db.session.query(BridgeCategoryEntity).order_by(BridgeCategoryEntity.erp_nr_parent.asc())
-# for cat in cats:
-#     api.delete_category(category=cat)
-#     api.upsert_category(category=cat)
-
-# for cat in cats:
-#     api.upsert_category(category=cat)
-
-for cat in cats:
-    api.upsert_category(category=cat, with_parent=True)
-
-# upsert = api.upsert_category(category=cat_deutsch)
-# pprint(upsert)
-# product = api.get_product('f03694c75251465cae63c0791872a3a4')
-# pprint(product)
-# customer_in_sw6 = api.get_customer(id='fc98adbcab884f1bbd9100fbf2e8c774')
-# pprint(customer_in_sw6)
-# customer = BridgeCustomerEntity().query.filter_by(erp_nr='10028').first()
-# api.upsert_customer(customer=customer)
-
-
-# Atti Zeugs - geht eigentlich ganz gut! Is ok...
+# Atti Zeugs
 # sw6controller = SW6I
 
 # erp_obj.close()
+
+"""
+######################
+Mappei
+######################
+"""
+get_products_list()
+
+
 """
 ######################
 Threaded 
@@ -161,23 +170,51 @@ t1.start()
 
 
 def main():
+    # erp_obj = ERPConnectionEntity()
+    # erp_obj.connect()
     """
     ######################
     Syncing
     ######################
     """
+    # bridge = BridgeSynchronizeEntity()
+    # bridge.id=1
+    # bridge.dataset_category_sync_date = datetime.now()
+    # bridge.dataset_product_sync_date = datetime.now()
+    # bridge.dataset_address_sync_date = datetime.now()
+    # bridge.dataset_tax_sync_date = datetime.now()
+    # bridge.dataset_order_sync_date = datetime.now()
+    # bridge.sw6_category_sync_date = datetime.now()
+    # bridge.sw6_product_sync_date = datetime.now()
+    # bridge.sw6_address_sync_date = datetime.now()
+    # bridge.sw6_order_sync_date = datetime.now()
+    # db.session.add(bridge)
+    # db.session.commit()
+
+    # Tax
+    # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
+    # sync_all_tax()
+
     # Categories
+    # Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()  # OK!
     # sync_all_categories()
     # sync_all_changed_categories()
 
-    # Tax
-    # sync_all_tax()
-
     # Products
+    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()  # OK!
     # sync_all_changed_products()
     # sync_all_products()
 
     # Adressen
+    # Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+    # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+    # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+
+    # History
+    # erp_history = ERPHistoryEntity(erp_obj=erp_obj)
+
+
+
     # sync_all_addresses()
     # os.system("shutdown /s /t 1")
 
@@ -190,6 +227,7 @@ def main():
 
     # sync_all_to_db()
 
+    # erp_obj.close()
     """
     ######################
     Tests
@@ -213,11 +251,12 @@ def main():
     ######################
     """
 
-    # Standard Route for index
     @app.route('/')
     def index():
         return render_template('themekitb5.html')
 
+
+    # Dashboard
     @app.route('/dashboard/')
     def index_dashboard():
         print('Dashboard')
@@ -274,7 +313,6 @@ Server
 # check if we are in the main Script? Thread? Check for __main__
 if __name__ == "__main__":
     with app.app_context():
-
         # db.drop_all()
         db.create_all()
         main()

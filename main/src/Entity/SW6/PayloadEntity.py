@@ -79,7 +79,7 @@ class PayloadEntity:
         #         "url": f"{db_row.media.media_path}{db_row.media.media_name}"
         #     }
 
-        elif self._type == "customer":
+        elif self._type == "customer_address":
             customer_id = db_row.adrnr
             billing_id = db_row.re_ansnr
             shipping_id = db_row.li_ansnr

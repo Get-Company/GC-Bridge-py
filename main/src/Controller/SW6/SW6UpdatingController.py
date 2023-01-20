@@ -16,7 +16,7 @@ class SW6UpdatingController:
         options = [
             ['category', BridgeCategoryEntity, last_category_update],
             ['product', BridgeProductEntity, last_pruduct_update],
-            # ['customer', BridgeAdressenEntity, last_customer_update]
+            # ['customer_address', BridgeAdressenEntity, last_customer_update]
         ]
         for option in options:
             updateController = SW6UpdatingEntity(option[0], option[1], option[2])

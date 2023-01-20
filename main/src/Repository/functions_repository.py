@@ -4,6 +4,7 @@ from sqlalchemy.orm import joinedload
 from main import db
 import datetime
 from json import dumps
+import pytz
 
 try:
     from urllib import urlencode, unquote
@@ -83,7 +84,8 @@ def parse_a_date_time(date_string="01.01.90T12:30:00", input_format="%d.%m.%yT%H
     :param input_format: string The format of the date string
     :return: obj datetime Object
     """
-    datetime_obj = datetime.datetime.strptime(date_string, input_format)
+    # berlin_timezone = pytz.timezone('Europe/Berlin')
+    datetime_obj = datetime.datetime.strptime(date_string, input_format).replace(tzinfo=None)
     return datetime_obj
 
 

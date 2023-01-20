@@ -42,6 +42,10 @@ class Bridge2ObjectCustomerAddressController(Bridge2ObjectController):
     def set_sync_all_range(self):
         self.erp_entity.set_range("10000", "69999")
 
+    def before_upsert(self, current_erp_entity):
+        print(current_erp_entity.get_("AdrNr"), current_erp_entity.get_("AnsNr"))
+        return True
+
     def reset_relations(self, bridge_entity: BridgeCustomerAddressEntity):
         # 1. Contacts
         bridge_entity.contacts = []

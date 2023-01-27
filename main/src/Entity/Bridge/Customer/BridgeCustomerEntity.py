@@ -9,7 +9,6 @@ from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntit
 
 # Relations
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
-from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
 
 
 # Is DataSet Adressen in ERP
@@ -79,6 +78,7 @@ class BridgeCustomerEntity(db.Model):
         self.erp_reansnr = erp_entity.get_("ReAnsNr")
         self.erp_liansnr = erp_entity.get_("LiAnsNr")
         self.erp_ltz_aend = erp_entity.get_('LtzAend')
+        self.email = erp_entity.get_login()
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
 
@@ -92,6 +92,8 @@ class BridgeCustomerEntity(db.Model):
         self.updated_at = datetime.now()
 
         return self
+
+
 
     def __repr__(self):
         # text = f"BridgeCustomerEntity: {self.id} - {self.erp_nr}"

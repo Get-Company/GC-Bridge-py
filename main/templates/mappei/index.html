@@ -1,12 +1,56 @@
 {% extends 'base.html' %}
 {% block title %}GeCo - Mappei{% endblock %}
 
+{% block css %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+{% endblock %}
+
 {% block body %}
-<textarea cols="100">nr;price_quantity;price_high;price_low;land
-{% for product in mappei_products %}{{product.nr}};{{product.prices[0].price_quantity}};{{product.prices[0].price_high | replace(".", ",")}};{{product.prices[0].price_low | replace(".", ",")}};{{product.prices[0].land}}
-{% endfor %}}
+
+
+<textarea cols="100">nr;price_quantity;price_high;price_low;land;
+{% for product in mappei_products %}
+    {% for land in product.prices %}
+        {{ product.nr }};
+        {{ land.price_quantity }};
+        {{ land.price_high | replace(".", ",") }};
+        {{ land.price_low | replace(".", ",") }};
+        {{ land.land }};
+    {% endfor %}
+{% endfor %}
 </textarea>
 
-
-
+<table class="table table-striped table-slim" id="mappei_products">
+    <thead>
+    <tr>
+        <th scope="col">nr</th>
+        <th scope="col">price_quantity</th>
+        <th scope="col">price_high</th>
+        <th scope="col">price_low</th>
+        <th scope="col">land</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for product in mappei_products %}
+    <tr>
+        <td>{{ product.nr }}</td>
+        <td>{{ product.prices[0].price_quantity }}</td>
+        <td>{{ product.prices[0].price_high }}</td>
+        <td>{{ product.prices[0].price_low }}</td>
+        <td>{{ product.prices[0].land }}</td>
+    </tr>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block end_of_body %}
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script type="application/javascript">
+    jQuery(document).ready( function () {
+        jQuery('#mappei_products').DataTable();
+    } );
+</script>
 {% endblock %}

@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
+    {% block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/gc_styles_compound.css') }}">
-    <script src="https://kit.fontawesome.com/42ebd07a81.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/vue@3"></script>
+    {% endblock %}}
+
 </head>
 <body>
 {% block body %}
 
 
+{% endblock %}
+{% block javascript %}
+<script src="https://kit.fontawesome.com/42ebd07a81.js" crossorigin="anonymous"></script>
+{% endblock %}
+{% block end_of_body %}
 {% endblock %}
 </body>
 

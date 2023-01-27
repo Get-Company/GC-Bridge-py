@@ -25,7 +25,7 @@ class ERPUmsatzEntity(ERPNestedDatasetObjectEntity):
         self.nested_dataset_range = nested_dataset_range
         self.prefill_json_directory = None
 
-        """ Functions before the supper INIT"""
+        """ Functions before the super INIT"""
         self.set_is_nested(True)
 
         if nested_dataset_id_value:

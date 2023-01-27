@@ -3,6 +3,7 @@ import pythoncom
 import logging
 
 
+
 class ERPObjectController:
     def __init__(self, mandant="Test"):
         self.mandant = None

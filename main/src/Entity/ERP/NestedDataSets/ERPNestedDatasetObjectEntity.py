@@ -97,14 +97,23 @@ class ERPNestedDatasetObjectEntity(ERPDatasetObjectEntity):
     def get_nested_datasets(self):
         return self.nested_datasets
 
+    def get_nested_dataset(self):
+        return self.nested_datasets[self.nested_dataset_name]
+
     def count_nested_datasets(self):
         return len(self.nested_datasets.keys())
 
     """ Positioning/Finding/Filtering """
 
-    def set_nested_dataset_cursor_to_field_value(self):
-        self.nested_datasets[self.nested_dataset_name].FindKey(self.nested_dataset_id_field,
-                                                               self.nested_dataset_id_value)
+    def set_nested_dataset_cursor_to_field_value(self, field=None, value=None):
+        if not field:
+            field = self.nested_dataset_id_field
+        if not value:
+            value = self.nested_dataset_id_value
+        self.nested_datasets[self.nested_dataset_name].FindKey(field, value)
+
+    def find_nested_(self, value, field=None):
+        self.set_nested_dataset_cursor_to_field_value(field=field, value=value)
 
     """ Range """
 
@@ -152,3 +161,27 @@ class ERPNestedDatasetObjectEntity(ERPDatasetObjectEntity):
 
     def is_ranged(self):
         return self.nested_datasets[self.nested_dataset_name].IsRanged()
+
+    def helper_nested_set_value_of(self, field, value):
+        """
+        Eval interprets a string as code.
+        Example: We get AsString from field_types dict and add it to 'self.dataset.Fields.Item(str(field)).'
+        Therefore we get 'self.dataset.Fields.Item(str(field)).AsString = "VALUE"' which gives us the right field value
+        Make sure all fields are in the dict
+        :param field: string Field name after büro+ convention
+        :param value: new value
+        :return:
+        """
+        field_type = self.get_nested_dataset().Fields.Item(field).FieldType
+        if field_type in self.field_types:
+            print("Set %s as %s - %s" % (field, self.field_types[field_type], value))
+            return exec('self.created_dataset.Fields("' +
+                        str(field) +
+                        '").' +
+                        self.field_types[field_type] +
+                        " = '" +
+                        str(value) +
+                        "'")
+        else:
+            print("We got the not known Type '%s' for field '%s' " % (field_type, field))
+            return False

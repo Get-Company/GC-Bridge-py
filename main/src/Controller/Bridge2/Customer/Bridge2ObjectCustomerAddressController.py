@@ -1,8 +1,6 @@
 import sqlalchemy
 
 from main.src.Controller.Bridge2.Bridge2ObjectController import Bridge2ObjectController
-from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerContactController import \
-    Bridge2ObjectCustomerContactController
 
 # ERP Entities
 from main.src.Entity.ERP.ERPAdressenEntity import ERPAdressenEntity
@@ -12,7 +10,6 @@ from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 # Bridge Entities
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
-from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
 
 from datetime import datetime
 
@@ -45,28 +42,6 @@ class Bridge2ObjectCustomerAddressController(Bridge2ObjectController):
     def before_upsert(self, current_erp_entity):
         print(current_erp_entity.get_("AdrNr"), current_erp_entity.get_("AnsNr"))
         return True
-
-    def reset_relations(self, bridge_entity: BridgeCustomerAddressEntity):
-        # 1. Contacts
-        bridge_entity.contacts = []
-        contacts_erp = self.erp_entity.get_ansprechpartner()
-        while not contacts_erp.range_eof():
-            adr_nr = contacts_erp.get_("AdrNr")
-            ans_nr = contacts_erp.get_("AnsNr")
-            ansp_nr = contacts_erp.get_("AspNr")
-            contact_erp = BridgeCustomerContactEntity().query.filter_by(
-                erp_nr=adr_nr
-            ).filter_by(
-                erp_ansnr=ans_nr
-            ).filter_by(
-                erp_aspnr=ansp_nr
-            ).one_or_none()
-
-            if contact_erp:
-                bridge_entity.contacts.append(contact_erp)
-            contacts_erp.range_next()
-
-        return bridge_entity
 
     def set_bridge_entity(self):
         """

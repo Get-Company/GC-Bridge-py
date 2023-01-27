@@ -23,4 +23,3 @@ def set_classei_mappei_relation(classei_nr, mappei_nr, ):
     classei.mappei.append(mappei)
     db.session.add(classei)
     db.session.commit()
-

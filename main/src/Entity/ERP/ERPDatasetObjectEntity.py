@@ -55,7 +55,8 @@ class ERPDatasetObjectEntity(object):
             'Boolean': 'AsInteger',  # AsBoolean: True/False | AsInteger: 1/0
             'Byte': 'AsInteger',
             'Info': 'Text',
-            'String': 'AsString'
+            'String': 'AsString',
+            'Double': 'AsString'
 
         }
         """ The fields of the dataset and their values """
@@ -334,7 +335,7 @@ class ERPDatasetObjectEntity(object):
     """ Positioning/Finding/Filtering """
 
     def set_dataset_cursor_to_field_value(self):
-        self.created_dataset.FindKey(self.dataset_id_field, self.dataset_id_value)
+        return self.created_dataset.FindKey(self.dataset_id_field, self.dataset_id_value)
 
     def find_(self, field=None, value=None):
         """
@@ -349,7 +350,7 @@ class ERPDatasetObjectEntity(object):
         if value:
             self.set_dataset_id_value(value)
 
-        self.set_dataset_cursor_to_field_value()
+        return self.created_dataset.FindKey(self.dataset_id_field, self.dataset_id_value)
 
     """ Range """
 

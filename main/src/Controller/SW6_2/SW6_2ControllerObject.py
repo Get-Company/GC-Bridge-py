@@ -13,7 +13,6 @@ from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryE
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
 from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
-from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
 
@@ -139,12 +138,8 @@ class SW6_2ControllerObject():
         address and contact.
         :return:
         """
+        return False  # ContactEntity
 
-        contacts = BridgeCustomerContactEntity.query.filter_by(erp_nr=customer_erp_nr).all()
-
-        for contact in contacts:
-            self.api.upsert_customer(contact.address.customer)
-            # self.api.upsert_customer_address(contact=contact)
 
     def sync_orders(self):
         orders = self.api.get_orders()

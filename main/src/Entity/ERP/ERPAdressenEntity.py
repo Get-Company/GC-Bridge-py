@@ -39,7 +39,9 @@ import logging
 from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
 from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
-import datetime
+from datetime import datetime
+
+from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
 
 
 class ERPAdressenEntity(ERPDatasetObjectEntity):
@@ -72,14 +74,23 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         print("In Child! EX called")
         self.created_dataset = self.get_dataset_infos().CreateDataSetEx()
 
+    """ Sync Queries """
+    def get_all_since_last_sync(self):
+        last_sync_date = BridgeSynchronizeEntity().get_entity_by_id_1().dataset_address_sync_date
+        test_sync_date = datetime(2023, 1, 23)
+        test_sync_date_2 = datetime(2023, 1, 24)
+        self.set_range(start=test_sync_date, end=test_sync_date_2, field="LtzAend")
+        return self.created_dataset
+
     """ Special Queries """
     def get_next_free_adrnr(self):
-        self.edit_()
         return self.created_dataset.SetupNr("")
+
 
     def create_new_customer(self, file="webshop.yaml", fields=None):
         """
-        Complete function for creating a new customer_address . Just add a dict of fields, and give the
+        Complete function for creating a new customer_address .
+        Just add a dict of fields, and give the
         path to the prefill file.
         """
         # Create the new dataset
@@ -222,6 +233,14 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         anschriften_ntt.find_('AdrNrAnsNr', [self.get_('AdrNr'), self.get_('LiAnsNr')])
 
         return anschriften_ntt
+
+    def get_login(self):
+        address = self.get_special_standard_billing_address()
+        email = address.get_("EMail1")
+        if email:
+           return email
+        else:
+            return False
 
     def print_dataset_fields(self):
         super().print_dataset_fields()

@@ -23,7 +23,9 @@ class MappeiProductEntity(db.Model):
     last_mod = db.Column(db.DateTime(), default=datetime.now())
 
     # Prices as an archive one - to - many
-    prices = db.relationship('MappeiPriceEntity', back_populates='product')
+    prices = db.relationship(
+        'MappeiPriceEntity',
+        back_populates='product')
 
     # Mappei Relation many - to - many
     classei = db.relationship(
@@ -33,7 +35,7 @@ class MappeiProductEntity(db.Model):
         lazy='dynamic')
 
     def __repr__(self):
-        return f"Mappei Product Entity {self.name}({self.nr})"
+        return f"Mappei Product Entity {self.name}({self.nr} - Land: {self.prices[0].land})"
 
     def get_price(self, amount):
         # price_high, price_low, price_quantity

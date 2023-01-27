@@ -9,12 +9,9 @@ from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 # Bridge Entities
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
-from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeCustomerContactEntity
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
 
 # Controller
-from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerContactController import \
-    Bridge2ObjectCustomerContactController
 from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerAddressController import \
     Bridge2ObjectCustomerAddressController
 from datetime import datetime
@@ -47,6 +44,17 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
     def set_sync_all_range(self):
         self.erp_entity.set_range("10000", "69999")
 
+    def set_sync_last_changed_range(self):
+        today = datetime.now()
+        last_sync = self.bridge_synchronize_entity.get_entity_by_id_1().dataset_address_sync_date
+        test_sync = datetime(2023, 1, 19, 13, 40)
+        print("Sync Range:", last_sync.strftime("%d.%m.%Y %H:%M:%S"), today.strftime("%d.%m.%Y %H:%M:%S"))
+        is_range = self.erp_entity.set_range(start=last_sync, end=today, field='LtzAend')
+        if is_range:
+            return True
+        else:
+            return False
+
     def sync_all(self):
         self.set_sync_all_range()
         # Filter the results
@@ -58,38 +66,20 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
         is_ranged = self.set_sync_last_changed_range()
         if is_ranged:
             # Filter the results
-            self.apply_filter()
+            self.erp_entity.filter_expression("")
             # Not really nice but we need quick results
             # Every Address and Contact must be synced by itself
-            Bridge2ObjectCustomerContactController.sync_one(value=self.erp_entity.get_("AdrNr"))
-            Bridge2ObjectCustomerAddressController.sync_one(value=self.erp_entity.get_("AdrNr"))
+            Bridge2ObjectCustomerAddressController(erp_obj=self.erp_obj).sync_range(start=self.erp_entity.get_("AdrNr"), end=self.erp_entity.get_("AdrNr"))
             self.upsert()
             return True
 
     def before_upsert(self, current_erp_entity):
-
-        Bridge2ObjectCustomerContactController(
-            erp_obj=self.erp_obj).sync_range(
-            start=current_erp_entity.get_("AdrNr"),
-            end=current_erp_entity.get_("AdrNr")
-        )
         Bridge2ObjectCustomerAddressController(
             erp_obj=self.erp_obj).sync_range(
             start=current_erp_entity.get_("AdrNr"),
             end=current_erp_entity.get_("AdrNr")
         )
         return True
-
-    def set_sync_last_changed_range(self):
-        today = datetime.now()
-        last_sync = self.bridge_synchronize_entity.get_entity_by_id_1().dataset_address_sync_date
-        test_sync = datetime(2023, 1, 19, 13, 40)
-        print("Sync Range:", last_sync.strftime("%d.%m.%Y %H:%M:%S"), today.strftime("%d.%m.%Y %H:%M:%S"))
-        is_range = self.erp_entity.set_range(start=test_sync, end=today, field='LtzAend')
-        if is_range:
-            return True
-        else:
-            return False
 
     def set_bridge_entity(self):
         """
@@ -204,6 +194,13 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
         self.commit_session(info=customer["customerNumber"])
         return True
 
+
+    """
+    Sync in both directions
+    """
+    # 1 Sync from ERP to Bridge
+    def sync_x_to_y(self, **kwargs):
+        pass
     """
     Special Tasks
     """
@@ -223,12 +220,9 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
 
         for address in customer["addresses"]:
             bridge_customer_address_entity = BridgeCustomerAddressEntity()
-            bridge_customer_contact_entity = BridgeCustomerContactEntity()
 
             mapped_customer_address = bridge_customer_address_entity.map_sw6_to_db(customer=customer, address=address)
-            mappend_customer_address_contact = bridge_customer_contact_entity.map_sw6_to_db(customer=customer, address=address)
 
-            mapped_customer_address.contacts.append(mappend_customer_address_contact)
             mapped_customer.addresses.append(mapped_customer_address)
 
         return mapped_customer

@@ -4,7 +4,6 @@ from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeAddressEntity
-from main.src.Entity.Bridge.Customer.BridgeCustomerContactEntity import BridgeContactEntity
 from main import db
 
 erp_obj = ERPConnectionEntity()

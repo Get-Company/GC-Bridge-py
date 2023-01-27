@@ -1,10 +1,12 @@
+import csv
 import time
+from io import StringIO
 from pprint import pprint
 
 import sqlalchemy
 
 from main import create_app
-from flask import render_template, redirect, request
+from flask import render_template, redirect, request, make_response
 from flask_migrate import Migrate
 import sys
 from sqlalchemy import and_
@@ -35,7 +37,7 @@ from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
 
 # Customer
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity, \
-    BridgeCustomerAddressEntity, BridgeCustomerContactEntity
+    BridgeCustomerAddressEntity
 from main.src.Entity.ERP.ERPAdressenEntity import ERPAdressenEntity, ERPAnschriftenEntity, ERPAnsprechpartnerEntity
 from main.src.Entity.ERP.NestedDataSets.ERPUmsatzEntity import ERPUmsatzEntity
 
@@ -51,7 +53,11 @@ from main.src.Entity.ERP.ERPHistoryEntity import ERPHistoryEntity
 # Connection
 from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
 
+# Misc
+from main.src.Entity.Bridge.Misc.BridgeCurrencyEntity import BridgeCurrencyEntity
+
 # Mappei
+
 # Controller
 from main.src.Controller.Mappei.parser import *
 
@@ -67,10 +73,14 @@ from main.src.Controller.Bridge2.Bridge2ObjectTaxController import Bridge2Object
 from main.src.Controller.Bridge2.Bridge2ObjectCategoryController import Bridge2ObjectCategoryController
 from main.src.Controller.Bridge2.Bridge2ObjectProductController import Bridge2ObjectProductController
 from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerController import Bridge2ObjectCustomerController
-from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerContactController import \
-    Bridge2ObjectCustomerContactController
 from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerAddressController import \
     Bridge2ObjectCustomerAddressController
+
+from main.src.Controller.Bridge2.Misc.Bridge2ObjectCurrencyController import Bridge2ObjectCurrencyController
+
+# ERP
+from main.src.Controller.ERP.ERPCustomerController import ERPCustomerController
+
 # Atti SW6
 from main.src.Controller.SW6.SW6UpdatingController import SW6UpdatingController
 from main.src.Controller.SW6.SW6InitController import SW6InitController
@@ -80,7 +90,6 @@ from main.src.Controller.Amazon.AmazonController import AmazonController
 
 # SW6_2
 from main.src.Controller.SW6_2.SW6_2ControllerObject import SW6_2ControllerObject
-
 
 """
 ######################
@@ -107,13 +116,22 @@ migrate = Migrate(app, db)
 ######################
 ERP Connection
 """
-# erp_obj = ERPConnectionEntity()
-# erp_obj.connect()
+erp_obj = ERPConnectionEntity()
+erp_obj.connect()
 
-# Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10026)
+# ERP
+# address = ERPAdressenEntity(erp_obj=erp_obj).find_("10026")
+# print(address.get_("AdrNr"))
+
+
+# ERPCustomerController(erp_obj=erp_obj).sync_range_upsert(start="10000", end="11000")
+ERPCustomerController(erp_obj=erp_obj).sync_changed_downsert()
+# ERPCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+
 # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10026)
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_changed()
+
 
 # SW6 Flo
 # SW6_2ControllerObject().create_saleschannels()
@@ -139,14 +157,14 @@ ERP Connection
 # Atti Zeugs
 # sw6controller = SW6I
 
-# erp_obj.close()
+erp_obj.close()
 
 """
 ######################
 Mappei
 ######################
 """
-get_products_list()
+# get_products_list()
 
 
 """
@@ -206,14 +224,11 @@ def main():
     # sync_all_products()
 
     # Adressen
-    # Bridge2ObjectCustomerContactController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
     # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
     # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
 
     # History
     # erp_history = ERPHistoryEntity(erp_obj=erp_obj)
-
-
 
     # sync_all_addresses()
     # os.system("shutdown /s /t 1")
@@ -244,6 +259,9 @@ def main():
     """
     # This is just a CLI Version which awaits input
     # get_products_list()
+    # products = MappeiProductEntity.query.filter(MappeiProductEntity.prices[.has(land="ch"))
+    # products = MappeiProductEntity.query.join(MappeiProductEntity)
+    # pprint(products)
 
     """
     ######################
@@ -254,7 +272,6 @@ def main():
     @app.route('/')
     def index():
         return render_template('themekitb5.html')
-
 
     # Dashboard
     @app.route('/dashboard/')
@@ -279,8 +296,12 @@ def main():
     @app.route('/mappei/all')
     def show_mappei_products_all():
         mappei_products = MappeiProductEntity.query.all()
-        print(mappei_products)
         return render_template('mappei/index.html', mappei_products=mappei_products)
+
+    @app.route('/mappei/<land>')
+    def show_mappei_products_(land: str):
+        mappei_products = MappeiProductEntity.query.all()
+        return render_template('mappei/index.html', mappei_products=mappei_products, land=land)
 
     @app.route('/customer/<adrnr>')
     def show_customer(adrnr):

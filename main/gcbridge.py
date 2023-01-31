@@ -127,12 +127,12 @@ ERP Connection
 # Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()
 # Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()
 
-# erp_obj_test = ERPConnectionEntity(mandant="TEST")
-# erp_obj_test.connect()
-# ERPCustomerController(erp_obj=erp_obj_test).sync_range_upsert(start="10000", end="10000")
+erp_obj_test = ERPConnectionEntity(mandant="TEST")
+erp_obj_test.connect()
+ERPCustomerController(erp_obj=erp_obj_test).sync_range_upsert(start="10000", end="12000")
 # ERPCustomerController(erp_obj=erp_obj_test).sync_changed_upsert()
 # ERPCustomerController(erp_obj=erp_obj_test).sync_changed_downsert()
-# erp_obj_test.close()
+erp_obj_test.close()
 
 # ERPCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
 
@@ -353,4 +353,4 @@ if __name__ == "__main__":
 
     # localhost:5000
     # !IMPORTANT! Do not use reloader on Threaded Tasks, for it will use up erp licenses
-    app.run(port=5000, debug=True, use_reloader=True)
+    # app.run(port=5000, debug=True, use_reloader=True)

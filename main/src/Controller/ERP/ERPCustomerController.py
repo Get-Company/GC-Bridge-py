@@ -145,11 +145,13 @@ class ERPCustomerController(ERPController):
 
         :return:
         """
-
+        pprint(self.new_or_updated_customers_in_bridge)
         for customer in self.new_or_updated_customers_in_bridge:
             erp_customer = ERPAdressenEntity(erp_obj=self.erp_obj, id_value=customer.erp_nr)
-
-            print(erp_customer.get_("AdrNr"), "from ERP, ", erp_customer)
+            if erp_customer:
+                print(erp_customer.get_("AdrNr"), "from ERP, ", erp_customer)
+            else:
+                print(erp_customer.erp_nr, 'Not found')
         return True
 
 

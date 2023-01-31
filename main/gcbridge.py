@@ -116,16 +116,24 @@ migrate = Migrate(app, db)
 ######################
 ERP Connection
 """
-erp_obj = ERPConnectionEntity()
-erp_obj.connect()
+# erp_obj = ERPConnectionEntity()
+# erp_obj.connect()
 
 # ERP
 # address = ERPAdressenEntity(erp_obj=erp_obj).find_("10026")
 # print(address.get_("AdrNr"))
 
+# Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()
+# Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()
+# Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()
 
-# ERPCustomerController(erp_obj=erp_obj).sync_range_upsert(start="10000", end="11000")
-ERPCustomerController(erp_obj=erp_obj).sync_changed_downsert()
+# erp_obj_test = ERPConnectionEntity(mandant="TEST")
+# erp_obj_test.connect()
+# ERPCustomerController(erp_obj=erp_obj_test).sync_range_upsert(start="10000", end="10000")
+# ERPCustomerController(erp_obj=erp_obj_test).sync_changed_upsert()
+# ERPCustomerController(erp_obj=erp_obj_test).sync_changed_downsert()
+# erp_obj_test.close()
+
 # ERPCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
 
 # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10026)
@@ -157,7 +165,7 @@ ERPCustomerController(erp_obj=erp_obj).sync_changed_downsert()
 # Atti Zeugs
 # sw6controller = SW6I
 
-erp_obj.close()
+# erp_obj.close()
 
 """
 ######################
@@ -303,11 +311,16 @@ def main():
         mappei_products = MappeiProductEntity.query.all()
         return render_template('mappei/index.html', mappei_products=mappei_products, land=land)
 
-    @app.route('/customer/<adrnr>')
-    def show_customer(adrnr):
+    @app.route('/customers')
+    def show_customers():
+        customers = BridgeCustomerEntity().query.all()
+        return render_template('classei/customer/customers.html', customers=customers)
+
+    @app.route('/customer/<customer_id>')
+    def show_customer(customer_id):
         try:
-            customer = BridgeCustomerEntity().query.filter_by(erp_nr=adrnr).one_or_none()
-            return render_template("classei/show_customer.html", customer=customer)
+            customer = BridgeCustomerEntity().query.get(customer_id)
+            return render_template("classei/customer/customer_details.html", customer=customer)
         except sqlalchemy.exc.MultipleResultsFound:
             return redirect("/dashborad")
 
@@ -340,4 +353,4 @@ if __name__ == "__main__":
 
     # localhost:5000
     # !IMPORTANT! Do not use reloader on Threaded Tasks, for it will use up erp licenses
-    # app.run(port=5000, debug=True, use_reloader=True)
+    app.run(port=5000, debug=True, use_reloader=True)

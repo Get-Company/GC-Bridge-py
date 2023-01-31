@@ -38,7 +38,6 @@ class SW6_2ControllerObject():
         self.upsert_taxes()
         self.upsert_categories()
         self.upsert_products()
-        self.upsert_customers()
 
     """
     Init functions for a new shop

@@ -7,20 +7,11 @@
 {% endblock %}
 
 {% block body %}
-
-
-<textarea cols="100">nr;price_quantity;price_high;price_low;land;
-{% for product in mappei_products %}
-    {% for land in product.prices %}
-        {{ product.nr }};
-        {{ land.price_quantity }};
-        {{ land.price_high | replace(".", ",") }};
-        {{ land.price_low | replace(".", ",") }};
-        {{ land.land }};
-    {% endfor %}
-{% endfor %}
+    <textarea cols="100">nr;price_quantity;price_high;price_low;land;
+{% for product in mappei_products %}{% for price_land in product.prices %}{% if land is defined %}{% if price_land.land==land %}
+{{ product.nr|trim }};{{ price_land.price_quantity }};{{ price_land.price_high | replace(".", ",") }};{{ price_land.price_low | replace(".", ",") }};{{ price_land.land|trim }};{% endif %}{%  else %}
+{{ product.nr }};{{ price_land.price_quantity }};{{ price_land.price_high | replace(".", ",") }};{{ price_land.price_low | replace(".", ",") }};{{ price_land.land }};{% endif %}{% endfor %}{% endfor %}
 </textarea>
-
 <table class="table table-striped table-slim" id="mappei_products">
     <thead>
     <tr>

@@ -122,7 +122,10 @@ class BridgeProductEntity(db.Model):
         self.price = parse_european_number_to_float(erp_entity.get_("Vk0.Preis")),
         self.price_rebate_amount = erp_entity.get_("Vk0.Rab0.Mge"),
         self.price_rebate = parse_european_number_to_float(erp_entity.get_("Vk0.Rab0.Pr")),
-        self.factor = erp_entity.get_("Sel6")
+        if erp_entity.get_("Sel6"):
+            self.factor = erp_entity.get_("Sel6")
+        else:
+            self.factor = None
         self.wshopkz = erp_entity.get_("WShopKz")
         self.created_at = datetime.now(),
         # Always keep api_ids

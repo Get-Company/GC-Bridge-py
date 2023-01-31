@@ -71,21 +71,24 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         Get the content of the fields by calling CreateDatasetEx(). All related tables are included
         :return:
         """
-        print("In Child! EX called")
         self.created_dataset = self.get_dataset_infos().CreateDataSetEx()
 
     """ Sync Queries """
     def get_all_since_last_sync(self):
         last_sync_date = BridgeSynchronizeEntity().get_entity_by_id_1().dataset_address_sync_date
+        current_time = datetime.now()
         test_sync_date = datetime(2023, 1, 23)
         test_sync_date_2 = datetime(2023, 1, 24)
-        self.set_range(start=test_sync_date, end=test_sync_date_2, field="LtzAend")
+
+        self.set_range(start=last_sync_date, end=current_time, field="LtzAend")
         return self.created_dataset
 
     """ Special Queries """
     def get_next_free_adrnr(self):
         return self.created_dataset.SetupNr("")
 
+    def map_bridge_to_erp(self, bridge_entity):
+        pass
 
     def create_new_customer(self, file="webshop.yaml", fields=None):
         """

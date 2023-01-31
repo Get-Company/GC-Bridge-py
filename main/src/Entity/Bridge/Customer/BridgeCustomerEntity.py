@@ -17,7 +17,7 @@ class BridgeCustomerEntity(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
     api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
-    erp_nr = db.Column(db.CHAR(10), nullable=True)
+    erp_nr = db.Column(db.CHAR(36), nullable=True)
     email = db.Column(db.String(255), nullable=True)
     ustid = db.Column(db.String(255), nullable=True)
     erp_reansnr = db.Column(db.Integer(), nullable=True)
@@ -92,8 +92,6 @@ class BridgeCustomerEntity(db.Model):
         self.updated_at = datetime.now()
 
         return self
-
-
 
     def __repr__(self):
         # text = f"BridgeCustomerEntity: {self.id} - {self.erp_nr}"

@@ -3,6 +3,7 @@ This Object is for creating the connection to büro+ microtech. You can get all 
 """
 import win32com.client as win32
 import pythoncom
+import pywintypes
 import logging
 
 
@@ -102,6 +103,8 @@ class ERPConnectionEntity:
             self.get_erp()
         except UnboundLocalError as e:
             self.logging.warning("No ERP to connect. Did you created it? self.set_erp")
+        except pywintypes.com_error as e:
+            print(e)
         else:
             self.erp.Init(f'{firma}', "", f'{benutzer}', '')
             self.erp.SelectMand(self.get_mandant())

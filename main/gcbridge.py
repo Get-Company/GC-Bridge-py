@@ -3,6 +3,8 @@ import time
 from io import StringIO
 from pprint import pprint
 
+
+
 import sqlalchemy
 
 from main import create_app
@@ -91,6 +93,12 @@ from main.src.Controller.Amazon.AmazonController import AmazonController
 # SW6_2
 from main.src.Controller.SW6_2.SW6_2ControllerObject import SW6_2ControllerObject
 
+# Atti
+from main.src.shopware_atti.help import *
+
+
+
+
 """
 ######################
 Tests
@@ -118,21 +126,23 @@ ERP Connection
 """
 # erp_obj = ERPConnectionEntity()
 # erp_obj.connect()
+#
+# erp_obj_test = ERPConnectionEntity(mandant="TEST")
+# erp_obj_test.connect()
+#
+# while True:
+#     # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_changed()
+#     Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_changed()
+#     Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()
+#
+#     ERPCustomerController(erp_obj=erp_obj_test).sync_changed()
+#
+#     if BridgeSynchronizeEntity().get_entity_by_id_1().loop_continue == 0:
+#         break
+#
+# erp_obj_test.close()
+# erp_obj.close()
 
-# ERP
-# address = ERPAdressenEntity(erp_obj=erp_obj).find_("10026")
-# print(address.get_("AdrNr"))
-
-# Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()
-# Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_all()
-# Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()
-
-erp_obj_test = ERPConnectionEntity(mandant="TEST")
-erp_obj_test.connect()
-ERPCustomerController(erp_obj=erp_obj_test).sync_range_upsert(start="10000", end="12000")
-# ERPCustomerController(erp_obj=erp_obj_test).sync_changed_upsert()
-# ERPCustomerController(erp_obj=erp_obj_test).sync_changed_downsert()
-erp_obj_test.close()
 
 # ERPCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
 
@@ -151,16 +161,6 @@ erp_obj_test.close()
 # SW6_2ControllerObject().upsert_customer_address(10026)
 # SW6_2ControllerObject().sync_orders()
 
-# synchronize_bridge = BridgeSynchronizeEntity().get_entity_by_id_1()
-# synchronize_bridge.dataset_address_sync_date
-# records = BridgeCustomerEntity.query.filter(
-#     (BridgeCustomerEntity.erp_nr == 10030) &
-#     (BridgeCustomerEntity.erp_nr <= 10050) &
-#     ((BridgeCustomerEntity.created_at < synchronize_bridge.dataset_address_sync_date) &
-#      (BridgeCustomerEntity.updated_at < synchronize_bridge.dataset_address_sync_date))
-# ).all()
-#
-# pprint(records)
 
 # Atti Zeugs
 # sw6controller = SW6I

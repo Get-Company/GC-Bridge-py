@@ -18,7 +18,7 @@ class BridgeCustomerEntity(db.Model):
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
     api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
     erp_nr = db.Column(db.CHAR(10), nullable=True)
-    email = db.Column(db.String(255), nullable=True)
+    email = db.Column(db.String(255), nullable=False)
     ustid = db.Column(db.String(255), nullable=True)
     erp_reansnr = db.Column(db.Integer(), nullable=True)
     erp_liansnr = db.Column(db.Integer(), nullable=True)
@@ -32,7 +32,10 @@ class BridgeCustomerEntity(db.Model):
     # Relation one - to -many
     addresses = db.relationship(
         'BridgeCustomerAddressEntity',
-        back_populates="customer")
+        back_populates="customer",
+        lazy=True,
+        cascade="all, delete, delete-orphan"
+    )
 
     # Relation one - to -many
     orders = db.relationship(
@@ -83,6 +86,21 @@ class BridgeCustomerEntity(db.Model):
             self.api_id = uuid.uuid4().hex
 
         return self
+
+    def map_db_to_erp(self):
+        """
+        We just need a list of the erp fields and their new value
+        :return: dict of fields
+        """
+        updated_fields_list = {
+            "WShopID": self.api_id,
+            "ReAnsNr": self.erp_reansnr,
+            "LiAnsNr": self.erp_liansnr,
+            "WShopAdrKz": 1,
+            "Memo": "Neuer Sync klappt"+self.updated_at.strftime("%d.%m.%Y %H:%M:%S"),
+            "LtzAend": self.updated_at
+        }
+        return updated_fields_list
 
     def map_sw6_to_db(self, customer: dict):
         self.erp_nr = customer['customerNumber']

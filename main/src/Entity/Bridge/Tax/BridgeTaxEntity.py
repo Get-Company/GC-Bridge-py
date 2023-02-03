@@ -1,8 +1,6 @@
 from main import db
 import uuid
 
-from main.src.Entity.ERP.NestedDataSets.ERPTaxEntity import ERPTaxEntity
-
 # Make the Tax class
 
 
@@ -26,7 +24,7 @@ class BridgeTaxEntity(db.Model):
         self.satz = entity.satz
         return True
 
-    def map_erp_to_db(self, erp_tax: ERPTaxEntity):
+    def map_erp_to_db(self, erp_tax):
         self.steuer_schluessel = erp_tax.get_("StSchl"),
         self.description = erp_tax.get_("Bez"),
         self.satz = erp_tax.get_("Sz")

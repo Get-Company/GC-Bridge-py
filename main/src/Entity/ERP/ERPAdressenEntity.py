@@ -41,8 +41,6 @@ from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
 from datetime import datetime
 
-from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
-
 
 class ERPAdressenEntity(ERPDatasetObjectEntity):
 
@@ -74,13 +72,10 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         self.created_dataset = self.get_dataset_infos().CreateDataSetEx()
 
     """ Sync Queries """
-    def get_all_since_last_sync(self):
-        last_sync_date = BridgeSynchronizeEntity().get_entity_by_id_1().dataset_address_sync_date
+    def get_all_since_last_sync(self, last_sync_date):
         current_time = datetime.now()
-        test_sync_date = datetime(2023, 1, 23)
-        test_sync_date_2 = datetime(2023, 1, 24)
-
         self.set_range(start=last_sync_date, end=current_time, field="LtzAend")
+        self.range_first()
         return self.created_dataset
 
     """ Special Queries """
@@ -89,6 +84,15 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
     def map_bridge_to_erp(self, bridge_entity):
         pass
+
+    def update_customer(self, update_fields_list):
+        self.edit_()
+        for field_key, field_value in update_fields_list.items():
+            # print("Reading", field_key,":", field_value)
+            self.create_(field_key, field_value)
+
+        self.set_updated_fields(updated_at=update_fields_list["LtzAend"])
+        self.post_()
 
     def create_new_customer(self, file="webshop.yaml", fields=None):
         """
@@ -246,6 +250,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
             return False
 
     def print_dataset_fields(self):
+
         super().print_dataset_fields()
 
     def print_dataset_indices(self):

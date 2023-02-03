@@ -42,8 +42,7 @@ class Bridge2ObjectCategoryController(Bridge2ObjectController):
     def set_sync_last_changed_range(self):
         today = datetime.now()
         last_sync = self.bridge_synchronize_entity.dataset_category_sync_date
-        test_sync = datetime(2022, 1, 1)
-        is_range = self.erp_entity.set_range(test_sync, today, 'LtzAend')
+        is_range = self.erp_entity.set_range(last_sync, today, 'LtzAend')
         if is_range:
             return True
         else:

@@ -5,6 +5,7 @@ from main.src.Entity.Mappei.MappeiProductEntity import *
 from main.src.Controller.SW6.SW6InitController import SW6InitController
 from main.src.Controller.SW6.SW6UpdatingController import SW6UpdatingController
 from main.src.Entity.Bridge.Orders.BridgeOrderEntity import *
+
 from pprint import pprint
 app = create_app()
 app.app_context().push()

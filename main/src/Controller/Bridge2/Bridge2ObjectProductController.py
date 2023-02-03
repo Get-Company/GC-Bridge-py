@@ -97,7 +97,7 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
         today = datetime.now()
         last_sync = self.bridge_synchronize_entity.dataset_product_sync_date
         test_sync = datetime(2022, 8, 1)
-        is_range = self.erp_entity.set_range(test_sync, today, 'LtzAend')
+        is_range = self.erp_entity.set_range(last_sync, today, 'LtzAend')
 
         if is_range:
             return True

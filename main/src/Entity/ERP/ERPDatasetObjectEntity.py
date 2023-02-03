@@ -11,7 +11,7 @@ from main.src.Repository.functions_repository import find_image_filename_in_path
 class ERPDatasetObjectEntity(object):
     """
     This is the Parent class of all Datasets from Büro+. Initiate it with an ERPConnectionEntity,
-    the datasets name it's id field and the id (value)
+    the datasets name its id field and the id (value)
 
     Field Types:
     If a field isn't recognized, add it to the field_types dict
@@ -95,7 +95,7 @@ class ERPDatasetObjectEntity(object):
         The field is collected and stored in a list.
         ! Important: Use the field names as used in Büro+
         Set the field ex: set_('ArtNr'). The helper method reads the field type,
-        translates it as ex. 'AsString' and adss it to the dict.
+        translates it as ex. 'AsString' and adds it to the dict.
         :param field: string Ex 'ArtNr' on Artikel
         :return:
         """
@@ -240,6 +240,22 @@ class ERPDatasetObjectEntity(object):
         """ To create a Dataset """
         # self.start_transaction()
         self.created_dataset.Append()
+
+    def set_updated_fields(self, updated_at:datetime):
+
+        self.created_dataset.SetSatzDatum(
+            datetime.datetime(
+                updated_at.year,
+                updated_at.month,
+                updated_at.day,
+                updated_at.hour,
+                updated_at.minute,
+                updated_at.second
+            ),
+            self.get_("ErstBzr"),
+            updated_at,
+            "GC-Auto"
+        )
 
     def start_transaction(self):
         """ the table is locked until commit!"""
@@ -388,9 +404,9 @@ class ERPDatasetObjectEntity(object):
                 str(start.strftime("%d.%m.%Y %H:%M:%S")),
                 str(end.strftime("%d.%m.%Y %H:%M:%S"))
             )
-            print(field,
-                  str(start.strftime("%d.%m.%Y %H:%M:%S")),
-                  str(end.strftime("%d.%m.%Y %H:%M:%S")))
+            # print(field,
+            #       str(start.strftime("%d.%m.%Y %H:%M:%S")),
+            #       str(end.strftime("%d.%m.%Y %H:%M:%S")))
         else:
             if not isinstance(start, list):
                 start = [start]
@@ -401,7 +417,7 @@ class ERPDatasetObjectEntity(object):
         self.created_dataset.ApplyRange()
         # Check if we get results
         if self.range_count() == 0:
-            print("Nothing in given range", start, end)
+            print("No", self.dataset_name, "in given range", start, end)
             return False
         # set the cursor to the first entry
         else:
@@ -502,7 +518,7 @@ class ERPDatasetObjectEntity(object):
         """
         field_type = self.created_dataset.Fields.Item(field).FieldType
         if field_type in self.field_types:
-            print("Set %s as %s - %s" % (field, self.field_types[field_type], value))
+            # print("Set %s as %s - %s" % (field, self.field_types[field_type], value))
             return exec('self.created_dataset.Fields("' +
                         str(field) +
                         '").' +

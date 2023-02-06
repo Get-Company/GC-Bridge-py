@@ -84,19 +84,26 @@ from main.src.Controller.Bridge2.Misc.Bridge2ObjectCurrencyController import Bri
 from main.src.Controller.ERP.ERPCustomerController import ERPCustomerController
 
 # Atti SW6
-from main.src.Controller.SW6.SW6UpdatingController import SW6UpdatingController
-from main.src.Controller.SW6.SW6InitController import SW6InitController
+from main.src.SW6_Bridge.process import sw_bridge
+#### Init und Sync All, Erste Upload von Bridge zu Shopware und/oder Sync all ######
+#sw_bridge.sync_all_customer_from_BRIDGE_to_SHOPWARE6()
+
+#### Sync alle Customers die in Bridge geändert wurden #######
+#sw_bridge.sync_all_changed_customers_from_BRIDGE_to_SHOPWARE6()
+
+#### Sync alle Customers die in SHOPWARE gerändert wurden #####
+sw_bridge.sync_all_changed_customers_from_SHOPWARE6_to_BRIDGE()
+
+#### UPLOAD alle neue Customer die in Shopware angelegt wurden inkl. Addressen ####
+#sw_bridge.upload_all_new_customer_from_SHOPWARE6_to_BRIDGE()
+
+
 
 # Amazon
 from main.src.Controller.Amazon.AmazonController import AmazonController
 
 # SW6_2
 from main.src.Controller.SW6_2.SW6_2ControllerObject import SW6_2ControllerObject
-
-# Atti
-from main.src.shopware_atti.help import *
-
-
 
 
 """
@@ -130,6 +137,8 @@ ERP Connection
 # erp_obj_test = ERPConnectionEntity(mandant="TEST")
 # erp_obj_test.connect()
 #
+# ERPCustomerController(erp_obj=erp_obj_test).sync_changed()
+
 # while True:
 #     # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_changed()
 #     Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_changed()
@@ -139,7 +148,7 @@ ERP Connection
 #
 #     if BridgeSynchronizeEntity().get_entity_by_id_1().loop_continue == 0:
 #         break
-#
+
 # erp_obj_test.close()
 # erp_obj.close()
 
@@ -207,7 +216,7 @@ def main():
     # bridge.id=1
     # bridge.dataset_category_sync_date = datetime.now()
     # bridge.dataset_product_sync_date = datetime.now()
-    # bridge.dataset_address_sync_date = datetime.now()
+    # bridge.dataset_customers_sync_date = datetime.now()
     # bridge.dataset_tax_sync_date = datetime.now()
     # bridge.dataset_order_sync_date = datetime.now()
     # bridge.sw6_category_sync_date = datetime.now()

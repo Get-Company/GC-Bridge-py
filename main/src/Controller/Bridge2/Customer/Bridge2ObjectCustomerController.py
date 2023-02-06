@@ -46,7 +46,7 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
 
     def set_sync_last_changed_range(self):
         today = datetime.now()
-        last_sync = self.bridge_synchronize_entity.get_entity_by_id_1().dataset_address_sync_date
+        last_sync = self.bridge_synchronize_entity.get_entity_by_id_1().dataset_customers_sync_date
         test_sync = datetime(2023, 1, 19, 13, 40)
         print("Sync Range:", last_sync.strftime("%d.%m.%Y %H:%M:%S"), today.strftime("%d.%m.%Y %H:%M:%S"))
         is_range = self.erp_entity.set_range(start=last_sync, end=today, field='LtzAend')
@@ -206,7 +206,7 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
     """
 
     def get_customer_new_or_updated_since_last_sync_from_erp(self):
-        last_customer_sync = BridgeSynchronizeEntity().get_entity_by_id_1().dataset_address_sync_date
+        last_customer_sync = BridgeSynchronizeEntity().get_entity_by_id_1().dataset_customers_sync_date
 
     def convert_customer_from_sw6_to_bridge_entity(self, customer: dict):
         """

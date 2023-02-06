@@ -52,7 +52,7 @@ class Bridge2ObjectCustomerAddressController(Bridge2ObjectController):
 
     def set_sync_last_changed_range(self):
         today = datetime.now()
-        last_sync = self.bridge_synchronize_entity.dataset_address_sync_date
+        last_sync = self.bridge_synchronize_entity.dataset_customers_sync_date
         test_sync = datetime(2022, 8, 1)
         is_range = self.erp_entity.set_range(test_sync, today, 'LtzAend')
         if is_range:

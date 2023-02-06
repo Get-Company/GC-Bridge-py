@@ -20,7 +20,7 @@ class BridgeObjectAddressController(BridgeObjectController):
         self.dataset = erp_get_dataset("Adressen")
         self.dataset_anschriften = erp_get_dataset("Anschriften")
         self.dataset_ansprechpartner = erp_get_dataset("Ansprechpartner")
-        self.last_sync_date_field = "dataset_address_sync_date"
+        self.last_sync_date_field = "dataset_customers_sync_date"
         self.dataset_field_ltzaend = "LtzAend"
         self.datetime_now = datetime.now()
         self.dataset_field_gspkz = "WShopAdrKz"

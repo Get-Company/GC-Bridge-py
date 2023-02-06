@@ -17,7 +17,7 @@ class BridgeCustomerEntity(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
     api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
-    erp_nr = db.Column(db.CHAR(10), nullable=True)
+    erp_nr = db.Column(db.CHAR(36), nullable=True)
     email = db.Column(db.String(255), nullable=False)
     ustid = db.Column(db.String(255), nullable=True)
     erp_reansnr = db.Column(db.Integer(), nullable=True)

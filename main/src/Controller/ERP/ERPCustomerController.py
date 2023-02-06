@@ -1,3 +1,10 @@
+"""
+Maßgeblich beteiligt war da Bauer Andi,
+der wo rausgefunden hat, dass es besser wäre, wenn das letzte
+Sync-Datum vom einen auf den andern übertragen wird!!!
+02.02.2023
+"""
+
 from typing import Union
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, SQLAlchemyError
 
@@ -30,7 +37,7 @@ class ERPCustomerController(ERPController):
 
     def sync_changed(self):
         bridge_synchronise_entity = BridgeSynchronizeEntity()
-        self.last_sync_date = bridge_synchronise_entity.get_entity_by_id_1().dataset_address_sync_date
+        self.last_sync_date = bridge_synchronise_entity.get_entity_by_id_1().dataset_customers_sync_date
 
 
         # Get new or updated from both sides
@@ -51,8 +58,7 @@ class ERPCustomerController(ERPController):
             print("###\n")
             self._sync_bridge_customer_to_erp(bridge_customer_list=bridge_customer_list)
         else:
-            print("No new or updated Customer in Bridge"
-                  "")
+            print("No new or updated Customer in Bridge")
 
         # Last set the sync date
         self.set_sync_date_now()
@@ -66,7 +72,7 @@ class ERPCustomerController(ERPController):
             LtzAend     >=  updated_at
 
         After that:
-        bridge_synchronize_entity.dataset_address_sync_date is set
+        bridge_synchronize_entity.dataset_customers_sync_date is set
         """
         # Don't set the date here, when downserting afterwrds. You will get a loop
         # self.set_sync_date_now()
@@ -192,7 +198,7 @@ class ERPCustomerController(ERPController):
 
     def set_sync_date_now(self):
         bridge_synchronize_entity = BridgeSynchronizeEntity().get_entity_by_id_1()
-        bridge_synchronize_entity.dataset_address_sync_date = datetime.now()
+        bridge_synchronize_entity.dataset_customers_sync_date = datetime.now()
         db.session.add(bridge_synchronize_entity)
         self.commit_with_errors()
         return True
@@ -235,7 +241,7 @@ class ERPCustomerController(ERPController):
     """
     def sync_changed_downsert(self):
         bridge_synchronize = BridgeSynchronizeEntity().get_entity_by_id_1()
-        last_sync = bridge_synchronize.dataset_address_sync_date
+        last_sync = bridge_synchronize.dataset_customers_sync_date
         customers = BridgeCustomerEntity.query.filter(
             BridgeCustomerEntity.updated_at >= last_sync
         ).all()

@@ -1,0 +1,236 @@
+2023-01-19 20:32:36,348 - INFO - root - <module>() - ---------------------------------
+2023-01-19 20:32:36,348 - INFO - root - <module>() - Project started
+2023-01-19 20:32:36,349 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 20:32:36,389 - INFO - entity_service - __category_init() - CategoryService - __category_init - Initializing categories
+2023-01-19 20:32:36,391 - INFO - entity_service - __category_init() - CategoryService - __category_init - Uploading categories without parend id parameter
+2023-01-19 20:32:36,391 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all category data
+2023-01-19 20:32:36,391 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-19 20:32:36,392 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-19 20:32:36,395 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:32:36,468 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-19 20:32:36,469 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-19 20:32:36,472 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:32:44,166 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-19 20:32:44,167 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 215 category data uploaded
+2023-01-19 20:32:44,167 - INFO - entity_service - __category_init() - CategoryService - __category_init - Uploading categories with parend id parameter to organize them hierarchically
+2023-01-19 20:32:44,168 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all category data
+2023-01-19 20:32:44,171 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:32:52,033 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-19 20:32:52,035 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 212 category data uploaded
+2023-01-19 20:32:52,038 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 20:32:52,096 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-19 20:32:52,097 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-19 20:32:52,097 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-19 20:32:52,097 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-19 20:32:52,098 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:32:52,169 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-19 20:32:52,170 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-19 20:32:52,172 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:32:56,878 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-19 20:32:56,879 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 36 customer data uploaded
+2023-01-19 20:32:56,880 - INFO - root - <module>() - Project finished
+2023-01-19 20:35:09,063 - INFO - root - <module>() - ---------------------------------
+2023-01-19 20:35:09,064 - INFO - root - <module>() - Project started
+2023-01-19 20:35:09,064 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 20:35:09,096 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 20:35:09,154 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-19 20:35:09,155 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-19 20:35:09,155 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-19 20:35:09,155 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-19 20:35:09,157 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:35:09,231 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-19 20:35:09,232 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-19 20:35:09,234 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:35:10,911 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-19 20:35:10,912 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 36 customer data uploaded
+2023-01-19 20:35:10,912 - INFO - root - <module>() - Project finished
+2023-01-19 20:36:31,262 - INFO - root - <module>() - ---------------------------------
+2023-01-19 20:36:31,262 - INFO - root - <module>() - Project started
+2023-01-19 20:36:31,263 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 20:36:31,296 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 20:36:31,368 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-19 20:36:31,368 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-19 20:36:31,369 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-19 20:36:31,369 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-19 20:36:31,372 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:36:31,444 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-19 20:36:31,445 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-19 20:36:31,448 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:36:33,211 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-19 20:36:33,212 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 36 customer data uploaded
+2023-01-19 20:36:33,213 - INFO - root - <module>() - Project finished
+2023-01-19 20:51:43,662 - INFO - root - <module>() - ---------------------------------
+2023-01-19 20:51:43,663 - INFO - root - <module>() - Project started
+2023-01-19 20:51:43,663 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 20:51:43,693 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 20:51:43,751 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-19 20:51:43,752 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-19 20:51:43,752 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-19 20:51:43,752 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-19 20:51:43,755 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:51:43,821 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-19 20:51:43,822 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-19 20:51:43,824 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 20:51:47,980 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-19 20:51:47,980 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 36 customer data uploaded
+2023-01-19 20:51:47,981 - INFO - root - <module>() - Project finished
+2023-01-19 23:54:54,890 - INFO - root - <module>() - ---------------------------------
+2023-01-19 23:54:54,891 - INFO - root - <module>() - Project started
+2023-01-19 23:54:54,891 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 23:54:54,922 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 23:54:54,980 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-19 23:54:54,981 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-19 23:54:54,981 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-19 23:54:54,981 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-19 23:54:54,984 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 23:54:55,052 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-19 23:54:55,053 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-19 23:54:55,056 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 23:54:56,640 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-19 23:54:56,641 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 36 customer data uploaded
+2023-01-19 23:54:56,641 - INFO - root - <module>() - Project finished
+2023-01-19 23:55:01,208 - INFO - root - <module>() - ---------------------------------
+2023-01-19 23:55:01,209 - INFO - root - <module>() - Project started
+2023-01-19 23:55:01,209 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 23:55:01,238 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 23:55:01,297 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-19 23:55:01,297 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-19 23:55:01,297 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-19 23:55:01,298 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-19 23:55:01,300 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 23:55:01,373 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-19 23:55:01,374 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-19 23:55:01,376 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 23:55:02,940 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-19 23:55:02,941 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 36 customer data uploaded
+2023-01-19 23:55:02,941 - INFO - root - <module>() - Project finished
+2023-01-19 23:55:23,706 - INFO - root - <module>() - ---------------------------------
+2023-01-19 23:55:23,706 - INFO - root - <module>() - Project started
+2023-01-19 23:55:23,706 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 23:55:23,737 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 23:56:05,257 - INFO - root - <module>() - ---------------------------------
+2023-01-19 23:56:05,257 - INFO - root - <module>() - Project started
+2023-01-19 23:56:05,257 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 23:56:05,273 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 23:56:55,993 - INFO - root - <module>() - ---------------------------------
+2023-01-19 23:56:55,993 - INFO - root - <module>() - Project started
+2023-01-19 23:56:55,993 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 23:56:56,025 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 23:57:15,994 - INFO - root - <module>() - ---------------------------------
+2023-01-19 23:57:15,994 - INFO - root - <module>() - Project started
+2023-01-19 23:57:15,994 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 23:57:16,025 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 23:58:10,524 - INFO - root - <module>() - ---------------------------------
+2023-01-19 23:58:10,524 - INFO - root - <module>() - Project started
+2023-01-19 23:58:10,524 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 23:58:10,556 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 23:58:10,603 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-19 23:58:10,603 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-19 23:58:10,603 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-19 23:58:10,603 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-19 23:58:10,603 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 23:58:10,681 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-19 23:58:10,681 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-19 23:58:10,684 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 23:58:12,245 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 400 None
+2023-01-19 23:58:12,245 - ERROR - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Problem occurred during uploading - {'entities': [], 'errors': []}
+2023-01-19 23:58:12,245 - INFO - root - <module>() - Project finished
+2023-01-19 23:59:13,729 - INFO - root - <module>() - ---------------------------------
+2023-01-19 23:59:13,729 - INFO - root - <module>() - Project started
+2023-01-19 23:59:13,729 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-19 23:59:13,760 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-19 23:59:13,807 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-19 23:59:13,807 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-19 23:59:13,807 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-19 23:59:13,807 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-19 23:59:13,807 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 23:59:13,887 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-19 23:59:13,887 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-19 23:59:13,887 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-19 23:59:15,600 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-19 23:59:15,600 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 37 customer data uploaded
+2023-01-19 23:59:15,600 - INFO - root - <module>() - Project finished
+2023-01-20 08:43:15,166 - INFO - root - <module>() - ---------------------------------
+2023-01-20 08:43:15,167 - INFO - root - <module>() - Project started
+2023-01-20 08:43:15,167 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-20 08:43:15,203 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-20 08:43:15,259 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-20 08:43:15,260 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-20 08:43:15,260 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-20 08:43:15,260 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-20 08:43:15,263 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 08:43:15,333 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-20 08:43:15,334 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-20 08:43:15,336 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 08:43:20,115 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-20 08:43:20,116 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 37 customer data uploaded
+2023-01-20 08:43:20,118 - INFO - root - <module>() - Project finished
+2023-01-20 08:45:39,097 - INFO - root - <module>() - ---------------------------------
+2023-01-20 08:45:39,097 - INFO - root - <module>() - Project started
+2023-01-20 08:45:39,097 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-20 08:45:39,126 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-20 08:45:39,182 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-20 08:45:39,182 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-20 08:45:39,182 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-20 08:45:39,183 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-20 08:45:39,185 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 08:45:39,253 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-20 08:45:39,254 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-20 08:45:39,256 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 08:45:40,884 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-20 08:45:40,885 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 37 customer data uploaded
+2023-01-20 08:45:40,886 - INFO - root - <module>() - Project finished
+2023-01-20 08:46:34,661 - INFO - root - <module>() - ---------------------------------
+2023-01-20 08:46:34,661 - INFO - root - <module>() - Project started
+2023-01-20 08:46:34,661 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-20 08:46:34,692 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-20 08:46:34,746 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-20 08:46:34,746 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-20 08:46:34,746 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-20 08:46:34,746 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-20 08:46:34,749 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 08:46:34,816 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-20 08:46:34,817 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-20 08:46:34,819 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 08:46:36,491 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-20 08:46:36,492 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 37 customer data uploaded
+2023-01-20 08:46:36,493 - INFO - root - <module>() - Project finished
+2023-01-20 08:50:03,229 - INFO - root - <module>() - ---------------------------------
+2023-01-20 08:50:03,230 - INFO - root - <module>() - Project started
+2023-01-20 08:50:03,230 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-20 08:50:03,257 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-20 08:50:03,311 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-20 08:50:03,312 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-20 08:50:03,312 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-20 08:50:03,312 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-20 08:50:03,314 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 08:50:03,386 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-20 08:50:03,386 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-20 08:50:03,389 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 08:50:05,027 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-20 08:50:05,028 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 37 customer data uploaded
+2023-01-20 08:50:05,028 - INFO - root - <module>() - Project finished
+2023-01-20 10:43:22,612 - INFO - root - <module>() - ---------------------------------
+2023-01-20 10:43:22,612 - INFO - root - <module>() - Project started
+2023-01-20 10:43:22,613 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-20 10:43:22,645 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-20 10:48:48,752 - INFO - root - <module>() - ---------------------------------
+2023-01-20 10:48:48,752 - INFO - root - <module>() - Project started
+2023-01-20 10:48:48,752 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-20 10:48:48,791 - INFO - entity_service - __category_init() - CategoryService - __category_init - Initializing categories
+2023-01-20 10:48:48,792 - INFO - entity_service - __category_init() - CategoryService - __category_init - Uploading categories without parend id parameter
+2023-01-20 10:48:48,792 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all category data
+2023-01-20 10:48:48,792 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-20 10:48:48,793 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-20 10:48:48,796 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 10:48:48,870 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-20 10:48:48,871 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-20 10:48:48,874 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 10:48:56,244 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-20 10:48:56,245 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 215 category data uploaded
+2023-01-20 10:48:56,245 - INFO - entity_service - __category_init() - CategoryService - __category_init - Uploading categories with parend id parameter to organize them hierarchically
+2023-01-20 10:48:56,246 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all category data
+2023-01-20 10:48:56,249 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-20 10:49:03,655 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-20 10:49:03,656 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 212 category data uploaded
+2023-01-20 10:49:03,659 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers

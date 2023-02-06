@@ -1,0 +1,61 @@
+{
+  "logging": {
+        "version" : 1,
+        "disable_existing_loggers": false,
+        "formatters" : {
+            "f": {"class":"logging.Formatter", "format": "%(asctime)s - %(levelname)s - %(name)s - %(funcName)s() - %(message)s"}
+        },
+        "handlers" : {
+           "stream": {
+                "class": "logging.StreamHandler",
+                "formatter": "f",
+                "level": "INFO"
+            },
+            "file": {
+                "class": "logging.handlers.TimedRotatingFileHandler",
+                "formatter": "f",
+                "level": "DEBUG",
+                "filename": "logs/shopware-bridge.log",
+                "when": "W0",
+                "interval": 1,
+                "backupCount": 2,
+                "encoding": "utf-8"
+              }
+            },
+        "loggers": {
+        },
+        "root": {
+            "level": "DEBUG",
+            "handlers": ["stream", "file"]
+        }
+    },
+    "sw_options": {
+      "shopware_admin_api_url": "http://localhost/api",
+      "shopware_auth_url": "http://localhost/api/oauth/token",
+      "client_id": "SWIAVLO4TTRZTWFRNHFREXIYUG",
+      "client_secret": "U1VCSmU5NXRyS0NWdjM5QWdYbU5XeHI5Wm5YYWZRam9LZ2tZOEk",
+      "grant_type": "client_credentials",
+      "customers_params": {
+        "countryId": "491b3f1900864d599de28fd5f9283609",
+        "groupId": "1653405424824b1d8cefcb888417f3ef",
+        "salesChannelId": "a8a5c40ce38b44d1a4bc894a0f343475",
+        "defaultPaymentMethodId": "100974ef3cbb4ffead3b81b362aa4f41",
+        "languageId": "eae7aac7c18f401196face426727954c",
+        "description": {
+          "countryId": "Settings->Countries->Germany->id from url",
+          "groupId": "Settings->Customer groups->Standard customer group->id from url",
+          "salesChannelId": "Sales Channels->Storefront->id from url",
+          "defaultPaymentMethodId": "Settings->Payment Methods->Invoice->Edit details->id from url",
+          "languageId": "Settings->Languages->Germany->id from url"
+        }
+      }
+    },
+  "sw_options_old": {
+    "shopware_admin_api_url": "http://localhost/api",
+    "shopware_storefront_api_url": "http://localhost/store-api",
+    "username": "",
+    "password": "",
+    "grant_type": "user_credentials"
+    },
+  "sqlalchemy_url": "mysql+pymysql://root:password@localhost:3306/gc-bridge_db"
+}

@@ -1,0 +1,220 @@
+2023-01-26 11:14:52,873 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:14:52,877 - INFO - root - <module>() - Project started
+2023-01-26 11:14:52,877 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:14:52,966 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:15:19,532 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:15:19,533 - INFO - root - <module>() - Project started
+2023-01-26 11:15:19,533 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:15:19,564 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:15:40,976 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:15:40,976 - INFO - root - <module>() - Project started
+2023-01-26 11:15:40,976 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:15:45,125 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:15:45,126 - INFO - root - <module>() - Project started
+2023-01-26 11:15:45,126 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:15:45,159 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:16:22,723 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:16:22,723 - INFO - root - <module>() - Project started
+2023-01-26 11:16:22,723 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:16:22,752 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:16:27,441 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:16:27,442 - INFO - root - <module>() - Project started
+2023-01-26 11:16:27,442 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:16:27,470 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:17:02,222 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:17:02,222 - INFO - root - <module>() - Project started
+2023-01-26 11:17:02,222 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:17:02,251 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:17:02,308 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-26 11:17:02,309 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-26 11:17:02,309 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-26 11:17:02,309 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-26 11:17:02,314 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:17:02,336 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 401 None
+2023-01-26 11:17:02,336 - ERROR - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Problem occured during getting access token - {'errors': [{'code': '4', 'status': '401', 'title': 'Client authentication failed', 'detail': None}]}
+2023-01-26 11:17:02,339 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:17:02,355 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 401 None
+2023-01-26 11:17:02,356 - ERROR - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Problem occurred during uploading - [{'code': '9', 'status': '401', 'title': 'The resource owner or authorization server denied the request.', 'detail': 'The JWT string must have two dots'}]
+2023-01-26 11:17:02,356 - INFO - root - <module>() - Project finished
+2023-01-26 11:17:51,029 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:17:51,029 - INFO - root - <module>() - Project started
+2023-01-26 11:17:51,029 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:17:51,057 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:17:51,110 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-26 11:17:51,111 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-26 11:17:51,111 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-26 11:17:51,111 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-26 11:17:51,114 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:17:51,136 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 401 None
+2023-01-26 11:17:51,137 - ERROR - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Problem occured during getting access token - {'errors': [{'code': '4', 'status': '401', 'title': 'Client authentication failed', 'detail': None}]}
+2023-01-26 11:17:51,140 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:17:51,209 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 401 None
+2023-01-26 11:17:51,209 - ERROR - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Problem occurred during uploading - [{'code': '9', 'status': '401', 'title': 'The resource owner or authorization server denied the request.', 'detail': 'The JWT string must have two dots'}]
+2023-01-26 11:17:51,210 - INFO - root - <module>() - Project finished
+2023-01-26 11:17:59,679 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:17:59,679 - INFO - root - <module>() - Project started
+2023-01-26 11:17:59,680 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:17:59,708 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:17:59,761 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-26 11:17:59,761 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-26 11:17:59,762 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-26 11:17:59,762 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-26 11:17:59,765 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:17:59,832 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-26 11:17:59,833 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-26 11:17:59,835 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:18:00,000 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 400 None
+2023-01-26 11:18:00,002 - ERROR - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Problem occurred during uploading - {'entities': [], 'errors': [{'code': '0', 'status': '500', 'title': 'Internal Server Error', 'detail': "An exception occurred while executing 'INSERT INTO `customer` (`id`, `customer_group_id`, `default_payment_method_id`, `sales_channel_id`, `language_id`, `default_billing_address_id`, `default_shipping_address_id`, `customer_number`, `first_name`, `last_name`, `email`, `created_at`) VALUES ('�ZF\x02�\x1fN��\x1f�\x1dC','ϽP\x18ӍAح�\x10�OȽ�','�HSO4�A\u07b5���\x081\x19\x02','�!mo�tL��A�Q�V��','Q:C���Nߡ-\x0eG�]0','\x7fߪ���C��9k��)�','\x7fߪ���C��9k��)�','fb5a4602a41f4ef4a5aec0b81fd31d43','Kuki','Mamanoka','1contact@get-company.com','2023-01-26 10:17:59.906');':\n\nSQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`shopware`.`customer`, CONSTRAINT `fk.customer.default_payment_method_id` FOREIGN KEY (`default_payment_method_id`) REFERENCES `payment_method` (`id`) ON UPDATE CASCADE)"}]}
+2023-01-26 11:18:00,003 - INFO - root - <module>() - Project finished
+2023-01-26 11:18:46,680 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:18:46,680 - INFO - root - <module>() - Project started
+2023-01-26 11:18:46,680 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:18:46,711 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:18:46,768 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-26 11:18:46,768 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-26 11:18:46,769 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-26 11:18:46,769 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-26 11:18:46,772 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:18:46,847 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-26 11:18:46,848 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-26 11:18:46,850 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:18:46,997 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 400 None
+2023-01-26 11:18:46,999 - ERROR - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Problem occurred during uploading - {'entities': [], 'errors': [{'code': '0', 'status': '500', 'title': 'Internal Server Error', 'detail': "An exception occurred while executing 'INSERT INTO `customer` (`id`, `customer_group_id`, `default_payment_method_id`, `sales_channel_id`, `language_id`, `default_billing_address_id`, `default_shipping_address_id`, `customer_number`, `first_name`, `last_name`, `email`, `created_at`) VALUES ('�ZF\x02�\x1fN��\x1f�\x1dC','ϽP\x18ӍAح�\x10�OȽ�','�HSO4�A\u07b5���\x081\x19\x02','�!mo�tL��A�Q�V��','Q:C���Nߡ-\x0eG�]0','\x7fߪ���C��9k��)�','\x7fߪ���C��9k��)�','fb5a4602a41f4ef4a5aec0b81fd31d43','Kuki','Mamanoka','1contact@get-company.com','2023-01-26 10:18:46.912');':\n\nSQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`shopware`.`customer`, CONSTRAINT `fk.customer.default_payment_method_id` FOREIGN KEY (`default_payment_method_id`) REFERENCES `payment_method` (`id`) ON UPDATE CASCADE)"}]}
+2023-01-26 11:18:46,999 - INFO - root - <module>() - Project finished
+2023-01-26 11:20:00,570 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:20:00,570 - INFO - root - <module>() - Project started
+2023-01-26 11:20:00,570 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:20:00,603 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:20:00,671 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-26 11:20:00,671 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-26 11:20:00,672 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-26 11:20:00,672 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-26 11:20:00,675 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:20:00,743 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-26 11:20:00,744 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-26 11:20:00,746 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:20:00,896 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 400 None
+2023-01-26 11:20:00,898 - ERROR - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Problem occurred during uploading - {'entities': [], 'errors': [{'code': '0', 'status': '500', 'title': 'Internal Server Error', 'detail': "An exception occurred while executing 'INSERT INTO `customer` (`id`, `customer_group_id`, `default_payment_method_id`, `sales_channel_id`, `language_id`, `default_billing_address_id`, `default_shipping_address_id`, `customer_number`, `first_name`, `last_name`, `email`, `created_at`) VALUES ('�ZF\x02�\x1fN��\x1f�\x1dC','ϽP\x18ӍAح�\x10�OȽ�','�HSO4�A\u07b5���\x081\x19\x02','�!mo�tL��A�Q�V��','Q:C���Nߡ-\x0eG�]0','\x7fߪ���C��9k��)�','\x7fߪ���C��9k��)�','fb5a4602a41f4ef4a5aec0b81fd31d43','Florian','ReAspBuchner2','1contact@get-company.com','2023-01-26 10:20:00.812');':\n\nSQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`shopware`.`customer`, CONSTRAINT `fk.customer.default_payment_method_id` FOREIGN KEY (`default_payment_method_id`) REFERENCES `payment_method` (`id`) ON UPDATE CASCADE)"}]}
+2023-01-26 11:20:00,898 - INFO - root - <module>() - Project finished
+2023-01-26 11:21:10,750 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:21:10,750 - INFO - root - <module>() - Project started
+2023-01-26 11:21:10,750 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:21:10,781 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:21:10,841 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-26 11:21:10,842 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-26 11:21:10,842 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-26 11:21:10,842 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-26 11:21:10,845 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:21:10,914 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-26 11:21:10,915 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-26 11:21:10,918 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:21:16,169 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-26 11:21:16,170 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 36 customer data uploaded
+2023-01-26 11:21:16,170 - INFO - root - <module>() - Project finished
+2023-01-26 11:21:59,963 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:21:59,963 - INFO - root - <module>() - Project started
+2023-01-26 11:21:59,963 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:21:59,994 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:23:09,125 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:23:09,126 - INFO - root - <module>() - Project started
+2023-01-26 11:23:09,126 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:23:09,155 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:24:05,433 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:24:05,433 - INFO - root - <module>() - Project started
+2023-01-26 11:24:05,433 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:24:05,465 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:25:40,186 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:25:40,186 - INFO - root - <module>() - Project started
+2023-01-26 11:25:40,186 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:25:40,220 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:25:40,280 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-26 11:25:40,280 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-26 11:25:40,280 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-26 11:25:40,280 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-26 11:25:40,280 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:25:40,344 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-26 11:25:40,344 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-26 11:25:40,344 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:25:42,098 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-26 11:25:42,099 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 37 customer data uploaded
+2023-01-26 11:25:42,100 - INFO - root - <module>() - Project finished
+2023-01-26 11:27:04,823 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:27:04,823 - INFO - root - <module>() - Project started
+2023-01-26 11:27:04,824 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:27:04,854 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:27:04,919 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-26 11:27:04,919 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-26 11:27:04,920 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-26 11:27:04,920 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-26 11:27:04,923 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:27:04,996 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-26 11:27:04,997 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-26 11:27:04,999 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:27:06,698 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-26 11:27:06,699 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 37 customer data uploaded
+2023-01-26 11:27:06,699 - INFO - root - <module>() - Project finished
+2023-01-26 11:28:50,033 - INFO - root - <module>() - ---------------------------------
+2023-01-26 11:28:50,034 - INFO - root - <module>() - Project started
+2023-01-26 11:28:50,034 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-26 11:28:50,062 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-26 11:28:50,117 - INFO - entity_service - __category_init() - CustomerService - __category_init - Uploading customers
+2023-01-26 11:28:50,117 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Try to init and upload all customer data
+2023-01-26 11:28:50,117 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Access token has expired
+2023-01-26 11:28:50,118 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Try to get new access token for client
+2023-01-26 11:28:50,120 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:28:50,191 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/oauth/token HTTP/1.1" 200 None
+2023-01-26 11:28:50,192 - INFO - sw6_interface - __get_access_token() - Sw6Interface - __get_access_token - Token has been taken successfully - it is valid until 600 sec
+2023-01-26 11:28:50,194 - DEBUG - urllib3.connectionpool - _new_conn() - Starting new HTTP connection (1): localhost:80
+2023-01-26 11:28:52,031 - DEBUG - urllib3.connectionpool - _make_request() - http://localhost:80 "POST /api/_action/sync HTTP/1.1" 200 None
+2023-01-26 11:28:52,032 - INFO - sw6_interface - sync_entity_to_sw() - Sw6Interface - sync_entity_to_sw - Uploading finished successfully - 38 customer data uploaded
+2023-01-26 11:28:52,032 - INFO - root - <module>() - Project finished
+2023-01-28 15:09:28,489 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:09:28,489 - INFO - root - <module>() - Project started
+2023-01-28 15:09:28,490 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:09:28,521 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-28 15:10:58,547 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:10:58,547 - INFO - root - <module>() - Project started
+2023-01-28 15:10:58,547 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:10:58,579 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-28 15:12:05,925 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:12:05,925 - INFO - root - <module>() - Project started
+2023-01-28 15:12:05,925 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:12:05,958 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-28 15:14:58,476 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:14:58,476 - INFO - root - <module>() - Project started
+2023-01-28 15:14:58,476 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:21:48,229 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:21:48,229 - INFO - root - <module>() - Project started
+2023-01-28 15:21:48,230 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:24:13,053 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:24:13,053 - INFO - root - <module>() - Project started
+2023-01-28 15:24:13,053 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:25:25,694 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:25:25,695 - INFO - root - <module>() - Project started
+2023-01-28 15:25:25,695 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:26:37,802 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:26:37,802 - INFO - root - <module>() - Project started
+2023-01-28 15:26:37,802 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:28:20,612 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:28:20,613 - INFO - root - <module>() - Project started
+2023-01-28 15:28:20,613 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:28:38,560 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:28:38,561 - INFO - root - <module>() - Project started
+2023-01-28 15:28:38,561 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:28:38,572 - INFO - root - <module>() - Project finished
+2023-01-28 15:29:10,542 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:29:10,542 - INFO - root - <module>() - Project started
+2023-01-28 15:29:10,542 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:29:30,303 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:29:30,303 - INFO - root - <module>() - Project started
+2023-01-28 15:29:30,303 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:30:55,442 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:30:55,442 - INFO - root - <module>() - Project started
+2023-01-28 15:30:55,442 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:32:36,738 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:32:36,738 - INFO - root - <module>() - Project started
+2023-01-28 15:32:36,738 - INFO - process - sync_to_sw() - Initialize the project
+2023-01-28 15:32:36,785 - INFO - entity_service - __category_init() - CustomerService - __category_init - Initializing customers
+2023-01-28 15:38:19,424 - INFO - root - <module>() - ---------------------------------
+2023-01-28 15:38:19,425 - INFO - root - <module>() - Project started
+2023-01-28 15:38:19,425 - INFO - process - sync_to_sw() - Initialize the project

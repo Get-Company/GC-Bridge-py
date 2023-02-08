@@ -84,7 +84,7 @@ from main.src.Controller.Bridge2.Misc.Bridge2ObjectCurrencyController import Bri
 from main.src.Controller.ERP.ERPCustomerController import ERPCustomerController
 
 # Atti SW6
-from main.src.SW6_Bridge.process import sw_bridge
+# from main.src.SW6_Bridge.process import sw_bridge
 #### Init und Sync All, Erste Upload von Bridge zu Shopware und/oder Sync all ######
 #sw_bridge.sync_all_customer_from_BRIDGE_to_SHOPWARE6()
 
@@ -92,7 +92,7 @@ from main.src.SW6_Bridge.process import sw_bridge
 #sw_bridge.sync_all_changed_customers_from_BRIDGE_to_SHOPWARE6()
 
 #### Sync alle Customers die in SHOPWARE gerändert wurden #####
-sw_bridge.sync_all_changed_customers_from_SHOPWARE6_to_BRIDGE()
+# sw_bridge.sync_all_changed_customers_from_SHOPWARE6_to_BRIDGE()
 
 #### UPLOAD alle neue Customer die in Shopware angelegt wurden inkl. Addressen ####
 #sw_bridge.upload_all_new_customer_from_SHOPWARE6_to_BRIDGE()
@@ -131,13 +131,11 @@ migrate = Migrate(app, db)
 ######################
 ERP Connection
 """
-# erp_obj = ERPConnectionEntity()
-# erp_obj.connect()
-#
-# erp_obj_test = ERPConnectionEntity(mandant="TEST")
-# erp_obj_test.connect()
-#
-# ERPCustomerController(erp_obj=erp_obj_test).sync_changed()
+
+erp_obj_test = ERPConnectionEntity(mandant="TEST")
+erp_obj_test.connect()
+
+ERPCustomerController(erp_obj=erp_obj_test).sync_changed()
 
 # while True:
 #     # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_changed()
@@ -149,11 +147,10 @@ ERP Connection
 #     if BridgeSynchronizeEntity().get_entity_by_id_1().loop_continue == 0:
 #         break
 
-# erp_obj_test.close()
+erp_obj_test.close()
 # erp_obj.close()
 
 
-# ERPCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
 
 # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10026)
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)

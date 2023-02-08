@@ -36,6 +36,7 @@ Examples:
 
 """
 import logging
+import re
 from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
 from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
@@ -242,12 +243,21 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         return anschriften_ntt
 
     def get_login(self):
+        """
+        This function returns the email address of the special standard billing address.
+        If the email address is not available, it returns False.
+
+        Returns:
+            str or bool: email address or False if not available
+        """
         address = self.get_special_standard_billing_address()
         email = address.get_("EMail1")
-        if email:
-           return email
+        # Check if the email address exists and if it is valid
+        if email and re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            return email
         else:
             return False
+
 
     def print_dataset_fields(self):
 

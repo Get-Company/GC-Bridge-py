@@ -214,21 +214,3 @@ class Bridge2ObjectController(ControllerObject):
 
     def before_upsert(self, current_erp_entity):
         pass
-
-    """
-    Sync in both directions
-    """
-
-    def sync_x_to_y(self, **kwargs):
-        pass
-
-    def get_newest_x_since_last_sync(self, x, bridge_synchronize_entity:BridgeSynchronizeEntity):
-        pass
-
-    def is_x_in_y(self, x, y):
-        pass
-
-    def is_x_newer_than_y(self, x, y):
-        pass
-
-

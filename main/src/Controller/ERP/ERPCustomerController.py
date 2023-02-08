@@ -29,7 +29,7 @@ class ERPCustomerController(ERPController):
         self.bridge_entity = BridgeCustomerEntity()
         self.webshop_filter = "WShopAdrKz = '1'"
 
-        self.last_sync_date = BridgeSynchronizeEntity().get_entity_by_id_1().da
+        self.last_sync_date = BridgeSynchronizeEntity().get_dataset_customers_sync_date()
 
         # Downsert
         self.new_or_updated_customers_in_bridge = None
@@ -159,7 +159,11 @@ class ERPCustomerController(ERPController):
         while not anschriften.range_eof():
             ansprechpartner = anschriften.get_ansprechpartner()
             while not ansprechpartner.range_eof():
-
+                print("Search Anspr:",
+                      ansprechpartner.get_("AdrNr"),
+                      ansprechpartner.get_("AnsNr"),
+                      ansprechpartner.get_("AspNr")
+                      )
                 # Map the fields
                 mapped_bridge_address = BridgeCustomerAddressEntity().map_erp_to_db(
                     erp_address_entity=anschriften,
@@ -187,8 +191,6 @@ class ERPCustomerController(ERPController):
 
                 ansprechpartner.range_next()
             anschriften.range_next()
-
-            bridge_synchronize = BridgeSynchronizeEntity().get_entity_by_id_1()
 
         return True
 
@@ -225,8 +227,9 @@ class ERPCustomerController(ERPController):
         return True
 
     def set_sync_date_now(self):
-        bridge_synchronize_entity = BridgeSynchronizeEntity().get_entity_by_id_1()
-        bridge_synchronize_entity.dataset_customers_sync_date = datetime.now()
+        print("Set Last Sync Date")
+        bridge_synchronize_entity = BridgeSynchronizeEntity()
+        BridgeSynchronizeEntity().set_dataset_customers_sync_date(datetime.now())
         db.session.add(bridge_synchronize_entity)
         self.commit_with_errors()
         return True

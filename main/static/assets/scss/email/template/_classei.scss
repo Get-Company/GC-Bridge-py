@@ -1,0 +1,103 @@
+p{
+  display:block!important;
+  margin: 0;
+  margin-bottom: 10px;
+}
+.grey {
+  color: gray;
+}
+.black {
+  color: #000000;
+}
+
+.orange {
+  color: $primary-color;
+}
+
+.red {
+  color: #ff0000;
+}
+
+.price {
+  font-size: $global-font-size * 1.5;
+}
+
+.small, .footer p {
+  font-size: $small-font-size;
+}
+.xs-small, .footer p {
+  font-size: $global-font-size * 0.6;
+}
+.xl-large{
+  font-size: $global-font-size * 2.5;
+}
+
+.times{
+  font-family: "Times New Roman", Times, serif;
+}
+
+.cite{
+  font-style: italic;
+  color: $secondary-color;
+}
+.cite_orange{
+  @extend .cite;
+  color: $primary-color;
+}
+
+
+.footer-text {
+  font-size: $small-font-size *0.8;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: $primary-color;
+  small{
+   color: $dark-gray;
+ }
+}
+
+.menu {
+  background-color:$primary-color;
+
+  th.menu-item {
+    a {
+      font-weight: bold;
+    }
+  }
+}
+
+.spacer {
+  background: transparent;
+}
+
+
+.row {
+  background: $row-background;
+  border-radius: 5px;
+  &.primary{
+    background: #fff0e0;
+  }
+  .columns{
+        padding-top: $global-padding;
+      &.col-small{
+        padding: 5px;
+        padding-bottom: 5px;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 5px;
+      }
+  }
+
+}
+
+/* Die Linie beim Bestellformular */
+.underline {
+  tr {
+    td, th {
+      border-bottom: 1px dotted #000;
+    }
+
+  }
+
+}

@@ -1,0 +1,132 @@
+.preheader {
+  color: #ffffff;
+font-size: 1px;
+  a {
+    color: #ffffff;
+  }
+}
+.p-0{
+  tr{
+    th{
+      padding: 0 0 0 0 !important;
+      padding-top: 0px !important;
+      padding-bottom: 0px !important;
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+    }
+  }
+}
+
+.pt-0 {
+  padding-top: 0px !important;
+  tr {
+    th {
+      padding-top: 0px !important;
+    }
+  }
+}
+
+.pb-0 {
+  padding-bottom: 0px !important;
+  tr {
+    th {
+      padding-bottom: 0px !important;
+    }
+  }
+}
+
+.pt-10 {
+  padding-top: $text-padding !important;
+  tr {
+    th {
+      padding-top: $text-padding !important;
+    }
+  }
+}
+
+.pb-10 {
+  tr {
+    th {
+      padding-bottom: $text-padding !important;
+    }
+  }
+}
+
+.pt-20 {
+  tr {
+    th {
+      padding-top: $text-padding * 2 !important;
+    }
+  }
+}
+
+
+.pb-20 {
+  tr {
+    th {
+      padding-bottom: $text-padding * 2 !important;
+    }
+  }
+}
+
+.pl-10{
+  tr{
+    th{
+      padding-left: 10px;
+    }
+  }
+
+}
+.pr-10{
+  tr{
+    th{
+      padding-right: 10px;
+    }
+  }
+
+}
+
+.py-0{
+  @extend .pt-0;
+  @extend .pb-0;
+}
+
+.py-10 {
+  @extend .pt-10;
+  @extend .pb-10;
+}
+
+.py-20 {
+  @extend .pt-20;
+  @extend .pb-20;
+}
+
+.px-10{
+  @extend .pl-10;
+  @extend .pr-10;
+}
+
+.pl-20{
+  tr{
+    th{
+      padding-left: 20px;
+    }
+  }
+
+}
+.pr-20{
+  tr{
+    th{
+      padding-right: 20px;
+    }
+  }
+
+}
+.px-20{
+  @extend .pl-20;
+  @extend .pr-20;
+}
+
+.mb-0{
+  margin-bottom: 0;
+}

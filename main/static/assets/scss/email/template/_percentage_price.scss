@@ -1,0 +1,27 @@
+.percentage-price-normal {
+  text-decoration: line-through;
+}
+
+.percentage-price-offer {
+  font-size: $h1-font-size * 0.8;
+  font-weight: bold;
+  text-align: center;
+  line-height: $global-line-height;
+}
+
+.percentage-price-reduction {
+  font-size: $h1-font-size;
+  color: $primary-color;
+  text-align: center;
+  line-height: $global-line-height;
+  font-weight: bold;
+}
+.rabatt-field {
+  font-size: $h1-font-size * 0.6;
+  background-color: $primary-color;
+  color: #ffffff;
+  text-align: center;
+  padding: 10px;
+  line-height: $global-line-height;
+  font-weight: bold;
+}

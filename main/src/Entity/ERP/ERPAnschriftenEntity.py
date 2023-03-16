@@ -6,6 +6,7 @@ Examples:
 import logging
 from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
+
 import datetime
 
 
@@ -49,4 +50,29 @@ class ERPAnschriftenEntity(ERPDatasetObjectEntity):
     def get_country_name(self):
         country_name = self.get_("LandBez")
         return country_name
+
+    def create_new_address(self,adrnr,  customer_file=None, fields=None):
+        """
+        Complete function for creating a new customer_address .
+        Just add a dict of fields, and give the
+        path to the prefill file.
+        """
+        # Create the new dataset
+        self.create_dataset()
+
+        # Append new row
+        self.append_()
+
+        # Fill out the fields given rom the json file
+        if customer_file:
+            self.prefill_from_file(file=self.prefill_json_directory+customer_file)
+        # Fill th fields given from the dict
+        if fields:
+            for field_key, field_value in fields.items():
+                self.create_(field_key, field_value)
+        self.create_("AdrNr", adrnr)
+        # Post everything
+        self.post_()
+
+
 

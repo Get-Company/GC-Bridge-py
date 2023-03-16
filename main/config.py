@@ -36,50 +36,40 @@ from attrs import validators
 @attrs.define
 class ConfShopware6ApiBase(object):
     # the api url, like : 'https://shop.yourdomain.com/api'
-    shopware_admin_api_url: str = "http://localhost/api"
+    shopware_admin_api_url: str = "https://sw6.classei-shop.com/api"
+    shopware_admin_api_url_token: str = "https://sw6.classei-shop.com/api/oauth/token"
     # the storefront api url, like : 'https://shop.yourdomain.com/store-api'
     shopware_storefront_api_url: str = ""
+    # API ID´s FIX
+    ##############
+    ##############
+    ##############
+    ##############
 
-    """
-    Admin API:
-    for User Credentials Grant Type:
-    ==================================
-    - with refresh token
-    - we recommend to only use this grant flow for client applications that should
-      perform administrative actions and require a user-based authentication
 
-    """
+    sales_channel = "07a1e910ba9a40269c2f70d16066f167"
+    currency = "b7d2554b0ce847cd82f3ac9bd1c0dfca"
+
+
+    ##############
+    ##############
+    ##############
+    ##############
+    ##############
+
     username: str = "admin"
     password: str = "shopware"
 
-    """
-    Admin API:
-    for Resource Owner Password Grant Type:
-    =======================================
-    - no refresh token
-    - should be used for machine-to-machine communications, such as CLI jobs or automated services
-    see https://shopware.stoplight.io/docs/admin-api/ZG9jOjEwODA3NjQx-authentication-and-authorisation
-    setup via Web Administration Interface > settings > system > integration: "access_id" and "access_secret"
-    or directly via URL : https://<fqdn>/admin#/sw/integration/index
-    were <fqdn> is the fully qualified domain name, like https://myshop.mydomain.com/admin#/sw/integration/index
-    """
+
     # the client key ID, setup at Web Administration Interface > settings > system > integration > access_id
-    client_id: str = "SWIAZMPJQW1JWGLYSMJTWXLWTA"
+    client_id: str = "SWIAC3NYCJRJR05XSJJVTMTSSQ"
     # the client secret, setup at Web Administration Interface > settings > system > integration > access_secret
-    client_secret: str = "dFNOT3F5dFRremhETFc3TWdrN00zZVBtdFBQQVZYTmFhWGxKYzA"
+    client_secret: str = "d3FCTU9vNkV6Mk1hTVhvYVNocDYxRkhZSGY1ZDRpcENvdjdmM0U"
 
-    """
-    Admin API:
-    Grant Type to use:
-    ==================
-    which grant type to use - can be either 'user_credentials'- or 'resource_owner'
-    """
-    grant_type: str = "user_credentials"
 
-    """
-    Store API:
-    sw-access-key set in Administration/Sales Channels/API
-    """
+    grant_type: str = "client_credentials"
+
+
     store_api_sw_access_key: str = ""
 
 

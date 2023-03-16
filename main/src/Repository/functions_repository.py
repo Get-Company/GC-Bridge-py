@@ -136,11 +136,12 @@ def parse_english_number_to_european(number):
     :return: float
     """
     if not number or number == '':
-        return
+        return False
     else:
         num = str(number)
         decmark_reg = re.compile('(?<=\d)\.(?=\d)')
         number_float_eu = decmark_reg.sub('.', num)
+        print(number_float_eu)
         return number_float_eu
 
 

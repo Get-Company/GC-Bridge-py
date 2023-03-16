@@ -71,7 +71,7 @@ class BridgeCustomerEntity(db.Model):
         self.erp_reansnr = entity.erp_reansnr
         self.erp_liansnr = entity.erp_liansnr
         self.erp_ltz_aend = entity.erp_ltz_aend
-        self.updated_at = datetime.now()
+        self.updated_at = datetime.now().replace(tzinfo=None)
 
         return self
 
@@ -80,7 +80,7 @@ class BridgeCustomerEntity(db.Model):
         self.ustid = erp_entity.get_("UStId")
         self.erp_reansnr = erp_entity.get_("ReAnsNr")
         self.erp_liansnr = erp_entity.get_("LiAnsNr")
-        self.erp_ltz_aend = erp_entity.get_('LtzAend')
+        self.erp_ltz_aend = erp_entity.get_('LtzAend').replace(tzinfo=None)
         self.email = erp_entity.get_login()
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
@@ -93,11 +93,11 @@ class BridgeCustomerEntity(db.Model):
         :return: dict of fields
         """
         updated_fields_list = {
-            "WShopID": self.api_id,
+            # "WShopID": self.api_id,
             "ReAnsNr": self.erp_reansnr,
             "LiAnsNr": self.erp_liansnr,
-            "WShopAdrKz": 1,
-            "Memo": "Neuer Sync klappt"+self.updated_at.strftime("%d.%m.%Y %H:%M:%S"),
+            # "WShopAdrKz": 1,
+            # "Memo": "Neuer Sync klappt"+self.updated_at.strftime("%d.%m.%Y %H:%M:%S"),
             "LtzAend": self.updated_at
         }
         return updated_fields_list

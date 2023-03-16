@@ -1,9 +1,12 @@
+import re
 import uuid
 import sys
+from typing import Union
+
 from main import db
 from datetime import datetime
 import json
-from sqlalchemy import update
+from slugify import slugify
 
 from main.src.Entity.Bridge.Media.BridgeMediaEntity import *
 from main.src.Entity.Mappei.MappeiProductEntity import MappeiProductEntity, association_mappei_classei
@@ -21,8 +24,6 @@ product_category = db.Table('bridge_product_category_entity',
                             )
 
 
-# TODO: Make the mapping a Method of the classes, since we have the "self" variabble
-
 # Make the product class
 class BridgeProductEntity(db.Model):
     __tablename__ = 'bridge_product_entity'
@@ -31,11 +32,10 @@ class BridgeProductEntity(db.Model):
     erp_nr = db.Column(db.String(255), nullable=True)
     api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
     name = db.Column(db.String(255), nullable=True)
+    name_url = db.Column(db.String(255), nullable=True)
+    description = db.Column(db.Text(4294967295), nullable=True)
+    description_short = db.Column(db.Text(4294967295), nullable=True)
     image = db.Column(db.JSON(), nullable=True)
-    description = db.Column(db.Text(), nullable=True)
-    price = db.Column(db.Float(), nullable=True)
-    price_rebate_amount = db.Column(db.Integer(), nullable=True)
-    price_rebate = db.Column(db.Float, nullable=True)
     stock = db.Column(db.Integer(), nullable=False)
     factor = db.Column(db.Integer(), nullable=True)
     min_purchase = db.Column(db.Integer(), nullable=True)
@@ -43,6 +43,8 @@ class BridgeProductEntity(db.Model):
     unit = db.Column(db.String(255), nullable=True)
     erp_ltz_aend = db.Column(db.DateTime(), default=datetime.today())
     wshopkz = db.Column(db.Boolean(), nullable=True)
+    shipping_cost_per_bundle = db.Column(db.Float(), nullable=True)
+    shipping_bundle_size = db.Column(db.Integer(), nullable=True)
 
     created_at = db.Column(db.DateTime(), nullable=True, default=' ')
 
@@ -63,6 +65,11 @@ class BridgeProductEntity(db.Model):
         back_populates='classei',
         lazy='dynamic',
         cascade="all, delete")
+
+    # Price Products Relation one - to - many
+    prices = db.relationship(
+        'BridgePriceEntity',
+        back_populates="product")
 
     # Tax one - to - one
     tax_id = db.Column(db.Integer, db.ForeignKey('bridge_tax_entity.id'))
@@ -91,18 +98,18 @@ class BridgeProductEntity(db.Model):
         self.hans = entity.hans
         """
         self.erp_nr = entity.erp_nr
-        self.name = entity.name
         self.image = entity.image
+        self.name = entity.name
         self.description = entity.description
-        self.price = entity.price
-        self.price_rebate_amount = entity.price_rebate_amount
-        self.price_rebate = entity.price_rebate
+        self.description_short = entity.description_short
         self.stock = entity.stock
         self.factor = entity.factor
         self.min_purchase = entity.min_purchase
         self.purchase_unit = entity.purchase_unit
         self.unit = entity.unit
         self.wshopkz = entity.wshopkz
+        self.shipping_cost_per_bundle = entity.shipping_cost_per_bundle
+        self.shipping_bundle_size = entity.shipping_bundle_size
 
         return self
 
@@ -113,44 +120,122 @@ class BridgeProductEntity(db.Model):
         """
         return self.erp_nr
 
-    def map_erp_to_db(self, erp_entity: ERPArtikelEntity, img=None):
-        self.erp_nr = erp_entity.get_("ArtNr"),
-        self.name = erp_entity.get_("KuBez1"),
-        self.image = img,  # JSON Object Like {"Bild1": "/some/path/to/image/image1.jpg", ...}
-        self.description = erp_entity.get_("KuBez5"),
-        self.stock = 99999,
-        self.price = parse_european_number_to_float(erp_entity.get_("Vk0.Preis")),
-        self.price_rebate_amount = erp_entity.get_("Vk0.Rab0.Mge"),
-        self.price_rebate = parse_european_number_to_float(erp_entity.get_("Vk0.Rab0.Pr")),
+    def map_erp_to_db(self, erp_entity: ERPArtikelEntity):
+        self.erp_nr = erp_entity.get_("ArtNr")
+        self.name = erp_entity.get_("KuBez5")
+
+        # Make it websafe
+        txt = erp_entity.get_("KuBez5")  # Get the name
+        regex_pattern = r'[^-a-zA-Z0-9_/]+'  # Search for Chars we want to keep
+        umlaute = [
+            ['Ä', 'AE'],
+            ['ä', 'ae'],
+            ['Ö', 'OE'],
+            ['ö', 'oe'],
+            ['Ü', 'UE'],
+            ['ü', 'ue']
+        ]
+        slug = slugify(
+            txt,
+            regex_pattern=regex_pattern,
+            replacements=umlaute,
+            lowercase=False)  # Do the magic
+        self.name_url = slug
+
+        self.image = erp_entity.get_images()
+        self.description = erp_entity.get_("Bez5")
+        self.description_short = erp_entity.get_("Bez2")
+        self.stock = erp_entity.get_("VerfMge")
         if erp_entity.get_("Sel6"):
             self.factor = erp_entity.get_("Sel6")
         else:
             self.factor = None
+        self.min_purchase = erp_entity.get_("Sel10")
+        self.purchase_unit = erp_entity.get_("Sel11")
         self.wshopkz = erp_entity.get_("WShopKz")
-        self.created_at = datetime.now(),
+        self.created_at = datetime.now()
+        self.unit = erp_entity.get_("Einh")
+        self.erp_ltz_aend = erp_entity.get_("LtzAend").replace(tzinfo=None)
         # Always keep api_ids
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
+
+        self.shipping_cost_per_bundle = erp_entity.get_("Sel70")  # Frachtkostenpauschale
+        self.shipping_bundle_size = erp_entity.get_("Sel71")  # Frachtkostenaufschlag pro Stück
 
         # Relations are set in the Bridge2ObjectProductController
 
         return self
 
-    def get_price(self, amount):
+    def get_special_price(self):
         """
-        Get the price for the given amount
-        :param amount:
-        :return: float
+        Check if there is a special price for this product and return the special price if it exists,
+        otherwise return False.
+
+        :return: float or False
         """
-        if int(amount) < int(self.price_rebate_amount):
-            price = int(amount) * float(self.price)
-        elif int(amount) >= int(self.price_rebate_amount):
-            price = int(amount) * float(self.price_rebate)
+        now = datetime.now()
+        for price in self.prices:
+            if price.special_price and price.special_start_date <= now <= price.special_end_date:
+                return price
+        return False
 
-        if self.factor >= 1:
-            price = float(price) / int(self.factor)
+    def get_current_price(self):
+        """
+        Returns the current price of the product based on the date.
+        If there is a special price, it returns that instead of the regular price.
+        """
+        today = datetime.now()
+        for price in self.prices:
+            if price.special_price and price.special_start_date <= today <= price.special_end_date:
+                return price.special_price
+            else:
+                return price.price
+        return None
 
-        return float(price)
+    def get_list_price(self):
+        """
+        Returns the current price of the product based1 on the date.
+        If there is a special price, it returns that instead of the regular price.
+        """
+        today = datetime.now()
+        for price in self.prices:
+            return price.price
+
+    def get_shipping_cost(self, shipping: Union[str, float] = '5,95', no_shipping_from: float = 99.0) -> Union[
+        str, float]:
+        """
+        Returns the shipping cost for this BridgeProductEntity object.
+        If the product has a fixed shipping cost per bundle, it returns that value.
+        Otherwise, it checks the current price of the product and returns the shipping cost
+        if the price is below the threshold for free shipping.
+
+        Args:
+            shipping (str or float, optional): The shipping cost to return if applicable.
+                If a string, should be in the format "x,yz" with the decimal separator as a comma.
+                If a float, should be the shipping cost in EUR.
+                Defaults to '5,95'.
+            no_shipping_from (float, optional): The price threshold for free shipping.
+                Defaults to 99.0.
+
+        Returns:
+            str or float: The shipping cost if applicable, or 0 if the price is above the threshold for free shipping.
+                If the shipping cost is returned as a float, it will be rounded to two decimal places.
+        """
+        if self.shipping_cost_per_bundle is not None:
+            # If the product has a fixed shipping cost per bundle, return that value.
+            return self.shipping_cost_per_bundle
+        elif self.prices:
+            # If the product has at least one price, check the current price and return the shipping cost if applicable.
+            current_price = self.get_current_price()
+            if current_price <= no_shipping_from:
+                # If the current price is below the threshold for free shipping, return the shipping cost.
+                if isinstance(shipping, str):
+                    # If the shipping cost is given as a string, convert it to a float with comma as decimal separator.
+                    shipping = float(shipping.replace(',', '.'))
+                return round(shipping, 2)  # Round to two decimal places.
+        # If the product has no fixed shipping cost per bundle and no prices, return 0.
+        return 0
 
 
 # Make the translation class

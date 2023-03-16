@@ -5,7 +5,9 @@ from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEnti
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
 from main.src.Entity.Bridge.Media.BridgeMediaEntity import BridgeMediaEntity
+from main.src.Entity.Bridge.Price.BridgePriceEntity import BridgePriceEntity
 
+import uuid
 
 from datetime import datetime
 
@@ -66,10 +68,12 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
 
         # 3. Media
         bridge_entity.medias = []
+        bridge_entity.image = None
         images_array = self.erp_entity.get_images()
 
         if images_array:
             for img in images_array:
+                print("Image Order", img["order"], img)
                 # 3.1 Check if media in db - update or insert
                 media_in_db = BridgeMediaEntity().query.filter_by(filename=img["name"]).one_or_none()
 
@@ -81,12 +85,23 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
 
                 media_to_insert.filename = img["name"]
                 media_to_insert.filetype = img["type"]
-                media_to_insert.description = bridge_entity.description
-                media_to_insert.path = 'https://www.classei.de/images/products/'
-
+                media_to_insert.description = bridge_entity.description_short
+                media_to_insert.path = 'https://assets.classei.de/img/'
+                media_to_insert.api_id = uuid.uuid4().hex
+                bridge_entity.image = images_array
                 bridge_entity.medias.append(media_to_insert)
         else:
             pass
+
+        # 5. Prices
+        bridge_price_entity = BridgePriceEntity().query.filter_by(product_id=bridge_entity.id).one_or_none()
+        mapped_erp_price = BridgePriceEntity().map_erp_to_db(erp_entity=self.erp_entity)
+
+        if bridge_price_entity:
+            bridge_price_entity.update_entity(entity=mapped_erp_price)
+            bridge_entity.prices = bridge_price_entity
+        else:
+            bridge_entity.prices = mapped_erp_price
 
         return bridge_entity
 
@@ -96,7 +111,6 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
     def set_sync_last_changed_range(self):
         today = datetime.now()
         last_sync = self.bridge_synchronize_entity.dataset_product_sync_date
-        test_sync = datetime(2022, 8, 1)
         is_range = self.erp_entity.set_range(last_sync, today, 'LtzAend')
 
         if is_range:

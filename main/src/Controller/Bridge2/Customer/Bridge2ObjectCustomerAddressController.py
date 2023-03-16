@@ -88,7 +88,7 @@ class Bridge2ObjectCustomerAddressController(Bridge2ObjectController):
 
     def commit_session(self):
         try:
-            self.db.session.commit()
+            self.commit_with_errors()
             print("\033[92m Success - Address:", self.erp_entity.get_("AdrNr"), self.erp_entity.get_("AnsNr"),
                   '\033[0m')
         except:

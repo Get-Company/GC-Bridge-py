@@ -50,6 +50,7 @@ class Sw6Interface:
         ], indent=4)
         try:
             response = requests.post(f"{self.__sw6_client_admin_url}/_action/sync", headers=headers, data=data).json()
+            print(response)
             self.logger.info(f"Sw6Interface - sync_entity_to_sw - Uploading finished successfully - {len(response['data'][0]['result'])} {self.__type} data uploaded")  \
                 if ((response['success'] == True) if 'success' in response.keys() else None) \
                 else self.logger.error(f"Sw6Interface - sync_entity_to_sw - Problem occurred during uploading - {response['errors'] if 'errors' in response.keys() else response['data'][0]['result'][0]}")

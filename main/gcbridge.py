@@ -1,11 +1,12 @@
-import csv
+import os
+import subprocess
 import time
 from io import StringIO
 from pprint import pprint
 
-
-
+import html2text
 import sqlalchemy
+from datetime import datetime, timedelta
 
 from main import create_app
 from flask import render_template, redirect, request, make_response
@@ -36,6 +37,9 @@ from main.src.Entity.ERP.ERPArtikelKategorieEntity import ERPArtikelKategorieEnt
 # Product
 from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
 from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
+
+# Price
+from main.src.Entity.Bridge.Price.BridgePriceEntity import BridgePriceEntity
 
 # Customer
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity, \
@@ -85,26 +89,12 @@ from main.src.Controller.ERP.ERPCustomerController import ERPCustomerController
 
 # Atti SW6
 # from main.src.SW6_Bridge.process import sw_bridge
-#### Init und Sync All, Erste Upload von Bridge zu Shopware und/oder Sync all ######
-#sw_bridge.sync_all_customer_from_BRIDGE_to_SHOPWARE6()
-
-#### Sync alle Customers die in Bridge geändert wurden #######
-#sw_bridge.sync_all_changed_customers_from_BRIDGE_to_SHOPWARE6()
-
-#### Sync alle Customers die in SHOPWARE gerändert wurden #####
-# sw_bridge.sync_all_changed_customers_from_SHOPWARE6_to_BRIDGE()
-
-#### UPLOAD alle neue Customer die in Shopware angelegt wurden inkl. Addressen ####
-#sw_bridge.upload_all_new_customer_from_SHOPWARE6_to_BRIDGE()
-
-
 
 # Amazon
 from main.src.Controller.Amazon.AmazonController import AmazonController
 
 # SW6_2
 from main.src.Controller.SW6_2.SW6_2ControllerObject import SW6_2ControllerObject
-
 
 """
 ######################
@@ -127,28 +117,6 @@ Migration
 """
 migrate = Migrate(app, db)
 
-"""
-######################
-ERP Connection
-"""
-
-erp_obj_test = ERPConnectionEntity(mandant="TEST")
-erp_obj_test.connect()
-
-ERPCustomerController(erp_obj=erp_obj_test).sync_changed()
-
-# while True:
-#     # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_changed()
-#     Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_changed()
-#     Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()
-#
-#     ERPCustomerController(erp_obj=erp_obj_test).sync_changed()
-#
-#     if BridgeSynchronizeEntity().get_entity_by_id_1().loop_continue == 0:
-#         break
-
-erp_obj_test.close()
-# erp_obj.close()
 
 
 
@@ -166,12 +134,12 @@ erp_obj_test.close()
 # SW6_2ControllerObject().sync_customers(erp_obj=erp_obj)
 # SW6_2ControllerObject().upsert_customer_address(10026)
 # SW6_2ControllerObject().sync_orders()
-
+# SW6_2ObjectEntity().delete_all_categories()
+# SW6_2ControllerObject().bulk_upload()
 
 # Atti Zeugs
-# sw6controller = SW6I
 
-# erp_obj.close()
+from main.src.Shopware6Bridge.process import *
 
 """
 ######################
@@ -185,6 +153,26 @@ Mappei
 ######################
 Threaded 
 ######################
+erp_obj = ERPConnectionEntity()
+erp_obj.connect()
+
+from main.src.Shopware6Bridge.process import *
+while True:
+    # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_changed()
+
+    Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_changed()
+    sw6_cat.sync_changed_CATEGORIES_from_BRIDGE_to_SW6()
+
+    Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()
+    sw6_prod.sync_changed_PRODUCTS_from_BRIDGE_to_SW6()
+
+
+
+# ERPCustomerController(erp_obj=erp_obj_test).sync_changed()
+    if BridgeSynchronizeEntity().get_entity_by_id_1().loop_continue == 0:
+        break
+
+erp_obj.close()
 
 def sync_thread():
     threaded_app = create_app()
@@ -200,28 +188,30 @@ t1 = threading.Thread(target=sync_thread)
 t1.start()
 """
 
-
 def main():
-    # erp_obj = ERPConnectionEntity()
-    # erp_obj.connect()
+    erp_obj = ERPConnectionEntity(mandant="TEST")
+    erp_obj.connect()
+
+    # ATTI #
+
+    ############# INIT ALL TAXES ##############
+    # sw6_tax.init_all_TAXES_from_BRIDGE_to_SW6()
+
+    ############# INIT ALL MEDIAS ##############
+    # sw6_media.init_all_MEDIAS_from_BRIDGE_to_SW6()
+
+    ############# INIT ALL CATEG ###############
+    # sw6_cat.init_all_CATEGORIES_from_BRIDGE_to_SW6()
+
+    ############# INIT ALL PROD ################
+    # sw6_prod.init_all_PRODUCTS_from_BRIDGE_to_SW6()
+
+
     """
     ######################
     Syncing
     ######################
     """
-    # bridge = BridgeSynchronizeEntity()
-    # bridge.id=1
-    # bridge.dataset_category_sync_date = datetime.now()
-    # bridge.dataset_product_sync_date = datetime.now()
-    # bridge.dataset_customers_sync_date = datetime.now()
-    # bridge.dataset_tax_sync_date = datetime.now()
-    # bridge.dataset_order_sync_date = datetime.now()
-    # bridge.sw6_category_sync_date = datetime.now()
-    # bridge.sw6_product_sync_date = datetime.now()
-    # bridge.sw6_address_sync_date = datetime.now()
-    # bridge.sw6_order_sync_date = datetime.now()
-    # db.session.add(bridge)
-    # db.session.commit()
 
     # Tax
     # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
@@ -233,13 +223,24 @@ def main():
     # sync_all_changed_categories()
 
     # Products
-    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()  # OK!
+    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed() # OK!
     # sync_all_changed_products()
     # sync_all_products()
 
     # Adressen
     # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
-    # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
+    # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10000, end=40000)
+
+    # For tests
+    # erp_buchner = ERPAdressenEntity(erp_obj=erp_obj, id_value=11869)
+    # erp_buchner.delete_dataset(check_delete=False)
+
+    buchner = BridgeCustomerEntity().query.get(2843)
+    buchner.erp_nr = "e6eb7732af184d9f971832065bc21567"
+    buchner.updated_at = datetime.now()
+    buchner.erp_ltz_aend = None
+
+    ERPCustomerController(erp_obj=erp_obj).sync_changed()
 
     # History
     # erp_history = ERPHistoryEntity(erp_obj=erp_obj)
@@ -248,15 +249,12 @@ def main():
     # os.system("shutdown /s /t 1")
 
     # All
-    # continuously
-    # erp_connect()
-    # while True:
-    #    sync_all_continuously(False)
-    # erp_close()
+
 
     # sync_all_to_db()
 
     # erp_obj.close()
+
     """
     ######################
     Tests
@@ -341,9 +339,71 @@ def main():
 
         return render_template('/classei/price_raise.html', classei_products=classei_products)
 
+    @app.route('/<domain>/email/<year>/<newsletter>/<erp_nums>')
+    def render_and_save_mjml(domain, year, newsletter, erp_nums):
+        # Set Project path
+        project_path = os.path.abspath("D:/htdocs/python/GC-Bridge/main")
+        # Set the path
+        path = os.path.abspath(os.path.join(project_path, 'templates', domain, 'email', year, newsletter))
+
+        # Make sure, the directory exists. If not, create it
+        os.makedirs(path, exist_ok=True)
+
+        # Get the erp_nums as list
+        erp_nums_str = erp_nums.split(',')
+        erp_nums_list = list(map(str, erp_nums_str))
+
+        # Get the products in the correct order
+        products = []
+        for erp_num in erp_nums_list:
+            print(erp_num)
+            product = BridgeProductEntity.query.filter_by(erp_nr=erp_num).one_or_none()
+            if product:
+                products.append(product)
+
+        pprint(products)
+
+        special_end_date = False
+        for product in products:
+            # This is for the product url
+            for category in product.categories:
+                parent_category = BridgeCategoryEntity.query.filter_by(api_id=category.api_idparent).one()
+                category.parent_category = parent_category
+
+            images = []
+            # This is for the images
+            for image in product.image:
+                image_str = json.dumps(image)
+                images.append(json.loads(image_str))
+            product.images = images
+
+            # This is for the disclaimer
+            if product.get_special_price():
+                special_end_date = product.get_special_price().special_end_date
+
+        # Get the html content
+        rendered_html = render_template(f"/{domain}/email/{year}/{newsletter}/newsletter.mjml", products=products, special_end_date=special_end_date)
+
+        # Schreiben Sie den Inhalt des Newsletters in eine HTML-Datei
+        rendered_mjml_file = os.path.join(path, f"{newsletter}.mjml")
+        with open(rendered_mjml_file, "w", encoding="utf-8") as f:
+            f.write(rendered_html)
+
+        npm_path = f"main/templates/{domain}/email/{year}/{newsletter}/{newsletter}"
+        npm_mjml_path = npm_path + ".mjml"
+        npm_html_path = npm_path + ".html"
+        npm_text_path = npm_path + ".text"
+
+        with open(npm_text_path, "w", encoding="utf-8") as f:
+            text_content = html2text.html2text(rendered_html)
+            f.write(text_content)
+
+        print("mjml -w", rendered_mjml_file, "-o", npm_html_path)
+
+        return render_template(f'/classei/email/{year}/{newsletter}/{newsletter}.html')
+
 
 # EOF main
-
 
 """ 
 ######################

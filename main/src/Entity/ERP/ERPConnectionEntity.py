@@ -108,9 +108,9 @@ class ERPConnectionEntity:
         else:
             self.erp.Init(f'{firma}', "", f'{benutzer}', '')
             self.erp.SelectMand(self.get_mandant())
-            print("ERP is connected to:", self.get_mandant(), "with user:", benutzer)
+            print("ERP connects to:", self.get_mandant(), "with user:", benutzer)
         finally:
-            print("Connect: This is ERP: %s" % self.get_erp())
+            print("Connected: This is ERP: %s" % self.get_erp())
 
     def close(self):
         """
@@ -125,9 +125,8 @@ class ERPConnectionEntity:
             self.logging.warning("Cannot DeInit. Object is NoneType")
         else:
             self.logging.info("ERP is closed")
+            print("Closed: This is ERP: %s" % self.get_erp())
             return True
-        finally:
-            print("Close: This is ERP: %s" % self.get_erp())
 
     def set_cursor_to_field_value(self, field, value):
         self.dataset.FindKey(field, value)

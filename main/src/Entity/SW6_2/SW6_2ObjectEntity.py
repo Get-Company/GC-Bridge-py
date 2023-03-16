@@ -30,9 +30,7 @@ class SW6_2ObjectEntity:
 
         self.api = my_api_client
 
-    """
-    Category
-    """
+    """    Category    """
 
     def get_category(self, id):
         category = self.api.request_get(request_url=f'/category/{id}')
@@ -121,9 +119,7 @@ class SW6_2ObjectEntity:
             else:
                 print("Main Category - do not delete")
 
-    """
-    SalesChannel
-    """
+    """    SalesChannel    """
 
     def get_saleschannel(self):
         sales_channels = self.api.request_get(request_url='sales-channel')
@@ -158,9 +154,7 @@ class SW6_2ObjectEntity:
         print("Created Sales Channel", payload)
         return new_sales_channel
 
-    """
-    Tax
-    """
+    """    Tax    """
 
     def get_tax(self, id):
         try:
@@ -237,9 +231,7 @@ class SW6_2ObjectEntity:
                 print("Tax ID is standard - Can not be deleted", '16d9f10db07d41aba8fb7dda32e4d4a9')
                 pass
 
-    """
-    Products
-    """
+    """    Products    """
 
     def get_product(self, id):
         try:
@@ -355,9 +347,7 @@ class SW6_2ObjectEntity:
             print("Delete Product", product['id'])
             self.delete_product(product['id'])
 
-    """
-    CustomerAddress
-    """
+    """    CustomerAddress    """
 
     def get_customer(self, id):
         try:
@@ -522,8 +512,7 @@ class SW6_2ObjectEntity:
         for customer in customers['data']:
             self.delete_customer(customer['id'])
 
-    """
-    Customer Addresses
+    """    Customer Addresses
     Beware! The customer address is a relation of contact
     each contact gets a address
     """
@@ -716,9 +705,7 @@ class SW6_2ObjectEntity:
         for address in customer_addresses_all["data"]:
             self.delete_customer_address(id=address["id"])
 
-    """
-    Countries
-    """
+    """    Countries    """
 
     def get_countries(self):
         countries = self.api.request_get(request_url="/country")
@@ -817,3 +804,28 @@ class SW6_2ObjectEntity:
         )
         salutation = self.api.request_post('/search/salutation', payload=payload)
         return salutation
+
+    """
+    Bulk Sync
+    """
+
+    def bulk_uploads(self, categories):
+        payload = [{
+            "action": "upsert",
+            "entity": "category",
+            "payload": []
+        }]
+        for category in categories:
+            payload[0]["payload"].append({
+                "id": category.api_id,
+                "name": category.title,
+                "createdAt": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "displayNestedProducts": True,
+                "productAssignmentType": "product",
+                "type": "page",
+                "description": category.description,
+                "parentId": category.api_idparent
+            })
+
+        category_response = self.api.request_post(request_url='/_action/sync', payload=payload)
+        print(category_response)

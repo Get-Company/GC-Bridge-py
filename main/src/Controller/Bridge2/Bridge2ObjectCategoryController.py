@@ -43,6 +43,7 @@ class Bridge2ObjectCategoryController(Bridge2ObjectController):
         today = datetime.now()
         last_sync = self.bridge_synchronize_entity.dataset_category_sync_date
         is_range = self.erp_entity.set_range(last_sync, today, 'LtzAend')
+
         if is_range:
             return True
         else:
@@ -74,7 +75,7 @@ class Bridge2ObjectCategoryController(Bridge2ObjectController):
             media_to_insert.filename = img["name"]
             media_to_insert.filetype = img["type"]
             media_to_insert.description = bridge_entity.title
-            media_to_insert.path = 'https://www.classei.de/images/categories/'
+            media_to_insert.path = 'https://assets.classei.de/img/'
 
             bridge_entity.medias.append(media_to_insert)
         else:

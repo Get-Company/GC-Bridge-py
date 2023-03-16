@@ -130,7 +130,6 @@ class SW6_2ControllerObject():
 
         return True
 
-
     def upsert_customer_address(self, customer_erp_nr):
         """
         Address are sync by the contact. Every address of a contact will bey synched. Informations are mixed between
@@ -139,8 +138,11 @@ class SW6_2ControllerObject():
         """
         return False  # ContactEntity
 
-
     def sync_orders(self):
         orders = self.api.get_orders()
         pprint(orders)
+
+    def bulk_upload(self):
+        categories = BridgeCategoryEntity().query.all()
+        self.api.bulk_uploads(categories=categories)
 

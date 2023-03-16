@@ -122,7 +122,6 @@ class Bridge2ObjectController(ControllerObject):
         # print(self.erp_entity.is_ranged(), self.erp_entity.range_eof())
         i = 0
         while not self.erp_entity.range_eof():
-
             self.before_upsert(current_erp_entity=self.erp_entity)
 
             # Always get a new instance of Bridge_Entity
@@ -141,7 +140,7 @@ class Bridge2ObjectController(ControllerObject):
             # Is not in DB - Insert
             elif entity_in_db is None:
                 print("Insert", entity_mapped_to_db)
-                entity_to_insert = entity_mapped_to_db
+                entity_to_insert = self.reset_relations(entity_mapped_to_db)
 
             else:
                 return False
@@ -149,7 +148,7 @@ class Bridge2ObjectController(ControllerObject):
 
             if i >= 50:
                 print(f"Commit Session - Buffer full: {i}")
-                self.commit_session()
+                self.commit_with_errors()
                 i = 0
                 print(f"Reset Buffer Counter to {i}=0")
             else:
@@ -165,7 +164,7 @@ class Bridge2ObjectController(ControllerObject):
         self.db.session.add(self.bridge_synchronize_entity)
 
         # Commit everything
-        self.commit_session()
+        self.commit_with_errors()
 
     def is_in_db(self):
         """
@@ -187,7 +186,7 @@ class Bridge2ObjectController(ControllerObject):
 
     def reset_relations(self, bridge_entity):
         """
-        After the entity was either updated&mapped (in db) or just mapped (new) all the relations must be set.
+        After the entity was either updated & mapped (in db) or just mapped (new) all the relations must be set.
         This is done in the child, depending on the relations
         :param bridge_entity:
         :return: BridgeEntity updated
@@ -205,12 +204,6 @@ class Bridge2ObjectController(ControllerObject):
         :return:
         """
         pass
-
-    def commit_session(self):
-        try:
-            self.db.session.commit()
-        except:
-            print("Error Commit Session")
 
     def before_upsert(self, current_erp_entity):
         pass

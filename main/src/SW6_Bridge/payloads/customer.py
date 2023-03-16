@@ -22,7 +22,7 @@ class CustomerPayload(Payload):
                     'city': address_row.city,
                     "countryId": self.config['sw_options']['customers_params']['countryId'],
                     "updatedAt": "2023-02-03T00:10:25.894+00:00",
-                    "salutationId": "f1e1cbcb66b0426d8b947054e244ad0c"
+                    "salutationId": "1676fe16d2a9433c8239c33f671bba33"
                 })
 
             payload = {
@@ -39,7 +39,7 @@ class CustomerPayload(Payload):
                 "defaultShippingAddress": addresses_payload[0],
                 "addresses": addresses_payload[1:] if len(addresses_payload) > 1 else None,
                 "updatedAt": "2023-02-03T00:10:25.894+00:00",
-                "salutationId": "f1e1cbcb66b0426d8b947054e244ad0c"
+                "salutationId": "1676fe16d2a9433c8239c33f671bba33"
             }
             print(payload)
             return payload

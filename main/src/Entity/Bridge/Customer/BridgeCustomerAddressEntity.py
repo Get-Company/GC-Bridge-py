@@ -10,6 +10,7 @@ from sqlalchemy import UniqueConstraint
 from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
 
+
 # Is DataSet Anschrift in ERP
 class BridgeCustomerAddressEntity(db.Model):
     __tablename__ = 'bridge_customer_address_entity'
@@ -69,9 +70,9 @@ class BridgeCustomerAddressEntity(db.Model):
         return self
 
     def map_erp_to_db(self, erp_address_entity: ERPAnschriftenEntity, erp_contact_entity: ERPAnsprechpartnerEntity):
-        self.erp_nr = erp_address_entity.get_('AdrNr')
-        self.erp_ansnr = erp_address_entity.get_('Ansnr')
-        self.erp_aspnr = erp_address_entity.get_('AspNr')
+        self.erp_nr = erp_contact_entity.get_('AdrNr')
+        self.erp_ansnr = erp_contact_entity.get_('Ansnr')
+        self.erp_aspnr = erp_contact_entity.get_('AspNr')
         self.na1 = erp_address_entity.get_('Na1')
         self.na2 = erp_address_entity.get_('Na2')
         self.na3 = erp_address_entity.get_('Na3')
@@ -118,6 +119,47 @@ class BridgeCustomerAddressEntity(db.Model):
         self.updated_at = datetime.now()
 
         return self
+
+    def map_db_to_erp_anschrift(self):
+        updated_fields_list = {
+            "AnsNr": self.erp_ansnr,
+            "EMail1": self.email,
+            "Ort": self.city,
+            "PLZ": self.plz,
+            "Str": self.str,
+            "Na2": self.na2,
+            "Na3": self.na3,
+        }
+        # Standard Billing Address
+        if self.customer.erp_reansnr == self.erp_ansnr:
+            updated_fields_list["StdReKz"] = 1
+        else:
+            updated_fields_list["StdReKz"] = 0
+
+        # Standard Shipping Address
+        if self.customer.erp_liansnr == self.erp_ansnr:
+            updated_fields_list["StdLiKz"] = 1
+        else:
+            updated_fields_list["StdLiKz"] = 0
+
+        # Company or Private
+        if self.customer.ustid:
+            updated_fields_list["Na1"] = self.company
+        else:
+            updated_fields_list["Na1"] = self.na1
+
+        return updated_fields_list
+
+    def map_db_to_erp_ansprechpartner(self):
+        updated_fields_list = {
+            "AnsNr": self.erp_ansnr,
+            "AspNr": self.erp_aspnr,
+            "Anr": "Frau",
+            "VNa": self.first_name,
+            "NNa": self.last_name,
+        }
+
+        return updated_fields_list
 
     def get_entity_id_field(self):
         """

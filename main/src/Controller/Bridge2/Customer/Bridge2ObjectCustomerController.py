@@ -163,7 +163,7 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
 
     def commit_session(self, info=None):
         try:
-            self.db.session.commit()
+            self.commit_with_errors()
             print("\033[92m Success - Customer:", info, '\033[0m')
         except Exception as e:
             print("\033[91m Fail - Customer:", info, '\033[0m')
@@ -194,13 +194,6 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
         self.commit_session(info=customer["customerNumber"])
         return True
 
-
-    """
-    Sync in both directions
-    """
-    # 1 Sync from ERP to Bridge
-    def sync_x_to_y(self, **kwargs):
-        pass
     """
     Special Tasks
     """

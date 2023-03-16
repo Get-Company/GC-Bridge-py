@@ -48,7 +48,9 @@ class SyncCustomers():
                     'street': address.str,
                     'zipcode': address.plz,
                     'city': address.city,
-                    'countryId': config['sw_options']['customers_params']['countryId']
+                    'countryId': config['sw_options']['customers_params']['countryId'],
+                    "salutationId": "1676fe16d2a9433c8239c33f671bba33"
+
                 })
 
             payload.append({
@@ -64,7 +66,8 @@ class SyncCustomers():
                 "defaultBillingAddress": addresses_payload[0],
                 "defaultShippingAddress": addresses_payload[0],
                 "addresses": addresses_payload[0:] if len(addresses_payload) > 0 else None,
-                "updatedAt": str(datetime.now())
+                "updatedAt": str(datetime.now()),
+                "salutationId": "1676fe16d2a9433c8239c33f671bba33"
             })
 
             data = json.dumps([
@@ -76,7 +79,7 @@ class SyncCustomers():
             ], indent=4)
 
             try:
-
+                print(payload)
                 response = requests.post(f"http://localhost/api/_action/sync", headers=self.headers, data=data).json()
                 print(response)
                 logger.info(

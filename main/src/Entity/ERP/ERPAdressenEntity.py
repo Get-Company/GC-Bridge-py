@@ -35,8 +35,11 @@ Examples:
 
 
 """
+import csv
 import logging
 import re
+from pprint import pprint
+
 from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
 from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
@@ -53,7 +56,8 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         self.dataset_id_value = str(id_value)  # Needs to be a string
         self.dataset_range = dataset_range
 
-        self.prefill_json_directory = "main/src/json/customer_address/"
+        self.prefill_json_directory = "main/src/json/customer/"
+        self.skip_gspkz = True
 
         # Need to call the __init_of the super class
         super().__init__(
@@ -62,7 +66,8 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
             dataset_id_field=self.dataset_id_field,
             dataset_id_value=self.dataset_id_value,
             dataset_range=self.dataset_range,
-            prefill_json_directory=self.prefill_json_directory
+            prefill_json_directory=self.prefill_json_directory,
+            skip_gspkz=self.skip_gspkz
         )
 
     def set_created_dataset(self):
@@ -72,19 +77,26 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         """
         self.created_dataset = self.get_dataset_infos().CreateDataSetEx()
 
+    """ Overrides """
+
+    def range_first(self):
+        self.created_dataset.First()
+        self.range_skip_gspkz()
+        self.range_skip_email()
+
+    def range_next(self):
+        self.created_dataset.Next()
+        self.range_skip_gspkz()
+        self.range_skip_email()
+
     """ Sync Queries """
+
     def get_all_since_last_sync(self, last_sync_date):
         current_time = datetime.now()
         self.set_range(start=last_sync_date, end=current_time, field="LtzAend")
-        self.range_first()
-        return self.created_dataset
+        return True
 
-    """ Special Queries """
-    def get_next_free_adrnr(self):
-        return self.created_dataset.SetupNr("")
-
-    def map_bridge_to_erp(self, bridge_entity):
-        pass
+    """ Create and Update Customer """
 
     def update_customer(self, update_fields_list):
         self.edit_()
@@ -95,27 +107,94 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         self.set_updated_fields(updated_at=update_fields_list["LtzAend"])
         self.post_()
 
-    def create_new_customer(self, file="webshop.yaml", fields=None):
+    def create_new_customer(self, bridge_customer, customer_file=None):
         """
-        Complete function for creating a new customer_address .
+        Complete function for creating a new customer.
         Just add a dict of fields, and give the
         path to the prefill file.
         """
         # Create the new dataset
         self.create_dataset()
+
         # Append new row
         self.append_()
+
+        # Next free AdrNr
+        adrnr = self.get_next_free_adrnr()
+        print("This AdrNr is reserved:", adrnr)
+        self.create_("AdrNr", adrnr)
+
+        # Fields from the Entity
+        fields = bridge_customer.map_db_to_erp()
+        for field_key, field_value in fields.items():
+            self.create_(field_key, field_value)
+
         # Fill out the fields given rom the json file
-        self.prefill_from_file(file=self.prefill_json_directory+file)
-        # Fill th fields given from the dict
-        if fields:
-            for field_key, field_value in fields.items():
-                self.create_(field_key, field_value)
-        # Set the next free AdressNr
-        self.create_("AdrNr", self.get_next_free_adrnr())
-        # Post everything
+        self.prefill_from_file(file=self.prefill_json_directory + customer_file)
+
         self.post_()
-        return True
+
+        for address in bridge_customer.addresses:
+
+            # Create a Dataset for Anschrift
+            erp_anschrift = ERPAnschriftenEntity(erp_obj=self.erp_obj)
+            erp_anschrift.create_dataset()
+
+            # Append new row
+            erp_anschrift.append_()
+
+            # Fields from the Entity
+            erp_anschrift.create_("AdrNr", adrnr)
+            fields_anschrift = address.map_db_to_erp_anschrift()
+
+            for field_anschrift_key, field_anschrift_value in fields_anschrift.items():
+                erp_anschrift.create_(field_anschrift_key, field_anschrift_value)
+
+            erp_anschrift.post_()
+
+            # Create Dataset for Ansprechpartner
+            erp_ansprechpartner = ERPAnsprechpartnerEntity(erp_obj=self.erp_obj)
+            erp_ansprechpartner.create_dataset()
+
+            # Append new row
+            erp_ansprechpartner.append_()
+
+            # Fields from the entity
+            erp_ansprechpartner.create_("AdrNr", adrnr)
+            erp_ansprechpartner.create_("AnsNr", address.erp_ansnr)
+            erp_ansprechpartner.create_("AspNr", address.erp_aspnr)
+            erp_ansprechpartner.create_("StdKz", 1)
+            erp_ansprechpartner.create_("Anr", "Frau")
+            erp_ansprechpartner.create_("VNa", address.first_name)
+            erp_ansprechpartner.create_("NNa", address.last_name)
+
+            # fields_ansprechpartner = address.map_db_to_erp_ansprechpartner()
+            # for field_ansprechpartner_key, field_ansprechpartner_value in fields_ansprechpartner.items():
+            #     erp_ansprechpartner.create_(field_ansprechpartner_key, field_ansprechpartner_value)
+
+            erp_ansprechpartner.post_()
+
+        customer_info = {
+            "adrnr": adrnr,
+            "erp_ltz_aend": self.get_("LtzAend")
+        }
+
+        return customer_info
+
+    """ Special Queries """
+
+    def range_skip_email(self):
+        while True:
+            if self.get_login():
+                break
+            elif self.get_login() is False and not self.range_eof():
+                self.range_next()
+
+    def get_next_free_adrnr(self):
+        return self.created_dataset.SetupNr("")
+
+    def map_bridge_to_erp(self, bridge_entity):
+        pass
 
     def remove_webshop_id(self):
         """ Easy remove when a client wants to have his account deleted """
@@ -123,6 +202,16 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
         self.update_('WShopAdrKz', 0)
         self.update_("WShopID", "")
+
+        print("After update:", self.get_("WShopAdrKz"), self.get_("WShopID"))
+
+        self.post_()
+
+    def add_webshop_id(self, webshop_id):
+        self.edit_()
+
+        self.update_('WShopAdrKz', 1)
+        self.update_("WShopID", webshop_id)
 
         print("After update:", self.get_("WShopAdrKz"), self.get_("WShopID"))
 
@@ -179,7 +268,8 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         anschriften_ntt.find_('AdrNrAnsNr', [self.get_('AdrNr'), self.get_('LiAnsNr')])
         ansprechpartner_ntt = ERPAnsprechpartnerEntity(erp_obj=self.erp_obj)
 
-        ansprechpartner_ntt.find_('AdrNrAnsNrAspNr', [self.get_('AdrNr'), self.get_('LiAnsNr'), anschriften_ntt.get_('AspNr')])
+        ansprechpartner_ntt.find_('AdrNrAnsNrAspNr',
+                                  [self.get_('AdrNr'), self.get_('LiAnsNr'), anschriften_ntt.get_('AspNr')])
 
         # Shipping
         anschriften = {
@@ -199,7 +289,8 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
         # Invoice
         anschriften_ntt.find_('AdrNrAnsNr', [self.get_('AdrNr'), self.get_('ReAnsNr')])
-        ansprechpartner_ntt.find_('AdrNrAnsNrAspNr', [self.get_('AdrNr'), self.get_('ReAnsNr'), anschriften_ntt.get_('AspNr')])
+        ansprechpartner_ntt.find_('AdrNrAnsNrAspNr',
+                                  [self.get_('AdrNr'), self.get_('ReAnsNr'), anschriften_ntt.get_('AspNr')])
 
         anschriften['invoice'] = {
             'anschrift': {
@@ -258,7 +349,6 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         else:
             return False
 
-
     def print_dataset_fields(self):
 
         super().print_dataset_fields()
@@ -266,3 +356,18 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
     def print_dataset_indices(self):
         super().print_dataset_indices()
 
+    def set_field_by_csv(self):
+        """ Insert a csv with field - values """
+        import csv
+        with open('main/src/csv/s_user_right.csv', 'r') as csvfile:
+            csvreader = csv.reader(csvfile, delimiter=';')
+            next(csvreader)  # Überspringe die Kopfzeile
+            for row in csvreader:
+                erp_obj = None
+                adressnummer, id_webshop, webshop_adresse_kennzeichen = row
+                erp_address_entity = ERPAdressenEntity(erp_obj=erp_obj, id_value=adressnummer)
+                if erp_address_entity:
+                    print(erp_address_entity.get_("AdrNr"))
+                    erp_address_entity.add_webshop_id(webshop_id=id_webshop)
+
+        print("Fertit")

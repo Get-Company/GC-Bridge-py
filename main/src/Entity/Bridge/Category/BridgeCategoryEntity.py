@@ -7,6 +7,8 @@ from main.src.Entity.Bridge.Product.BridgeProductEntity import product_category
 from main.src.Entity.ERP.ERPArtikelKategorieEntity import *
 from main.src.Entity.Bridge.Media.BridgeMediaEntity import media_cat
 
+from slugify import slugify
+
 
 # Make the category class
 class BridgeCategoryEntity(db.Model):
@@ -52,7 +54,7 @@ class BridgeCategoryEntity(db.Model):
         self.title = erp_category.get_('Bez'),
         self.image = None,
         self.description = erp_category.get_('Info'),
-        self.erp_ltz_aend = erp_category.get_('LtzAend'),
+        self.erp_ltz_aend = erp_category.get_('LtzAend').replace(tzinfo=None),
         # Always keep api_ids
         if not self.api_id:
             self.api_id = uuid.uuid4().hex
@@ -76,7 +78,46 @@ class BridgeCategoryEntity(db.Model):
         self.title = entity.title
         self.image = entity.image
         self.description = entity.description
+        self.erp_ltz_aend = entity.erp_ltz_aend
         return True
+
+    def get_parent_category_title(self, slugify=True):
+        # Make it websafe
+        parent = self.query.filter_by(api_id=self.api_idparent).one_or_none()
+        if parent:
+            if slugify:
+                parent_title = self.slugify(parent.title)
+                return parent_title # Get the name
+            else:
+                return parent.title
+        return False
+
+    def get_category_title(self, slugify=True):
+        if slugify:
+            category_title = self.slugify(self.title)
+            return category_title
+        else:
+            return self.title
+
+    def slugify(self, name):
+        regex_pattern = r'[^-a-zA-Z0-9_/]+'  # Search for Chars we want to keep
+        umlaute = [
+            ['Ä', 'AE'],
+            ['ä', 'ae'],
+            ['Ö', 'OE'],
+            ['ö', 'oe'],
+            ['Ü', 'UE'],
+            ['ü', 'ue']
+        ]
+        slug = slugify(
+            name,
+            regex_pattern=regex_pattern,
+            replacements=umlaute,
+            lowercase=False)  # Do the magic
+
+        return slug
+
+
 
 
 # Make the translation class

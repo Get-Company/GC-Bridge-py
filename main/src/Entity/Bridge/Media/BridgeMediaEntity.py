@@ -1,5 +1,6 @@
 from main import db
 from datetime import datetime
+import uuid
 
 # from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
 # from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
@@ -29,7 +30,8 @@ class BridgeMediaEntity(db.Model):
     path = db.Column(db.String(255), nullable=False)
     filename = db.Column(db.String(255), nullable=False)
     filetype = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String(255), nullable=True)
+    description = db.Column(db.Text(4294967295), nullable=True)
+    api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
 
     products = db.relationship(
         "BridgeProductEntity",

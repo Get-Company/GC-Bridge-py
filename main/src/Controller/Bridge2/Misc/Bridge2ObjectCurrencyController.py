@@ -25,14 +25,14 @@ class Bridge2ObjectCurrencyController(Bridge2ObjectController):
             print("Currency ", currency["base"], "will be inserted")
             currency_entity = BridgeCurrencyEntity().map_api_to_bridge(currency)
             db.session.add(currency_entity)
-            db.session.commit()
+            self.c
         elif need_sync:
             currency = self.get_curreny_from_api()
             print("Currency ", currency["base"], "will be updated from", need_sync.rate, "to", currency["rates"]["EUR"])
             currency_entity = BridgeCurrencyEntity().map_api_to_bridge(currency)
             updated_entity = need_sync.update_entity(currency_entity)
             db.session.add(updated_entity)
-            db.session.commit()
+            self.commit_with_errors()
         else:
             pass
 

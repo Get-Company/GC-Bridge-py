@@ -27,6 +27,8 @@ class MainProcess:
     def sync_all_customer_from_BRIDGE_to_SHOPWARE6(self):
         CustomerService(self.config, db.session, Customer).init_model_for_sw()
 
+    def sync_selected_customer_from_BRIDGE_to_SHOPWARE6(self, start, end):
+        sync.sync_selected_customers_from_BRIDGE_to_sw_WITHOUT_SYNC_CHECK_NIIIIX_CHECKEN_DIESE(start, end)
 
 
 
@@ -37,8 +39,7 @@ class MainProcess:
 
 
 
-            #sync.sync_selected_customers_from_BRIDGE_to_sw_WITH_SYNC_CHECK(config, 10000, 15000)
-            #sync.sync_selected_customers_from_BRIDGE_to_sw_WITHOUT_SYNC_CHECK_NIIIIX_CHECKEN_DIESE(10005, 10007)
+#sync.sync_selected_customers_from_BRIDGE_to_sw_WITH_SYNC_CHECK(config, 10000, 15000)
 
             #atti_hilfe.sync_all_changed_customers_from_SW_to_bridge()
 

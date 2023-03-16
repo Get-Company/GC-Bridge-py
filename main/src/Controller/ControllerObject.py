@@ -24,3 +24,5 @@ class ControllerObject:
         except SQLAlchemyError as e:
             db.session.rollback()
             print(f"Error: {e}")
+        finally:
+            db.session.close()

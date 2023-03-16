@@ -32,7 +32,8 @@ class ERPDatasetObjectEntity(object):
                  dataset_id_field,
                  dataset_id_value,
                  dataset_range,
-                 prefill_json_directory
+                 prefill_json_directory,
+                 skip_gspkz = True,
                  ):
         self.erp_obj = erp_obj
         self.created_dataset = None
@@ -44,6 +45,8 @@ class ERPDatasetObjectEntity(object):
         self.dataset_fields = dict()
         """ For the templates for customers, orders aso. Is filled in the child """
         self.prefill_json_directory = prefill_json_directory
+        """ If the dataset is blocked """
+        self.skip_gspkz = skip_gspkz
         """ Dict FieldTypes and their translation/mapping """
         self.field_types = {
             'WideString': 'AsString',
@@ -138,7 +141,8 @@ class ERPDatasetObjectEntity(object):
 
             images.append(
                 {"name": image_array[0],
-                 "type": image_array[1]
+                 "type": image_array[1],
+                 "order": 1,
                  }
             )
         else:
@@ -151,7 +155,8 @@ class ERPDatasetObjectEntity(object):
 
             images.append(
                 {"name": image_array[0],
-                 "type": image_array[1]
+                 "type": image_array[1],
+                 "order": 2,
                  }
             )
         else:
@@ -164,7 +169,8 @@ class ERPDatasetObjectEntity(object):
 
             images.append(
                 {"name": image_array[0],
-                 "type": image_array[1]
+                 "type": image_array[1],
+                 "order": 3,
                  }
             )
         else:
@@ -177,7 +183,8 @@ class ERPDatasetObjectEntity(object):
 
             images.append(
                 {"name": image_array[0],
-                 "type": image_array[1]
+                 "type": image_array[1],
+                 "order": 4,
                  }
             )
         else:
@@ -190,7 +197,8 @@ class ERPDatasetObjectEntity(object):
 
             images.append(
                 {"name": image_array[0],
-                 "type": image_array[1]
+                 "type": image_array[1],
+                 "order": 5,
                  }
             )
         else:
@@ -210,22 +218,12 @@ class ERPDatasetObjectEntity(object):
         :param value: string the value for the field
         :return: dict self.fields_list
         """
-        self.edit_()
         self.fields_list[field] = value
         self.helper_set_value_of(field, value)
 
     def create_(self, field, value):
         self.fields_list[field] = value
         self.helper_set_value_of(field, value)
-
-    def delete_(self, check_delete=True):
-        self.edit_()
-        if check_delete:
-            self.delete_check_dataset()
-        else:
-            self.delete_dataset()
-
-        self.post_dataset()
 
     def copy_(self):
         """ Child classes need to take care of this """
@@ -262,10 +260,11 @@ class ERPDatasetObjectEntity(object):
         self.created_dataset.StartTransaction()
 
     def post_(self):
-        """ After makin changes to the fields, post them into the dataset"""
+        """ After making changes to the fields, post them into the dataset"""
         try:
             self.created_dataset.Post()
-        except:
+        except Exception as e:
+            print(f"ERP Post gone wrong - Cancel | Error: {e}")
             self.cancel_()
 
     def cancel_(self):
@@ -348,6 +347,19 @@ class ERPDatasetObjectEntity(object):
     def get_created_dataset(self):
         return self.created_dataset
 
+    def delete_dataset(self, check_delete=True):
+        """ Delete with checks
+        The delete without checks works fine
+        """
+        # Todo: Why is delete with checks not working? A window is shown in büro+ but no delete happens
+        self.edit_()
+        self.update_("GspKz", 0)
+        if check_delete:
+            self.created_dataset.Delete(aMeld=1, aIgnoreWarnings=1)
+        else:
+            self.created_dataset.Delete()
+        self.post_()
+
     """ Positioning/Finding/Filtering """
 
     def set_dataset_cursor_to_field_value(self):
@@ -390,7 +402,6 @@ class ERPDatasetObjectEntity(object):
         :param field: The indicy or index of the DataSet
         :return:
         """
-
         if field is None:
             field = self.dataset_id_field
 
@@ -399,37 +410,51 @@ class ERPDatasetObjectEntity(object):
 
         # Check if range is date
         if isinstance(start, datetime.datetime) and isinstance(end, datetime.datetime):
-            self.created_dataset.SetRange(
-                field,
-                str(start.strftime("%d.%m.%Y %H:%M:%S")),
-                str(end.strftime("%d.%m.%Y %H:%M:%S"))
-            )
-            # print(field,
-            #       str(start.strftime("%d.%m.%Y %H:%M:%S")),
-            #       str(end.strftime("%d.%m.%Y %H:%M:%S")))
+           start = str(start.strftime("%d.%m.%Y %H:%M:%S"))
+           end = str(end.strftime("%d.%m.%Y %H:%M:%S"))
+
         else:
             if not isinstance(start, list):
                 start = [start]
             if not isinstance(end, list):
                 end = [end]
-            self.created_dataset.SetRange(field, start, end)
+
+        self.created_dataset.SetRange(field, start, end)
+
         # Apply Range
         self.created_dataset.ApplyRange()
         # Check if we get results
         if self.range_count() == 0:
             print("No", self.dataset_name, "in given range", start, end)
+            self.created_dataset.CancelRange()
             return False
         # set the cursor to the first entry
-        else:
-            # print("Found", self.range_count(), self.dataset_name, "between", start, end)
-            self.created_dataset.First()
-            return self
+        elif self.range_count() > 1:
+            print("Found", self.range_count(), self.dataset_name, "between", start, end)
+            self.range_first()
+            return True
+        elif self.range_count() == 1:
+            print("Found 1 between", start, end)
+            return True
 
     def range_next(self):
         self.created_dataset.Next()
+        self.range_skip_gspkz()
 
     def range_first(self):
         self.created_dataset.First()
+        self.range_skip_gspkz()
+
+    def range_skip_gspkz(self):
+        if self.skip_gspkz:
+            while True:
+                gspkz = self.get_("GspKz")
+                if gspkz is not None and gspkz == 1 and not self.range_eof():
+                    self.range_next()
+                elif gspkz == 0:
+                    break
+        else:
+            return True
 
     def range_eof(self):
         """
@@ -536,7 +561,7 @@ class ERPDatasetObjectEntity(object):
         if not file:
             raise FileNotFoundError
         else:
-            with open(self.prefill_json_directory + file, 'r') as f:
+            with open(file, 'r') as f:
                 print("Open file for prefill: ", self.prefill_json_directory + file)
                 # data = json.load(f)
                 try:

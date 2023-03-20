@@ -187,9 +187,9 @@ def sync_thread():
 t1 = threading.Thread(target=sync_thread)
 t1.start()
 """
-
 def main():
-    erp_obj = ERPConnectionEntity(mandant="TEST")
+    erp_obj = ERPConnectionEntity()
+    # erp_obj = ERPConnectionEntity(mandant="TEST")
     erp_obj.connect()
 
     # ATTI #
@@ -206,6 +206,10 @@ def main():
     ############# INIT ALL PROD ################
     # sw6_prod.init_all_PRODUCTS_from_BRIDGE_to_SW6()
 
+    ############ ORDER FROM SW6 TO BRIDGE ######
+    # sw6_order.upload_all_new_orders_from_SW6_to_BRIDGE()
+    # order = BridgeOrderEntity.query.get(2)
+    # print(order.products[0].get_unit_price(order))
 
     """
     ######################
@@ -230,17 +234,7 @@ def main():
     # Adressen
     # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
     # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10000, end=40000)
-
-    # For tests
-    # erp_buchner = ERPAdressenEntity(erp_obj=erp_obj, id_value=11869)
-    # erp_buchner.delete_dataset(check_delete=False)
-
-    buchner = BridgeCustomerEntity().query.get(2843)
-    buchner.erp_nr = "e6eb7732af184d9f971832065bc21567"
-    buchner.updated_at = datetime.now()
-    buchner.erp_ltz_aend = None
-
-    ERPCustomerController(erp_obj=erp_obj).sync_changed()
+    # ERPCustomerController(erp_obj=erp_obj).sync_changed()
 
     # History
     # erp_history = ERPHistoryEntity(erp_obj=erp_obj)
@@ -250,10 +244,13 @@ def main():
 
     # All
 
+    adr1 = ERPAdressenEntity(erp_obj=erp_obj, id_value=51449)
+    adr1.remove_webshop_id()
+
 
     # sync_all_to_db()
 
-    # erp_obj.close()
+    erp_obj.close()
 
     """
     ######################

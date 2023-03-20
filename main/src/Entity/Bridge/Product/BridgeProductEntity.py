@@ -237,6 +237,16 @@ class BridgeProductEntity(db.Model):
         # If the product has no fixed shipping cost per bundle and no prices, return 0.
         return 0
 
+    def get_unit_price(self, order):
+        unit_price = db.session.query(
+            order_product.c.unit_price,
+        ).filter(
+            order_product.c.product_id == self.id,
+            order_product.c.order_id == order.id
+        ).scalar()
+
+        return unit_price
+
 
 # Make the translation class
 class BridgeProductTranslationEntity(db.Model):

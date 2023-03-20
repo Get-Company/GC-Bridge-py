@@ -88,7 +88,6 @@ class Bridge2ObjectOrderController:
                 order_customer.append([products["orderId"], products["customerId"]])
         return order_customer
 
-
     def make_order_list(self):
 
         """

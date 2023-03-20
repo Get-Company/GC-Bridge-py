@@ -36,8 +36,8 @@ from attrs import validators
 @attrs.define
 class ConfShopware6ApiBase(object):
     # the api url, like : 'https://shop.yourdomain.com/api'
-    shopware_admin_api_url: str = "https://sw6.classei-shop.com/api"
-    shopware_admin_api_url_token: str = "https://sw6.classei-shop.com/api/oauth/token"
+    shopware_admin_api_url: str = "https://sw6dev.classei-shop.com/api"
+    shopware_admin_api_url_token: str = "https://sw6dev.classei-shop.com/api/oauth/token"
     # the storefront api url, like : 'https://shop.yourdomain.com/store-api'
     shopware_storefront_api_url: str = ""
     # API ID´s FIX
@@ -47,7 +47,7 @@ class ConfShopware6ApiBase(object):
     ##############
 
 
-    sales_channel = "07a1e910ba9a40269c2f70d16066f167"
+    sales_channel = "a0651b52312b4f65b5938ac0e90b13e7"
     currency = "b7d2554b0ce847cd82f3ac9bd1c0dfca"
 
 
@@ -62,9 +62,9 @@ class ConfShopware6ApiBase(object):
 
 
     # the client key ID, setup at Web Administration Interface > settings > system > integration > access_id
-    client_id: str = "SWIAC3NYCJRJR05XSJJVTMTSSQ"
+    client_id: str = "SWIAZHQ5QLHRBUQWAVPMCNR1ZA"
     # the client secret, setup at Web Administration Interface > settings > system > integration > access_secret
-    client_secret: str = "d3FCTU9vNkV6Mk1hTVhvYVNocDYxRkhZSGY1ZDRpcENvdjdmM0U"
+    client_secret: str = "T25BQTYyNFNzTm9LeGswYkRZM2JlT2hrbE9rYlZEMVpUUjJMQWI"
 
 
     grant_type: str = "client_credentials"

@@ -85,7 +85,7 @@ class ERPCustomerController(ERPController):
             # 1 Sync ERP->Bridge
             print("###\n", "ERP->Bridge")
             print("###\n")
-            # self._sync_erp_customer_to_bridge()
+            self._sync_erp_customer_to_bridge()
         else:
             print("No new or updated Customer in ERP")
 
@@ -225,6 +225,7 @@ class ERPCustomerController(ERPController):
                     print("ERP Customer Update:", erp_customer.get_("AdrNr"), bridge_date, erp_date)
                     # Adresses
                     for bridge_address in bridge_customer.addresses:
+                        print("Update Addresses")
                         self._sync_bridge_customer_addresses_to_erp(bridge_address=bridge_address)
                 # Else Bridge is not newer, pass
                 else:
@@ -250,17 +251,30 @@ class ERPCustomerController(ERPController):
 
         return True
 
-    def _sync_bridge_customer_addresses_to_erp(self, bridge_address):
+    def _sync_bridge_customer_addresses_to_erp(self, bridge_address:BridgeCustomerAddressEntity):
         erp_address = ERPAnschriftenEntity(erp_obj=self.erp_obj, id_value=[
             bridge_address.erp_nr,
             bridge_address.erp_ansnr
         ])
         # Is in db
         if erp_address:
-            print(erp_address.get_("Na1"), erp_address.get_("Na2"), erp_address.get_("Na3"))
+            erp_address.update_address(update_fields_list=bridge_address.map_db_to_erp_anschrift())
         else:
-            print("This address should be updated!")
-            pass
+            erp_address.create_new_address(adrnr=bridge_address.erp_nr, ansnr=bridge_address.erp_ansnr)
+
+        erp_contact = ERPAnsprechpartnerEntity(erp_obj=self.erp_obj, id_value=[
+            bridge_address.erp_nr,
+            bridge_address.erp_ansnr,
+            bridge_address.erp_aspnr
+        ])
+
+        # Is in db
+        if erp_contact:
+            erp_contact.update_contact(update_fields_list=bridge_address.map_db_to_erp_ansprechpartner())
+        else:
+            erp_contact.create_new_contact(adrnr=bridge_address.erp_nr, ansnr=bridge_address.erp_ansnr, aspnnr=bridge_address.erp_aspnr)
+
+
 
     def set_sync_date_now(self):
         print("Set Last Sync Date")

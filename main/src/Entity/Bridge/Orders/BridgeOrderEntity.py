@@ -1,14 +1,17 @@
 from main import db
 from datetime import datetime
+import pprint
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
 
 # Many-To-Many for Order/Product
 order_product = db.Table('bridge_order_product_entity',
-                         db.Column('order_id', db.Integer, db.ForeignKey('bridge_order_entity.id'),
-                                   primary_key=True),
-                         db.Column('product_id', db.Integer, db.ForeignKey('bridge_product_entity.id'),
-                                   primary_key=True)
+                         db.Column('id', db.Integer(), primary_key=True, nullable=False),
+                         db.Column('order_id', db.Integer, db.ForeignKey('bridge_order_entity.id')),
+                         db.Column('product_id', db.Integer, db.ForeignKey('bridge_product_entity.id')),
+                         db.Column('quantity', db.Integer()),
+                         db.Column('unit_price', db.Float()),
+                         db.Column('total_price', db.Float())
                          )
 
 # Order Entity
@@ -19,6 +22,8 @@ class BridgeOrderEntity(db.Model):
     api_id = db.Column(db.CHAR(36), nullable=False)
     purchase_date = db.Column(db.DateTime(), nullable=False)
     description = db.Column(db.String(255), nullable=True)
+    total_price = db.Column(db.Float(), nullable=False)
+    payment_method = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime(), nullable=True, default=datetime.now())
     edited_at = db.Column(db.DateTime(), nullable=False)
 
@@ -38,6 +43,8 @@ class BridgeOrderEntity(db.Model):
         back_populates='orders',
         lazy='dynamic')
 
+
+
     def update_entity(self, entity):
         """
         The entity is produced by ERP. Simply use the same names
@@ -49,3 +56,40 @@ class BridgeOrderEntity(db.Model):
         self.edited_at = datetime.now()
 
         return self
+
+    def get_order_products(self):
+        """
+        Returns a list of dictionaries containing product information (id, quantity, unit_price, total_price)
+        for all products associated with this order.
+        """
+        order_products = db.session.query(
+            order_product.c.product_id,
+            order_product.c.quantity,
+            order_product.c.unit_price,
+            order_product.c.total_price
+        ).filter(
+            order_product.c.order_id == self.id
+        ).all()
+
+        products_list = []
+        for product in order_products:
+            product.append({
+                'product_id': product[0],
+                'quantity': product[1],
+                'unit_price': product[2],
+                'total_price': product[3]
+            })
+
+        return True
+
+
+
+
+
+
+
+
+
+
+
+

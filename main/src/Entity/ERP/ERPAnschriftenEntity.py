@@ -51,7 +51,7 @@ class ERPAnschriftenEntity(ERPDatasetObjectEntity):
         country_name = self.get_("LandBez")
         return country_name
 
-    def create_new_address(self,adrnr,  customer_file=None, fields=None):
+    def create_new_address(self, adrnr, ansnr,  customer_file=None, fields=None):
         """
         Complete function for creating a new customer_address .
         Just add a dict of fields, and give the
@@ -71,7 +71,18 @@ class ERPAnschriftenEntity(ERPDatasetObjectEntity):
             for field_key, field_value in fields.items():
                 self.create_(field_key, field_value)
         self.create_("AdrNr", adrnr)
+        self.create_("AnsNr", adrnr)
+
         # Post everything
+        self.post_()
+
+    def update_address(self, update_fields_list):
+        self.edit_()
+
+        for field_key, field_value in update_fields_list.items():
+            # print("Set", field_key,":", field_value)
+            self.create_(field_key, field_value)
+
         self.post_()
 
 

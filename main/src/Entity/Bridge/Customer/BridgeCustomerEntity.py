@@ -98,7 +98,9 @@ class BridgeCustomerEntity(db.Model):
             "LiAnsNr": self.erp_liansnr,
             # "WShopAdrKz": 1,
             # "Memo": "Neuer Sync klappt"+self.updated_at.strftime("%d.%m.%Y %H:%M:%S"),
-            "LtzAend": self.updated_at
+            "LtzAend": self.updated_at,
+            "WShopAdrKz": 1,
+            "WShopID": self.api_id
         }
         return updated_fields_list
 

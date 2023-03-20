@@ -26,7 +26,7 @@ class ERPAnsprechpartnerEntity(ERPDatasetObjectEntity):
             prefill_json_directory=self.prefill_json_directory
         )
 
-    def create_new_contact(self, adrnr, customer_file=None, fields=None):
+    def create_new_contact(self, adrnr, ansnr, aspnnr, customer_file=None, fields=None):
         """
         Complete function for creating a new customer_address .
         Just add a dict of fields, and give the
@@ -46,6 +46,19 @@ class ERPAnsprechpartnerEntity(ERPDatasetObjectEntity):
             for field_key, field_value in fields.items():
                 self.create_(field_key, field_value)
         self.create_("AdrNr", adrnr)
+        self.create_("AnsNr", ansnr)
+        self.create_("AspNr", aspnnr)
+
         # Post everything
         self.post_()
+
+    def update_contact(self, update_fields_list):
+        self.edit_()
+
+        for field_key, field_value in update_fields_list.items():
+            # print("Set", field_key,":", field_value)
+            self.create_(field_key, field_value)
+
+        self.post_()
+
 

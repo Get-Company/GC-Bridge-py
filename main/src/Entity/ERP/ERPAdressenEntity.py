@@ -101,7 +101,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
     def update_customer(self, update_fields_list):
         self.edit_()
         for field_key, field_value in update_fields_list.items():
-            # print("Reading", field_key,":", field_value)
+            # print("Set", field_key,":", field_value)
             self.create_(field_key, field_value)
 
         self.set_updated_fields(updated_at=update_fields_list["LtzAend"])

@@ -62,6 +62,20 @@ class ERPDatasetObjectEntity(object):
             'Double': 'AsString'
 
         }
+        self.field_types_to_set = {
+            'WideString': 'AsString',
+            'Float': 'AsFloat',
+            'Blob': 'Text',
+            'Date': 'AsString',
+            'DateTime': 'AsString',
+            'Integer': 'AsInteger',
+            'Boolean': 'AsInteger',  # AsBoolean: True/False | AsInteger: 1/0
+            'Byte': 'AsInteger',
+            'Info': 'Text',
+            'String': 'AsString',
+            'Double': 'AsString'
+
+        }
         """ The fields of the dataset and their values """
         self.fields_list = dict()
 
@@ -219,10 +233,18 @@ class ERPDatasetObjectEntity(object):
         :return: dict self.fields_list
         """
         self.fields_list[field] = value
+
+        if isinstance(value, datetime.datetime):
+            value = value.strftime("%d.%m.%Y %H:%M:%S.%f")
+
         self.helper_set_value_of(field, value)
 
     def create_(self, field, value):
         self.fields_list[field] = value
+
+        if isinstance(value, datetime.datetime):
+            value = value.strftime("%d.%m.%Y %H:%M:%S.%f")
+
         self.helper_set_value_of(field, value)
 
     def copy_(self):
@@ -239,19 +261,12 @@ class ERPDatasetObjectEntity(object):
         # self.start_transaction()
         self.created_dataset.Append()
 
-    def set_updated_fields(self, updated_at:datetime):
+    def set_updated_fields(self, bridge_customer):
 
         self.created_dataset.SetSatzDatum(
-            datetime.datetime(
-                updated_at.year,
-                updated_at.month,
-                updated_at.day,
-                updated_at.hour,
-                updated_at.minute,
-                updated_at.second
-            ),
+            bridge_customer.created_at,
             self.get_("ErstBzr"),
-            updated_at,
+            bridge_customer.updated_at,
             "GC-Auto"
         )
 
@@ -381,7 +396,6 @@ class ERPDatasetObjectEntity(object):
         return self.created_dataset.FindKey(self.dataset_id_field, self.dataset_id_value)
 
     """ Range """
-
     def set_range(self, start, end=None, field=None):
         """
         Set a range by the give field with a list of indexes.
@@ -408,33 +422,36 @@ class ERPDatasetObjectEntity(object):
         if end is None:
             end = start
 
-        # Check if range is date
+        # Check if the start and end values are datetime objects
         if isinstance(start, datetime.datetime) and isinstance(end, datetime.datetime):
-           start = str(start.strftime("%d.%m.%Y %H:%M:%S"))
-           end = str(end.strftime("%d.%m.%Y %H:%M:%S"))
-
+            # If yes, convert them to a string with microsecond precision
+            start = str(start.strftime("%d.%m.%Y %H:%M:%S.%f"))
+            end = str(end.strftime("%d.%m.%Y %H:%M:%S.%f"))
         else:
+            # If not, check if they are lists and convert them if necessary
             if not isinstance(start, list):
                 start = [start]
             if not isinstance(end, list):
                 end = [end]
 
+        # print("This is the range", field, start, end)
         self.created_dataset.SetRange(field, start, end)
 
         # Apply Range
         self.created_dataset.ApplyRange()
         # Check if we get results
         if self.range_count() == 0:
-            print("No", self.dataset_name, "in given range", start, end)
+            # print("\nNo", self.dataset_name, "in given range", start,"and", end)
             self.created_dataset.CancelRange()
+            self.created_dataset = None
             return False
         # set the cursor to the first entry
         elif self.range_count() > 1:
-            print("Found", self.range_count(), self.dataset_name, "between", start, end)
+            # print("Found", self.range_count(), self.dataset_name, "between", start, end)
             self.range_first()
             return True
         elif self.range_count() == 1:
-            print("Found 1 between", start, end)
+            # print("Found 1 between", start, end)
             return True
 
     def range_next(self):
@@ -526,7 +543,12 @@ class ERPDatasetObjectEntity(object):
 
         field_type = dataset.Fields.Item(field).FieldType
         if field_type in self.field_types:
-            return eval('dataset.Fields.Item(str(field)).' + self.field_types[field_type])
+            # Remove the timezone from the date
+            if field_type == "DateTime":
+                is_date = eval('dataset.Fields.Item(str(field)).' + self.field_types[field_type])
+                return is_date.replace(tzinfo=None)
+            else:
+                return eval('dataset.Fields.Item(str(field)).' + self.field_types[field_type])
         else:
             print("We got the not known Type '%s' for field '%s' " % (field_type, field))
             return False
@@ -542,12 +564,13 @@ class ERPDatasetObjectEntity(object):
         :return:
         """
         field_type = self.created_dataset.Fields.Item(field).FieldType
-        if field_type in self.field_types:
-            # print("Set %s as %s - %s" % (field, self.field_types[field_type], value))
+
+        if field_type in self.field_types_to_set:
+            print("Set %s as %s - %s" % (field, self.field_types_to_set[field_type], value))
             return exec('self.created_dataset.Fields("' +
                         str(field) +
                         '").' +
-                        self.field_types[field_type] +
+                        self.field_types_to_set[field_type] +
                         " = '" +
                         str(value) +
                         "'")
@@ -576,6 +599,4 @@ class ERPDatasetObjectEntity(object):
         for field in self.get_dataset_infos().Fields:
             print(field.Name)
 
-    def print_dataset_indices(self):
-        for index in self.get_dataset_infos().Indices:
-            print(index.Name)
+

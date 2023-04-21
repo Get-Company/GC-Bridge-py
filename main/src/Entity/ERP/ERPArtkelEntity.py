@@ -1,6 +1,7 @@
 import logging
 from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
-import datetime
+from datetime import datetime, timedelta
+import calendar
 
 
 class ERPArtikelEntity(ERPDatasetObjectEntity):
@@ -35,4 +36,24 @@ class ERPArtikelEntity(ERPDatasetObjectEntity):
 
     def get_title(self):
         return self.get_('Bez1')
+
+    def set_special_price(self, start_date, price=None, percentage=None):
+        self.edit_()
+        if percentage:
+            price = self.get_("Vk0.Preis") * (1-percentage/100)
+            # Formatieren des Preises im deutschen Format
+            price = '{:,.2f}'.format(price).replace(',', ' ').replace('.', ',').replace(' ', '.')
+
+            print("Preis:", price)
+        end_of_next_month_after_start_date = datetime(start_date.year, start_date.month + 2, 1) - timedelta(days=1)
+
+        print("End of next month", end_of_next_month_after_start_date)
+        self.update_("Vk0.SVonDat", start_date)
+        self.update_("Vk0.SBisDat", end_of_next_month_after_start_date)
+        self.update_("Vk0.SPr", price)
+        self.update_("Vk1.SVonDat", start_date)
+        self.update_("Vk1.SBisDat", end_of_next_month_after_start_date)
+        self.update_("Vk1.SPr", price)
+
+        self.post_()
 

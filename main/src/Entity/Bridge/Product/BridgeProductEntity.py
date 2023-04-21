@@ -66,9 +66,10 @@ class BridgeProductEntity(db.Model):
         lazy='dynamic',
         cascade="all, delete")
 
-    # Price Products Relation one - to - many
+    # Price Products Relation one - to - one
     prices = db.relationship(
         'BridgePriceEntity',
+        uselist=False,  # It's a one-to-one, is one-to-many a better idea?
         back_populates="product")
 
     # Tax one - to - one
@@ -163,6 +164,7 @@ class BridgeProductEntity(db.Model):
         self.shipping_cost_per_bundle = erp_entity.get_("Sel70")  # Frachtkostenpauschale
         self.shipping_bundle_size = erp_entity.get_("Sel71")  # Frachtkostenaufschlag pro Stück
 
+
         # Relations are set in the Bridge2ObjectProductController
 
         return self
@@ -175,9 +177,8 @@ class BridgeProductEntity(db.Model):
         :return: float or False
         """
         now = datetime.now()
-        for price in self.prices:
-            if price.special_price and price.special_start_date <= now <= price.special_end_date:
-                return price
+        if self.prices.special_price and self.prices.special_start_date <= now <= self.prices.special_end_date:
+            return self.prices.special_price
         return False
 
     def get_current_price(self):
@@ -195,12 +196,9 @@ class BridgeProductEntity(db.Model):
 
     def get_list_price(self):
         """
-        Returns the current price of the product based1 on the date.
-        If there is a special price, it returns that instead of the regular price.
+        Returns the current price of the product.
         """
-        today = datetime.now()
-        for price in self.prices:
-            return price.price
+        return self.prices.price
 
     def get_shipping_cost(self, shipping: Union[str, float] = '5,95', no_shipping_from: float = 99.0) -> Union[
         str, float]:

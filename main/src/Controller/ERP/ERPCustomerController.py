@@ -18,9 +18,8 @@ from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEnti
 
 from main import db
 from pprint import pprint
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
-import pytz
 
 
 class ERPCustomerController(ERPController):
@@ -33,20 +32,20 @@ class ERPCustomerController(ERPController):
 
         self.last_sync_date = BridgeSynchronizeEntity().get_dataset_customers_sync_date()
 
-        # Downsert
-        self.new_or_updated_customers_in_bridge = None
+        self.bridge_customer_list = []
 
         super().__init__(erp_obj)
 
     """ #### Type of Sync #### """
+
     def sync_ranged(self, start, end):
         print("Customer Range Sync started", start, end)
         self.erp_entity.set_range(
             start=start, end=end
         )
-        bridge_customer_list = self._get_ranged_bridge(start=start, end=end)
+        self.bridge_customer_list = self._get_ranged_bridge(start=start, end=end)
 
-        self._sync(bridge_customer_list=bridge_customer_list)
+        self._sync()
         return True
 
     def _get_ranged_bridge(self, start, end):
@@ -56,13 +55,24 @@ class ERPCustomerController(ERPController):
 
     def sync_changed(self):
         # Get new or updated from both sides
-        self.erp_entity.get_all_since_last_sync(last_sync_date=self.last_sync_date)
-        bridge_customer_list = self._get_changed_bridge()
+        erp_customer_found = self.erp_entity.get_all_since_last_sync(last_sync_date=self.last_sync_date, offset=1)
+        if erp_customer_found:
+            while not self.erp_entity.range_eof():
+                print("ERP Customer found:", self.erp_entity.get_("AdrNr"), self.erp_entity.get_("LtzAend"))
+                self.erp_entity.range_next()
+        else:
+            self.erp_entity = None
+            print("No ERP Customer found.")
+
+        self.bridge_customer_list = self._get_changed_bridge()
+        if self.bridge_customer_list:
+            for customer in self.bridge_customer_list:
+                print("Bridge Customer found:", customer.erp_nr)
 
         # Last set the sync date
         self.set_sync_date_now()
 
-        self._sync(bridge_customer_list=bridge_customer_list)
+        self._sync()
 
         return True
 
@@ -74,30 +84,31 @@ class ERPCustomerController(ERPController):
         return customers
 
     """ #### The sync Workload #### """
-    def _sync(self, bridge_customer_list):
-        bridge_synchronise_entity = BridgeSynchronizeEntity()
-        self.last_sync_date = bridge_synchronise_entity.get_entity_by_id_1().dataset_customers_sync_date
 
-        self.erp_entity.filter_expression(self.webshop_filter)
-        self.erp_entity.filter_set()
+    def _sync(self):
+        # Do we have results?
+        if self.erp_entity is not None:
 
-        if self.erp_entity.range_count() >= 1:
+            self.erp_entity.filter_expression(self.webshop_filter)
+            self.erp_entity.filter_set()
+
             # 1 Sync ERP->Bridge
-            print("###\n", "ERP->Bridge")
+            print("\n###\n", "ERP->Bridge")
             print("###\n")
             self._sync_erp_customer_to_bridge()
         else:
             print("No new or updated Customer in ERP")
 
-        if len(bridge_customer_list) >= 1:
+        if len(self.bridge_customer_list) >= 1:
             # 2 Sync Bridge->ERP
             print("###\n", "Bridge->ERP")
             print("###\n")
-            self._sync_bridge_customer_to_erp(bridge_customer_list=bridge_customer_list)
+            self._sync_bridge_customer_to_erp()
         else:
             print("No new or updated Customer in Bridge")
 
     """ #### ERP ---> Bridge #### """
+
     def _sync_erp_customer_to_bridge(self):
         """
         Check
@@ -108,67 +119,129 @@ class ERPCustomerController(ERPController):
         bridge_synchronize_entity.dataset_customers_sync_date is set
         """
         # Loop through all the customers
+        self.erp_entity.range_first()
         while not self.erp_entity.range_eof():
-
             # Is the customer in the db
             is_in_db = self.is_customer_in_bridge(customer=self.erp_entity)
             if is_in_db:
+                print("Yes, in db:", is_in_db.id)
                 erp_date = self.erp_entity.get_("LtzAend").replace(tzinfo=None)
                 bridge_date = is_in_db.updated_at.replace(tzinfo=None)
 
-                # Is the customer newer than the db
+                # Is erp newer than the db
                 if erp_date > bridge_date:
                     bridge_customer = BridgeCustomerEntity().map_erp_to_db(self.erp_entity)
 
                     if not bridge_customer:
                         print("Passing Customer")
                         self.erp_entity.range_next()
-                        continue
 
                     is_in_db.update_entity(bridge_customer)
-                    is_in_db.updated_at = erp_date
-                    print("Bridge Customer Update:", is_in_db.erp_nr, erp_date, is_in_db.updated_at)
+                    print("Buchner Felder jetzt:", is_in_db.id, is_in_db.api_id, is_in_db.erp_nr, erp_date,
+                          is_in_db.updated_at)
                     db.session.add(is_in_db)
                     # Is commit returning True
                     if self.commit_with_errors():
+                        # Das aktualisierte Objekt aus der Datenbank abrufen
+                        updated_bridge_customer = self.bridge_entity.query.filter_by(id=is_in_db.id).one_or_none()
+
+                        # Überprüfen, ob das Objekt korrekt aktualisiert wurde
+                        if updated_bridge_customer:
+                            print("Das aktualisierte Objekt wurde erfolgreich aus der Datenbank abgerufen.")
+                        else:
+                            print("Es gab ein Problem beim Abrufen des aktualisierten Objekts aus der Datenbank.")
+
                         # Now all the addresses
-                        self._sync_erp_customer_addresses_to_bridge(bridge_customer=is_in_db)
+                        self._sync_erp_customer_addresses_to_bridge(bridge_customer=updated_bridge_customer)
 
                 # Is the customer older than the db
                 else:
-                    pass
+                    print("Erp is not newer than bridge")
+
 
             # Customer is new?
             else:
+                print("No, not in db!")
                 bridge_customer = BridgeCustomerEntity().map_erp_to_db(erp_entity=self.erp_entity)
                 bridge_customer.updated_at = self.erp_entity.get_("LtzAend")
-                print("Bridge Customer Create:", bridge_customer.erp_nr, self.erp_entity.get_("LtzAend"), bridge_customer.updated_at)
+                bridge_customer.updated_at = bridge_customer.updated_at + timedelta(seconds=1)
+                print("Bridge Customer Create:", bridge_customer.erp_nr, self.erp_entity.get_("LtzAend"),
+                      bridge_customer.updated_at)
                 db.session.add(bridge_customer)
-                self.commit_with_errors()
-                # Now all the addresses
-                self._sync_erp_customer_addresses_to_bridge(bridge_customer=bridge_customer)
+                if self.commit_with_errors():
+                    # Now all the addresses
+                    self._sync_erp_customer_addresses_to_bridge(bridge_customer=bridge_customer)
 
-            self.erp_entity.range_next()
+                else:
+                    print("Address Commit gone Wrong", bridge_customer.erp_nr, bridge_customer.id)
+
+
+            # Check if we are at the end of the range
+            if self.erp_entity.range_eof():
+                print("The last Customer")
+                break
+            else:
+                print("Next customer")
+                self.erp_entity.range_next()
+
         return True
 
     def _sync_erp_customer_addresses_to_bridge(self, bridge_customer):
-        bridge_customer.addresses = []
-        db.session.add(bridge_customer)
+        # Delete all related address to this customer
+        for address in bridge_customer.addresses:
+            db.session.delete(address)
         self.commit_with_errors()
+
+        # Get Anschriften
         anschriften = self.erp_entity.get_anschriften()
+
+        # Check if we got anschriften or return none
+        if not anschriften:
+            print("No Anschriften found.")
+            return None
+
+        print("We have", anschriften.range_count(), "anschriften")
+
+        # Set the index for the anschriften while loop
         ans_index = 0
-        ansp_index = 0
+
+        # Start while Anschriften
         while not anschriften.range_eof():
-            if ans_index >= 200:
+
+            # Install a limit off synchronized anschriften
+            if ans_index >= 999:
                 break
+
+            # get ansprechpartner
             ansprechpartner = anschriften.get_ansprechpartner()
+
+            # Check if we got ansprechpartner or return none
+            if not ansprechpartner:
+                print("No Ansprechpartner found.")
+                return None
+
+            # Set the index for the ansprechpartner while loop
+            ansp_index = 0
+
+            # Start while Ansprechpartner
             while not ansprechpartner.range_eof():
-                if ansp_index >= 100:
+
+                # Install a limit off synchronized ansprechpartner
+                if ansp_index >= 50:
                     break
+
+                # Do a print of the current Ansprechpartner
                 print("Search Anspr:",
+                      "AdrNr:",
                       ansprechpartner.get_("AdrNr"),
+                      "AnsNr:",
                       ansprechpartner.get_("AnsNr"),
-                      ansprechpartner.get_("AspNr")
+                      "AspNr:",
+                      ansprechpartner.get_("AspNr"),
+                      "AnsIndex:",
+                      ans_index,
+                      "AnspIndex:",
+                      ansp_index,
                       )
 
                 # Map the fields
@@ -177,37 +250,45 @@ class ERPCustomerController(ERPController):
                     erp_contact_entity=ansprechpartner
                 )
 
-                # Find the entity in th db
-                bridge_address = BridgeCustomerAddressEntity().query \
-                    .filter_by(erp_nr=ansprechpartner.get_("AdrNr")) \
-                    .filter_by(erp_ansnr=ansprechpartner.get_("AnsNr")) \
-                    .filter_by(erp_aspnr=ansprechpartner.get_("AspNr")) \
-                    .one_or_none()
+                # Add the customer to the addresses
+                mapped_bridge_address.customer = bridge_customer
 
-                # If in db
-                if bridge_address:
-                    bridge_address.update_entity(mapped_bridge_address)
-                    bridge_address.customer = bridge_customer
-                    db.session.add(bridge_address)
-                    self.commit_with_errors()
+                # Add and Commit the Address
+                db.session.add(mapped_bridge_address)
+                self.commit_with_errors()
 
-                else:
-                    mapped_bridge_address.customer = bridge_customer
-                    db.session.add(mapped_bridge_address)
-                    self.commit_with_errors()
+                # Raise index by 1
                 ansp_index += 1
-                ansprechpartner.range_next()
-            ans_index += 1
-            anschriften.range_next()
 
+                # End while if last ansprechpartner
+                if ansprechpartner.range_eof():
+                    print("End of range Asp")
+                    break
+                else:
+                    print("Next Ansprechpartner")
+                    ansprechpartner.range_next()
+
+            # Raise Anschriften by 1
+            ans_index += 1
+
+            # End while if last anschrift
+            if anschriften.range_eof():
+                print("End of range Ans")
+                break
+            else:
+                anschriften.range_next()
+
+        print("End of function")
         return True
 
+
     """ #### Bridge ---> ERP #### """
-    def _sync_bridge_customer_to_erp(self, bridge_customer_list):
+
+    def _sync_bridge_customer_to_erp(self):
         """
         :return:
         """
-        for bridge_customer in bridge_customer_list:
+        for bridge_customer in self.bridge_customer_list:
             # Atti is setting the api_id 36 char into the erp_nr field
             # when the customer is new.
             if len(bridge_customer.erp_nr) == 5:
@@ -215,13 +296,16 @@ class ERPCustomerController(ERPController):
             else:
                 erp_customer = False
 
-            # Customer
+            # Customer Update
             if erp_customer:
                 bridge_date = bridge_customer.updated_at
                 erp_date = erp_customer.get_('LtzAend').replace(tzinfo=None)
                 # If Bridge is newer
                 if bridge_date > erp_date:
-                    erp_customer.update_customer(update_fields_list=bridge_customer.map_db_to_erp())
+                    erp_customer.update_customer(
+                        update_fields_list=bridge_customer.map_db_to_erp(),
+                        bridge_customer=bridge_customer
+                    )
                     print("ERP Customer Update:", erp_customer.get_("AdrNr"), bridge_date, erp_date)
                     # Adresses
                     for bridge_address in bridge_customer.addresses:
@@ -235,7 +319,8 @@ class ERPCustomerController(ERPController):
                 print("Create new Customer")
 
                 new_customer = ERPAdressenEntity(erp_obj=self.erp_obj)
-                new_customer_info = new_customer.create_new_customer(bridge_customer=bridge_customer, customer_file='webshop.yaml')
+                new_customer_info = new_customer.create_new_customer(bridge_customer=bridge_customer,
+                                                                     customer_file='webshop.yaml')
 
                 if new_customer_info["adrnr"]:
                     print(f"New Customer in ERP created!")
@@ -251,7 +336,7 @@ class ERPCustomerController(ERPController):
 
         return True
 
-    def _sync_bridge_customer_addresses_to_erp(self, bridge_address:BridgeCustomerAddressEntity):
+    def _sync_bridge_customer_addresses_to_erp(self, bridge_address: BridgeCustomerAddressEntity):
         erp_address = ERPAnschriftenEntity(erp_obj=self.erp_obj, id_value=[
             bridge_address.erp_nr,
             bridge_address.erp_ansnr
@@ -272,21 +357,29 @@ class ERPCustomerController(ERPController):
         if erp_contact:
             erp_contact.update_contact(update_fields_list=bridge_address.map_db_to_erp_ansprechpartner())
         else:
-            erp_contact.create_new_contact(adrnr=bridge_address.erp_nr, ansnr=bridge_address.erp_ansnr, aspnnr=bridge_address.erp_aspnr)
-
-
+            erp_contact.create_new_contact(adrnr=bridge_address.erp_nr, ansnr=bridge_address.erp_ansnr,
+                                           aspnnr=bridge_address.erp_aspnr)
 
     def set_sync_date_now(self):
-        print("Set Last Sync Date")
-        dataset_customers_sync_date = BridgeSynchronizeEntity().set_dataset_customers_sync_date(datetime.now())
-        print(dataset_customers_sync_date)
+        """
+        Sets the BridgeSynchronizeEntity dataset_customers_sync_date.
+        """
+        # datetime
+        last_sync_date = datetime.now()
+
+        # Set the dataset_customers_sync_date in BridgeSynchronizeEntity
+        dataset_customers_sync_date = BridgeSynchronizeEntity().set_dataset_customers_sync_date(last_sync_date)
         db.session.add(dataset_customers_sync_date)
+
+        # Commit changes to database
         self.commit_with_errors()
+
         return True
 
     def commit_with_errors(self):
         try:
             db.session.commit()
+            print("\nCommit done")
             return True
         except IntegrityError as e:
             db.session.rollback()
@@ -299,10 +392,11 @@ class ERPCustomerController(ERPController):
             db.session.rollback()
             print(f"Error: {e}")
 
-################################ ALT #########################
+    ################################ ALT #########################
     """
     Upsert = ERP -> Bridge 
     """
+
     def sync_range_upsert(self, start, end, field=None):
         # 1. Get Customers from ERP
         self.erp_entity.set_range(start=start, end=end)
@@ -320,6 +414,7 @@ class ERPCustomerController(ERPController):
     """
     Downsert = Bridge -> ERP
     """
+
     def sync_changed_downsert(self):
         bridge_synchronize = BridgeSynchronizeEntity().get_entity_by_id_1()
         last_sync = bridge_synchronize.dataset_customers_sync_date
@@ -334,12 +429,11 @@ class ERPCustomerController(ERPController):
             print("No new customer found in bridge")
             return True
 
-
     """
     Sync Tools
     """
 
-    def is_customer_in_bridge(self, customer: ERPAdressenEntity) -> Union[ERPAdressenEntity, Exception]:
+    def is_customer_in_bridge(self, customer: ERPAdressenEntity) -> Union[BridgeCustomerEntity, Exception]:
         """
         Check if a given ERPAdressenEntity is present in the bridge table.
         :param customer: The ERPAdressenEntity to check for in the bridge table.
@@ -348,6 +442,7 @@ class ERPCustomerController(ERPController):
         :rtype: Union[ERPAdressenEntity, Exception]
         """
         customer_number = customer.get_("AdrNr")
+        print("Searching for", customer_number)
         res = self.bridge_entity.query.filter_by(erp_nr=customer_number).one_or_none()
         if res:
             return res
@@ -355,18 +450,3 @@ class ERPCustomerController(ERPController):
             return None
         else:
             raise Exception("Multiple Entries found")
-
-    def set_timezone(self, date, timezone="Europe/Berlin"):
-        """Sets the timezone of a datetime object.
-
-        Args:
-            date (datetime): The datetime object to be modified.
-            timezone (str, optional): The timezone to be set. Defaults to 'Europe/Berlin'.
-
-        Returns:
-            datetime: The datetime object with the specified timezone.
-        """
-        if date.tzinfo is None:
-            date = pytz.utc.localize(date)
-
-        return date.astimezone(pytz.timezone(timezone))

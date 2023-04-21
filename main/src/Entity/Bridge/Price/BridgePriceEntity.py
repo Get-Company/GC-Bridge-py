@@ -22,7 +22,7 @@ class BridgePriceEntity(db.Model):
     product = db.relationship(
         "BridgeProductEntity",
         back_populates="prices")
-    product_id = db.Column(db.Integer(), db.ForeignKey('bridge_product_entity.id'))
+    product_id = db.Column(db.Integer(), db.ForeignKey('bridge_product_entity.id'), unique=True)
 
     def update_entity(self, entity):
         self.price = entity.price

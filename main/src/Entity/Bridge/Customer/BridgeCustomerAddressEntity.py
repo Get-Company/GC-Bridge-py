@@ -71,8 +71,17 @@ class BridgeCustomerAddressEntity(db.Model):
 
     def map_erp_to_db(self, erp_address_entity: ERPAnschriftenEntity, erp_contact_entity: ERPAnsprechpartnerEntity):
         self.erp_nr = erp_contact_entity.get_('AdrNr')
+
         self.erp_ansnr = erp_contact_entity.get_('Ansnr')
+        if self.erp_ansnr < 0:
+            print("Error in ansnr. AdrNr:", self.erp_nr)
+            return False
+
         self.erp_aspnr = erp_contact_entity.get_('AspNr')
+        if self.erp_aspnr < 0:
+            print("Error in aspnr. AdrNr:", self.erp_nr)
+            return False
+
         self.na1 = erp_address_entity.get_('Na1')
         self.na2 = erp_address_entity.get_('Na2')
         self.na3 = erp_address_entity.get_('Na3')

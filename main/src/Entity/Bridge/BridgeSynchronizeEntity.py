@@ -5,18 +5,18 @@ from datetime import datetime
 class BridgeSynchronizeEntity(db.Model):
     __tablename__ = 'bridge_synchronize_entity'
     id = db.Column(db.Integer(), primary_key=True, nullable=False, unique=True)
-    dataset_category_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
-    dataset_product_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
-    dataset_customers_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
-    dataset_tax_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
-    dataset_order_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
+    dataset_category_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now().replace(microsecond=0))
+    dataset_product_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now().replace(microsecond=0))
+    dataset_customers_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now().replace(microsecond=0))
+    dataset_tax_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now().replace(microsecond=0))
+    dataset_order_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now().replace(microsecond=0))
     # SW6 Fields
-    sw6_category_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
-    sw6_product_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
-    sw6_customers_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
-    sw6_order_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now())
+    sw6_category_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now().replace(microsecond=0))
+    sw6_product_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now().replace(microsecond=0))
+    sw6_customers_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now().replace(microsecond=0))
+    sw6_order_sync_date = db.Column(db.DateTime(), nullable=True, default=datetime.now().replace(microsecond=0))
     # Loop True or false
-    loop_continue = db.Column(db.BOOLEAN, nullable=True)
+    loop_continue = db.Column(db.Boolean, nullable=True)
 
     """ Get the first row since everything will be stored there """
     def get_entity_by_id_1(self):

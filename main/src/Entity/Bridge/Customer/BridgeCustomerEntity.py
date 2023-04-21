@@ -17,12 +17,11 @@ class BridgeCustomerEntity(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
     api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
-    erp_nr = db.Column(db.CHAR(36), nullable=True)
+    erp_nr = db.Column(db.CHAR(36), nullable=True, unique=True)
     email = db.Column(db.String(255), nullable=False)
     ustid = db.Column(db.String(255), nullable=True)
     erp_reansnr = db.Column(db.Integer(), nullable=True)
     erp_liansnr = db.Column(db.Integer(), nullable=True)
-    erp_ltz_aend = db.Column(db.DateTime(), nullable=True)  # Delete this and refactor
     created_at = db.Column(db.DateTime(), default=datetime.now())
     updated_at = db.Column(db.DateTime(), default=datetime.now())
 
@@ -66,12 +65,21 @@ class BridgeCustomerEntity(db.Model):
             print("Standard Billing Address not found")
 
     def update_entity(self, entity):
+        """
+        Update the current object with the values of another object.
+
+        :param entity: The object to update the current object with.
+        :type entity: Any object
+        :return: The updated object.
+        :rtype: Any object
+        """
         self.erp_nr = entity.erp_nr
         self.ustid = entity.ustid
         self.erp_reansnr = entity.erp_reansnr
         self.erp_liansnr = entity.erp_liansnr
-        self.erp_ltz_aend = entity.erp_ltz_aend
-        self.updated_at = datetime.now().replace(tzinfo=None)
+        self.api_id = entity.api_id or uuid.uuid4().hex
+        self.email = entity.email
+        self.updated_at = entity.updated_at
 
         return self
 
@@ -80,10 +88,14 @@ class BridgeCustomerEntity(db.Model):
         self.ustid = erp_entity.get_("UStId")
         self.erp_reansnr = erp_entity.get_("ReAnsNr")
         self.erp_liansnr = erp_entity.get_("LiAnsNr")
-        self.erp_ltz_aend = erp_entity.get_('LtzAend').replace(tzinfo=None)
+        if erp_entity.get_("WShopID"):
+            self.api_id = erp_entity.get_("WShopID")
+        # Update Date Fields
+        updated = erp_entity.get_('LtzAend')
+        self.updated_at = updated
+
         self.email = erp_entity.get_login()
-        if not self.api_id:
-            self.api_id = uuid.uuid4().hex
+        print(self.email)
 
         return self
 
@@ -93,7 +105,6 @@ class BridgeCustomerEntity(db.Model):
         :return: dict of fields
         """
         updated_fields_list = {
-            # "WShopID": self.api_id,
             "ReAnsNr": self.erp_reansnr,
             "LiAnsNr": self.erp_liansnr,
             # "WShopAdrKz": 1,

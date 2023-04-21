@@ -13,7 +13,7 @@
                 </span> netto
                 <br />
                 <span style="color: #ff9933;">
-                    Aktionspreis: {{ "%.2f"|format(product.get_special_price().special_price)|replace('.', ',') }} €
+                    Aktionspreis: {{ "%.2f"|format(product.get_special_price())|replace('.', ',') }} €
                 </span> netto
                 {% else %}
                 Listenpreis: {{ "%.2f"|format(product.get_list_price())|replace('.', ',') }} € netto

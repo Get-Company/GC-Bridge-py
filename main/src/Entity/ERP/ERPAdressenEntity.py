@@ -31,8 +31,10 @@ Examples:
     Beispiel:
     anschriften_ntt.find_('AdrNrAnsNr', [self.get_('AdrNr'), self.get_('LiAnsNr')])
 
-    Ansprechpartner:
-
+    # Delete the webshop id, block the user and set a block message:
+    address = ERPAdressenEntity(erp_obj=erp_obj, id_value=adrnr)
+    message = "Gesperrt wegen Wunsch zur Löschung."
+    address.remove_webshop_id(block=True, message=message)
 
 """
 import csv
@@ -43,7 +45,7 @@ from pprint import pprint
 from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
 from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class ERPAdressenEntity(ERPDatasetObjectEntity):
@@ -78,6 +80,11 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         self.created_dataset = self.get_dataset_infos().CreateDataSetEx()
 
     """ Overrides """
+    def get_nested_dataset(self, nested_data_set_name):
+        self.created_dataset = self.get_dataset_infos().CreateDataSet()
+        nested_data_set = self.created_dataset.NestedDataSets(nested_data_set_name)
+        nested_data_set.FindKey("Jahr", 2022)
+        print(nested_data_set.Fields("UmsNov").AsString)
 
     def range_first(self):
         self.created_dataset.First()
@@ -91,20 +98,37 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
     """ Sync Queries """
 
-    def get_all_since_last_sync(self, last_sync_date):
-        current_time = datetime.now()
-        self.set_range(start=last_sync_date, end=current_time, field="LtzAend")
-        return True
+    def get_all_since_last_sync(self, last_sync_date: datetime, offset: int = 5) -> bool:
+        """
+        Set the range for a data query based on the last synchronization time and current time.
+
+        :param last_sync_date: A datetime object representing the time of the last synchronization.
+        :param offset: An integer specifying how many seconds should be added to the current time.
+            This ensures that all records with a timestamp up to the current second are included in the range.
+            Default is 5 seconds.
+        :return: A boolean indicating whether the range was set successfully (`True`) or not (`False`).
+        """
+        # Calculate the current time by adding the specified offset to the current datetime.
+        current_time = datetime.now() + timedelta(seconds=offset)
+
+        # Debugging message to show the start and end time of the query range.
+        print(f"Setting query range from {last_sync_date} to {current_time}")
+
+        # Set the query range using the start and end time.
+        range_set_success = self.set_range(start=last_sync_date, end=current_time, field="LtzAend")
+
+        # Return a boolean indicating whether the range was set successfully.
+        return range_set_success
+
 
     """ Create and Update Customer """
 
-    def update_customer(self, update_fields_list):
+    def update_customer(self, update_fields_list, bridge_customer):
         self.edit_()
         for field_key, field_value in update_fields_list.items():
-            # print("Set", field_key,":", field_value)
-            self.create_(field_key, field_value)
+            self.update_(field_key, field_value)
 
-        self.set_updated_fields(updated_at=update_fields_list["LtzAend"])
+        self.set_updated_fields(bridge_customer=bridge_customer)
         self.post_()
 
     def create_new_customer(self, bridge_customer, customer_file=None):
@@ -196,12 +220,16 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
     def map_bridge_to_erp(self, bridge_entity):
         pass
 
-    def remove_webshop_id(self):
+    def remove_webshop_id(self, block=False, message=None):
         """ Easy remove when a client wants to have his account deleted """
         self.edit_()
 
         self.update_('WShopAdrKz', 0)
         self.update_("WShopID", "")
+        if block:
+            self.update_("GspKz", 1)
+        if message:
+            self.update_("GspInfo", message)
 
         print("After update:", self.get_("WShopAdrKz"), self.get_("WShopID"))
 
@@ -236,6 +264,8 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         # Set the filter and set to first query of range
         self.filter_set()
         self.range_first()
+
+    """ Specials """
 
     def get_special_orgaplan_with_turnover(self):
         """ We want all customers from Orgaplan without a turnover"""
@@ -309,9 +339,13 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
     def get_anschriften(self):
         anschriften_ntt = ERPAnschriftenEntity(erp_obj=self.erp_obj)
-        anschriften_ntt.set_range(field='AdrNrAnsNr', start=self.get_('AdrNr'))
-        anschriften_ntt.range_first()
-        return anschriften_ntt
+        anschriften_ntt.set_range(field='AdrNrAnsNr', start=[self.get_('AdrNr'),0], end=[self.get_('AdrNr'), 999])
+
+        if anschriften_ntt.is_ranged():
+            anschriften_ntt.range_first()
+            return anschriften_ntt
+        else:
+            return False
 
     def get_special_standard_billing_address(self):
         """

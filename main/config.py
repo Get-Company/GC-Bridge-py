@@ -50,6 +50,12 @@ class ConfShopware6ApiBase(object):
     sales_channel = "a0651b52312b4f65b5938ac0e90b13e7"
     currency = "b7d2554b0ce847cd82f3ac9bd1c0dfca"
 
+    ##CUSTOMERS##
+    sal_mr = "405f161be0db4decab1dd31caf9d75c3"
+    sal_mrs = "fdef9939e237469e82a997876c219a61"
+    sal_company = "c086baddff894b2e963a7fb54491d613"
+
+
 
     ##############
     ##############

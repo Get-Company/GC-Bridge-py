@@ -4,23 +4,33 @@ from main.src.Entity.ERP.NestedDataSets.ERPNestedDatasetObjectEntity import ERPN
 Attention: NestedDataSet
 Umsatz is the NestedDataSet from Adressen and its called Ums (yes Ums)
 We have to set the NestedDataSet as the Created Dataset in this class to get all the functions
-Have a look at"""
+Have a look at
+"""
 
 
 class ERPUmsatzEntity(ERPNestedDatasetObjectEntity):
 
-    def __init__(self, erp_obj, adrnr, nested_dataset_id_value=None, nested_dataset_range=None):
+    def __init__(
+            self,
+            erp_obj,
+            nested_dataset_id_field="Jahr",
+            nested_dataset_id_value=None,
+            nested_dataset_range=None,
+            dataset_id_field="Nr",
+            dataset_id_value=None
+    ):
+
         self.erp_obj = erp_obj
 
         """ Parent """
         self.dataset_name = 'Adressen'
-        self.dataset_id_field = 'Nr'
-        self.dataset_id_value = adrnr
+        self.dataset_id_field = dataset_id_field
+        self.dataset_id_value = dataset_id_value
         self.dataset_range = None
 
         """ Nested """
         self.nested_dataset_name = 'Ums'
-        self.nested_dataset_id_field = 'Jahr'
+        self.nested_dataset_id_field = nested_dataset_id_field
         self.nested_dataset_id_value = nested_dataset_id_value
         self.nested_dataset_range = nested_dataset_range
         self.prefill_json_directory = None
@@ -45,3 +55,4 @@ class ERPUmsatzEntity(ERPNestedDatasetObjectEntity):
             prefill_json_directory=self.prefill_json_directory
 
         )
+

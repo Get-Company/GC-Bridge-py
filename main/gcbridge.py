@@ -1,10 +1,9 @@
 import os
-import subprocess
-import time
 from io import StringIO
 from pprint import pprint
 
 import html2text
+import subprocess
 import sqlalchemy
 from datetime import datetime, timedelta
 
@@ -188,9 +187,8 @@ t1 = threading.Thread(target=sync_thread)
 t1.start()
 """
 def main():
-    erp_obj = ERPConnectionEntity()
     # erp_obj = ERPConnectionEntity(mandant="TEST")
-    erp_obj.connect()
+    # erp_obj.connect()
 
     # ATTI #
 
@@ -205,6 +203,11 @@ def main():
 
     ############# INIT ALL PROD ################
     # sw6_prod.init_all_PRODUCTS_from_BRIDGE_to_SW6()
+    sw6_prod.sync_selected_PRODUCTS_from_BRIDGE_to_SW6(start="7510", end="7510")
+    ############# CUSTOMERS ###################
+    # sw6_cus.upload_new_customers_from_SW6_to_BRIDGE()
+    # sw6_cus.sync_all_CUSTOMERS_from_BRIDGE_to_SW6()
+    # sw6_cus.sync_selected_CUSTOMERS_from_BRIDGE_to_SW6_without_syncronise_check("e6eb7732af184d9f971832065bc21567", "e6eb7732af184d9f971832065bc21567")
 
     ############ ORDER FROM SW6 TO BRIDGE ######
     # sw6_order.upload_all_new_orders_from_SW6_to_BRIDGE()
@@ -227,15 +230,32 @@ def main():
     # sync_all_changed_categories()
 
     # Products
-    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed() # OK!
+    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()  # OK!
+
     # sync_all_changed_products()
     # sync_all_products()
+
 
     # Adressen
     # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
     # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10000, end=40000)
-    # ERPCustomerController(erp_obj=erp_obj).sync_changed()
 
+    # buchner_ans = ERPAnschriftenEntity(erp_obj=erp_obj, id_value=[10026,0])
+    # buchner_ans.edit_()
+    # buchner_ans.update_("EMail1", "contact@get-cümpany.com")
+    # buchner_ans.post_()
+    #
+    # buchner = ERPAdressenEntity(erp_obj=erp_obj, id_value=10026)
+    # print("\nLast Sync", BridgeSynchronizeEntity().get_entity_by_id_1().dataset_customers_sync_date)
+    # print("LtzAend:", buchner.get_("LtzAend"))
+    # buchner.edit_()
+    # buchner.update_("Memo", "Schlechter Zahler")
+    # buchner.post_()
+
+    # print("LtzAend:", buchner.get_("LtzAend"), "\n")
+
+    # ERPCustomerController(erp_obj=erp_obj).sync_ranged(start=10026, end=10026)
+    # ERPCustomerController(erp_obj=erp_obj).sync_changed()
     # History
     # erp_history = ERPHistoryEntity(erp_obj=erp_obj)
 
@@ -243,14 +263,10 @@ def main():
     # os.system("shutdown /s /t 1")
 
     # All
-
-    adr1 = ERPAdressenEntity(erp_obj=erp_obj, id_value=51449)
-    adr1.remove_webshop_id()
-
-
     # sync_all_to_db()
 
-    erp_obj.close()
+    # erp_obj.close()
+
 
     """
     ######################
@@ -358,8 +374,6 @@ def main():
             if product:
                 products.append(product)
 
-        pprint(products)
-
         special_end_date = False
         for product in products:
             # This is for the product url
@@ -376,7 +390,7 @@ def main():
 
             # This is for the disclaimer
             if product.get_special_price():
-                special_end_date = product.get_special_price().special_end_date
+                special_end_date = product.prices.special_end_date
 
         # Get the html content
         rendered_html = render_template(f"/{domain}/email/{year}/{newsletter}/newsletter.mjml", products=products, special_end_date=special_end_date)

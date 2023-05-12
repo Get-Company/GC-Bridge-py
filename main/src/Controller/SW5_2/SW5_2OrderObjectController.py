@@ -53,5 +53,42 @@ class SW5_2OrderObjectController(SW5_2ObjectController):
 
 
 
+        data = json_data['data']
+        addresses = data['addresses']
+
+        erp_ansnr = 0
+
+        session = Session()
+
+        for address in addresses:
+            na1 = address['company']
+            na2 = address['firstname'] + ' ' + address['lastname']
+            str = address['street']
+            plz = address['zipcode']
+            city = address['city']
+            land_ISO2 = address['country']['iso']
+            company = address['company']
+
+            new_entry = BridgeCustomerAddressEntity(
+                erp_nr=erp_nr,
+                erp_ansnr=erp_ansnr,
+                na1=na1,
+                na2=na2,
+                str=str,
+                plz=plz,
+                city=city,
+                land_ISO2=land_ISO2,
+                company=company,
+                erp_ltz_aend=datetime.now(),  # Assuming this is when the entry is made
+            )
+
+            session.add(new_entry)
+
+            erp_ansnr += 1
+
+        session.commit()
+
+
+
 
 

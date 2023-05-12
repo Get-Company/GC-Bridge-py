@@ -122,6 +122,7 @@ class ERPCustomerController(ERPController):
         self.erp_entity.range_first()
         while not self.erp_entity.range_eof():
             # Is the customer in the db
+
             is_in_db = self.is_customer_in_bridge(customer=self.erp_entity)
             if is_in_db:
                 print("Yes, in db:", is_in_db.id)
@@ -278,9 +279,7 @@ class ERPCustomerController(ERPController):
             else:
                 anschriften.range_next()
 
-        print("End of function")
         return True
-
 
     """ #### Bridge ---> ERP #### """
 
@@ -314,6 +313,7 @@ class ERPCustomerController(ERPController):
                 # Else Bridge is not newer, pass
                 else:
                     pass
+
             # New Customer, Create
             else:
                 print("Create new Customer")

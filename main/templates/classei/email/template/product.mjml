@@ -6,8 +6,13 @@
                 <a style="text-decoration: None; color:#000000" target="_blank"
                    href="https://www.classei-shop.com/search?sSearch={{product.erp_nr}}">
                     <h4>
-                        <span style="font-size:30px; font-weight:bold; line-height: 45px;">
-                            {{product.name}} {{alt_text}}
+                        <span style="font-size:30px; font-weight:bold; line-height: 45px; display: block">
+                            {% if product.name|length > 30 %}
+                            {% set short_name = product.name[:30]|replace('  ', ' ') ~ ' [...]' %}
+                            {{ short_name }}
+                            {% else %}
+                            {{ product.name }}
+                            {% endif %}
                         </span>
                     </h4>
                 </a>

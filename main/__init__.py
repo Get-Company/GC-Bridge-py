@@ -20,7 +20,6 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.debug = True
-
     db.init_app(app)
 
     return app

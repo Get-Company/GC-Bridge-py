@@ -35,7 +35,7 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
 
         self.prefill_json_directory = "main/src/json/order/"
 
-        self.order = None
+        self.created_dataset = self.erp_obj.get_erp().GetSpecialObject(1)
 
         # Need to call the __init_of the super class
         super().__init__(
@@ -52,11 +52,30 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
     def create_new_order(self):
         self.order = self.erp_obj.get_erp().GetSpecialObject(1)
 
-    def create_new_webshop_order(self, adrnr):
+    def create_new_webshop_order(self, order, positions):
         self.create_new_order()
-        self.order.Append(111, adrnr)
+        self.order.Append(111, order.customer.erp_nr)
         self.created_dataset = self.order.Dataset
-        self.prefill_from_file("shopware6/rechnung/germany.yaml")
+        self.create_("AuftrNr", "SW6_"+order.api_id)
+        self.prefill_from_file(
+            file=self.prefill_json_directory + "shopware6/rechnung/germany.yaml"
+        )
+        for pos in positions['order_products']:
+            print(pos["name"])
+            self.add_position(
+                quantity=pos["quantity"],
+                artnr=pos["erp_nr"]
+            )
+        self.post_dataset()
+
+    def create_new_webshop_order_v2(self, adrnr):
+        self.Append(111, adrnr)
+        self.prefill_from_file(
+            file=self.prefill_json_directory + "shopware6/rechnung/germany.yaml"
+        )
+        self.create_("AuftrNr", "SW6_"+self.order.api_id)
+        self.dataset.Positionen.Add(10, "St", 104014)
+        return self.get_("BelegNr")
 
     def add_position(self, quantity, artnr):
         """

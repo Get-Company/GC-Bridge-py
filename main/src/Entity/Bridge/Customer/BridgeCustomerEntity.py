@@ -124,6 +124,18 @@ class BridgeCustomerEntity(db.Model):
 
         return self
 
+    def map_sw5_to_db(self, customer: list):
+        self.erp_nr = customer['number']
+        self.api_id = customer['id']
+        self.ustid = customer['defaultBillingAddress']['vatId']
+        self.email = customer["email"]
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+        self.erp_reansnr = 0
+        self.erp_liansnr = 0
+
+        return self
+
     def __repr__(self):
         # text = f"BridgeCustomerEntity: {self.id} - {self.erp_nr}"
         # return text

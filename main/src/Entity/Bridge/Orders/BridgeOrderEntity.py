@@ -2,7 +2,7 @@ from main import db
 from datetime import datetime
 import pprint
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
-from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
+from main.src.Entity.Bridge.Orders.BridgeOrderStateEntity import BridgeOrderStateEntity
 
 # Many-To-Many for Order/Product
 order_product = db.Table('bridge_order_product_entity',
@@ -20,6 +20,7 @@ class BridgeOrderEntity(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
     api_id = db.Column(db.CHAR(36), nullable=False)
+    erp_order_id = db.Column(db.String(255), nullable=True)
     purchase_date = db.Column(db.DateTime(), nullable=False)
     description = db.Column(db.String(255), nullable=True)
     total_price = db.Column(db.Float(), nullable=False)
@@ -30,10 +31,14 @@ class BridgeOrderEntity(db.Model):
     """
     Relations
     """
+    # Relation one - to - one
+    order_state = db.relationship("BridgeOrderStateEntity", uselist=False, back_populates="order")
+
     # Relation many - to - one
     customer = db.relationship(
         "BridgeCustomerEntity",
         back_populates="orders")
+
     customer_id = db.Column(db.Integer(), db.ForeignKey('bridge_customer_entity.id'))
 
     # Order Products Relation many - to - many
@@ -42,6 +47,7 @@ class BridgeOrderEntity(db.Model):
         secondary=order_product,
         back_populates='orders',
         lazy='dynamic')
+
 
 
 

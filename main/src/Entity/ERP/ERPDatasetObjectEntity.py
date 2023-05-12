@@ -256,10 +256,10 @@ class ERPDatasetObjectEntity(object):
         # self.start_transaction()
         self.created_dataset.Edit()
 
-    def append_(self):
+    def append_(self, *args, **kwargs):
         """ To create a Dataset """
         # self.start_transaction()
-        self.created_dataset.Append()
+        self.created_dataset.Append(*args, **kwargs)
 
     def set_updated_fields(self, bridge_customer):
 

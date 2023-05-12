@@ -10,11 +10,13 @@ from datetime import datetime, timedelta
 from main import create_app
 from flask import render_template, redirect, request, make_response
 from flask_migrate import Migrate
+
 import sys
 from sqlalchemy import and_
 from loguru import logger
 
-from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import BridgeAdressenEntity
+# from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import BridgeAdressenEntity
+# from main.src.Shopware6Bridge.process import sw6_cus, sw6_order
 
 """
 ######################
@@ -50,7 +52,8 @@ from main.src.Entity.ERP.NestedDataSets.ERPUmsatzEntity import ERPUmsatzEntity
 from main.src.Entity.Bridge.Media.BridgeMediaEntity import BridgeMediaEntity
 
 # Order
-from main.src.Entity.Bridge.Orders.BridgeOrderEntity import BridgeOrderEntity
+from main.src.Entity.Bridge.Orders.BridgeOrderEntity import BridgeOrderEntity, order_product
+from main.src.Entity.Bridge.Orders.BridgeOrderStateEntity import BridgeOrderStateEntity
 
 # History
 from main.src.Entity.ERP.ERPHistoryEntity import ERPHistoryEntity
@@ -65,6 +68,10 @@ from main.src.Entity.Bridge.Misc.BridgeCurrencyEntity import BridgeCurrencyEntit
 
 # Controller
 from main.src.Controller.Mappei.parser import *
+
+# SW5
+# from main.src.Controller.SW5.APIClient import client_from_env, APIClient
+from main.src.Entity.SW5_2.SW5_2OrderObjectEntity import SW5_2OrderObjectEntity
 
 # SW6
 from main.src.Entity.SW6_2.SW6_2ObjectEntity import SW6_2ObjectEntity
@@ -85,6 +92,7 @@ from main.src.Controller.Bridge2.Misc.Bridge2ObjectCurrencyController import Bri
 
 # ERP
 from main.src.Controller.ERP.ERPCustomerController import ERPCustomerController
+from main.src.Controller.ERP.ERPOrderController import ERPOrderController
 
 # Atti SW6
 # from main.src.SW6_Bridge.process import sw_bridge
@@ -95,6 +103,9 @@ from main.src.Controller.Amazon.AmazonController import AmazonController
 # SW6_2
 from main.src.Controller.SW6_2.SW6_2ControllerObject import SW6_2ControllerObject
 
+# SW5_2
+from main.src.Controller.SW5_2.SW5_2CustomerController import SW5_2CustomerObjectController
+from main.src.Controller.SW5_2.SW5_2OrderObjectController import SW5_2OrderObjectController
 """
 ######################
 Tests
@@ -116,9 +127,6 @@ Migration
 """
 migrate = Migrate(app, db)
 
-
-
-
 # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10026)
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_changed()
@@ -138,7 +146,7 @@ migrate = Migrate(app, db)
 
 # Atti Zeugs
 
-from main.src.Shopware6Bridge.process import *
+# from main.src.Shopware6Bridge.process import *
 
 """
 ######################
@@ -186,8 +194,11 @@ def sync_thread():
 t1 = threading.Thread(target=sync_thread)
 t1.start()
 """
+
+SW5_2OrderObjectController().get_todays_open_orders()
+
 def main():
-    # erp_obj = ERPConnectionEntity(mandant="TEST")
+    # erp_obj = ERPConnectionEntity(mandant="58")
     # erp_obj.connect()
 
     # ATTI #
@@ -203,8 +214,10 @@ def main():
 
     ############# INIT ALL PROD ################
     # sw6_prod.init_all_PRODUCTS_from_BRIDGE_to_SW6()
-    sw6_prod.sync_selected_PRODUCTS_from_BRIDGE_to_SW6(start="7510", end="7510")
+    # sw6_prod.sync_selected_PRODUCTS_from_BRIDGE_to_SW6(start="7510", end="7510")
     ############# CUSTOMERS ###################
+    # sw6_cus.sync_changed_CUSTOMERS_from_BRIDGE_to_SW6()
+    # sw6_cus.sync_changed_CUSTOMERS_from_SW6_to_BRIDGE()
     # sw6_cus.upload_new_customers_from_SW6_to_BRIDGE()
     # sw6_cus.sync_all_CUSTOMERS_from_BRIDGE_to_SW6()
     # sw6_cus.sync_selected_CUSTOMERS_from_BRIDGE_to_SW6_without_syncronise_check("e6eb7732af184d9f971832065bc21567", "e6eb7732af184d9f971832065bc21567")
@@ -214,11 +227,14 @@ def main():
     # order = BridgeOrderEntity.query.get(2)
     # print(order.products[0].get_unit_price(order))
 
+
+
     """
     ######################
     Syncing
     ######################
     """
+
 
     # Tax
     # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
@@ -230,32 +246,16 @@ def main():
     # sync_all_changed_categories()
 
     # Products
-    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()  # OK!
-
-    # sync_all_changed_products()
+    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()  #  sync_all_changed_products()
     # sync_all_products()
 
-
     # Adressen
-    # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10100)
-    # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10000, end=40000)
-
-    # buchner_ans = ERPAnschriftenEntity(erp_obj=erp_obj, id_value=[10026,0])
-    # buchner_ans.edit_()
-    # buchner_ans.update_("EMail1", "contact@get-cümpany.com")
-    # buchner_ans.post_()
-    #
-    # buchner = ERPAdressenEntity(erp_obj=erp_obj, id_value=10026)
-    # print("\nLast Sync", BridgeSynchronizeEntity().get_entity_by_id_1().dataset_customers_sync_date)
-    # print("LtzAend:", buchner.get_("LtzAend"))
-    # buchner.edit_()
-    # buchner.update_("Memo", "Schlechter Zahler")
-    # buchner.post_()
-
-    # print("LtzAend:", buchner.get_("LtzAend"), "\n")
-
-    # ERPCustomerController(erp_obj=erp_obj).sync_ranged(start=10026, end=10026)
     # ERPCustomerController(erp_obj=erp_obj).sync_changed()
+    # Vorgänge
+    # bestellungen = ERPOrderController(erp_obj=erp_obj)
+    # bestellungen.get_new_orders()
+    # bestellungen.create_new_orders_in_erp()
+
     # History
     # erp_history = ERPHistoryEntity(erp_obj=erp_obj)
 
@@ -266,7 +266,6 @@ def main():
     # sync_all_to_db()
 
     # erp_obj.close()
-
 
     """
     ######################
@@ -393,7 +392,8 @@ def main():
                 special_end_date = product.prices.special_end_date
 
         # Get the html content
-        rendered_html = render_template(f"/{domain}/email/{year}/{newsletter}/newsletter.mjml", products=products, special_end_date=special_end_date)
+        rendered_html = render_template(f"/{domain}/email/{year}/{newsletter}/newsletter.mjml", products=products,
+                                        special_end_date=special_end_date)
 
         # Schreiben Sie den Inhalt des Newsletters in eine HTML-Datei
         rendered_mjml_file = os.path.join(path, f"{newsletter}.mjml")
@@ -430,4 +430,5 @@ if __name__ == "__main__":
 
     # localhost:5000
     # !IMPORTANT! Do not use reloader on Threaded Tasks, for it will use up erp licenses
+
     # app.run(port=5000, debug=True, use_reloader=True)

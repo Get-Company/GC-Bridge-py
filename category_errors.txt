@@ -1,6 +1,0 @@
-2023-03-07 14:28:40.329496 - ERROR_SW_2IMPR: 1 category failed to upload with name: 9 and ID: ba79dd5ad2b54aabb525a7ce7ca42874
-The string "0" is not a valid uuid.
-2023-03-07 14:29:06.988139 - ERROR_SW_AUK77: 1 category failed to upload with name: 77 and ID: d302bc78760d43c1ae5b3560f9957414
-The string "0" is not a valid uuid.
-2023-03-07 14:29:32.795505 - ERROR_SW_C5C46: 1 category failed to upload with name: 143 and ID: f593c85b46454cd883dc02edbb998837
-The string "0" is not a valid uuid.

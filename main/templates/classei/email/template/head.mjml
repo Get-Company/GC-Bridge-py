@@ -11,6 +11,17 @@
 <mj-font name="Roboto Thin" href="https://assets.classei.de/fonts/Roboto-Thin.ttf" />
 <mj-font name="Roboto Thin Italic" href="https://assets.classei.de/fonts/Roboto-ThinItalic.ttf" />
 
+<mj-style>
+    @font-face {
+        font-family: 'Roboto';
+        src: url('https://assets.classei.de/fonts/Roboto-Regular.ttf');
+        font-weight: normal;
+        font-style: normal;
+    }
+    body {
+        font-family: 'Roboto', sans-serif !important;
+    }
+</mj-style>
 <mj-attributes>
     <mj-all
             font-family="Roboto, Arial, sans-serif"

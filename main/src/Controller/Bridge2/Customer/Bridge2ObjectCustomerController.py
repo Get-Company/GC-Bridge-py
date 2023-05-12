@@ -1,3 +1,5 @@
+from sqlalchemy.exc import NoResultFound
+
 from main.src.Controller.Bridge2.Bridge2ObjectController import Bridge2ObjectController
 import sqlalchemy
 
@@ -219,3 +221,50 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
             mapped_customer.addresses.append(mapped_customer_address)
 
         return mapped_customer
+
+    def delete_doublicate_customer(self, wrong_adrnr, right_adrnr, sw="sw5"):
+        """
+        This function deletes the wrong customer and merge its orders and address data to the right customer.
+        :param wrong_adrnr: The wrong address number.
+        :param right_adrnr: The correct address number.
+        :param sw: The Shopware version. Default is "sw5".
+        :return: True if the customer has been successfully deleted, False otherwise.
+        """
+        try:
+            wrong_bridge_customer = BridgeCustomerEntity().query.filter_by(erp_nr=wrong_adrnr).one_or_none()
+            print(f"Found ERP customer with address number {wrong_adrnr}")
+        except NoResultFound:
+            wrong_bridge_customer = None
+
+        try:
+            right_bridge_customer = BridgeCustomerEntity().query.filter_by(erp_nr=right_adrnr).one_or_none()
+            print(f"Found ERP customer with address number {right_adrnr}")
+        except NoResultFound:
+            right_bridge_customer = None
+
+        if sw == "sw5":
+            from main.src.Controller.SW5.APIClient import client_from_env
+            sw_client = client_from_env()
+        elif sw == "sw6":
+            print("SW6 API not yet configured")
+            return False
+        else:
+            print("Not the right SW version. Choose 'sw5' or 'sw6'.")
+            return False
+
+        try:
+            wrong_sw_customer = sw_client.get_customer(customer_id=wrong_adrnr, is_number_not_id=True)
+        except Exception as e:
+            print(f"Could not find wrong SW customer with adrnr {wrong_adrnr}: {e}")
+            wrong_sw_customer = None
+
+        try:
+            right_sw_customer = sw_client.get_customer(customer_id=right_adrnr, is_number_not_id=True)
+        except Exception as e:
+            print(f"Could not find right SW customer with adrnr {right_adrnr}: {e}")
+            right_sw_customer = None
+
+
+
+
+

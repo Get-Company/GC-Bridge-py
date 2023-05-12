@@ -2,6 +2,7 @@ from sqlite3 import IntegrityError
 
 from sqlalchemy import insert
 from sqlalchemy.orm import joinedload
+from main.src.Entity.Bridge.Orders.BridgeOrderStateEntity import *
 
 from main.src.Shopware6Bridge.connectors.dbconnector import *
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import *
@@ -45,14 +46,12 @@ r = Requests()
 #             sql_session.commit()
 
 def upload_all_new_orders_from_SW6_to_BRIDGE(orders):
-    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    #CustomerPayload().upload_all_new_customers_from_SW6(r.get_all_new_customers_from_SW6())
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     for api_id, order_data in orders.items():
         order_in_db = sql_session.query(BridgeOrderEntity).filter_by(api_id=api_id).first()
 
         if order_in_db:
             continue
+
         payment_method = order_data["payment_method"]
         customer = sql_session.query(BridgeCustomerEntity).filter_by(api_id=order_data['customerID']).first()
         customer_id = customer.id
@@ -61,6 +60,14 @@ def upload_all_new_orders_from_SW6_to_BRIDGE(orders):
         positionprice = order_data['total'][0]['price']
         order_date = datetime.fromisoformat(order_date_str)
         description = None
+
+        # Create a new instance of BridgeOrderStateEntity
+        order_state = BridgeOrderStateEntity()
+        order_state.payment_state = 0
+        order_state.shipping_state = 0
+        order_state.order_state = 0
+
+        # Create the BridgeOrderEntity instance
         order = BridgeOrderEntity(api_id=api_id,
                                   purchase_date=order_date,
                                   description=description,
@@ -68,8 +75,18 @@ def upload_all_new_orders_from_SW6_to_BRIDGE(orders):
                                   customer_id=customer_id,
                                   total_price=positionprice,
                                   payment_method=payment_method)
+
+        # Associate the order with the order_state
+        order.order_state = order_state
+
+        # Associate the order_state with the order
+        order_state.order = order
+
         sql_session.add(order)
+        sql_session.add(order_state)
         sql_session.commit()
+
+
 
         bridge_order_product_entity = db.Table('bridge_order_product_entity', db.metadata, autoload=True)
 
@@ -80,7 +97,6 @@ def upload_all_new_orders_from_SW6_to_BRIDGE(orders):
             total_price = product['total_price']
             product_entity = sql_session.query(BridgeProductEntity).filter_by(api_id=product_id).first()
 
-            #####UPLOAD TO RELATION TABLE!!!!!!
             sql_session.execute(
                 bridge_order_product_entity.insert(),
                 {"order_id": order.id, "product_id": product_entity.id, "quantity": quantity,
@@ -93,6 +109,7 @@ def upload_all_new_orders_from_SW6_to_BRIDGE(orders):
 
 
 
+# upload_all_new_orders_from_SW6_to_BRIDGE(r.get_all_orders_from_SW6())
 
 # order_id = 3
 #

@@ -187,11 +187,11 @@ class BridgeProductEntity(db.Model):
         If there is a special price, it returns that instead of the regular price.
         """
         today = datetime.now()
-        for price in self.prices:
-            if price.special_price and price.special_start_date <= today <= price.special_end_date:
-                return price.special_price
-            else:
-                return price.price
+        if self.prices.special_price and self.prices.special_start_date <= today <= self.prices.special_end_date:
+            return self.prices.special_price
+        else:
+            return self.prices.price
+
         return None
 
     def get_list_price(self):

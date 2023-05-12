@@ -1,7 +1,10 @@
-[ **Hier Online ansehen** \- Falls die E-Mail nicht korrekt dargestellt wird
-]({readonline|template:notemplate}{/readonline}) ORGA-MAPPEN ORGA-TABS ORGA-
-BOXEN FERTIG-SETS < Hallo {if:anrede~Herr} Herr {/if} {if:anrede~Frau} Frau
-{/if} {subtag:name},
+@font-face { font-family: 'Roboto'; src:
+url('https://assets.classei.de/fonts/Roboto-Regular.ttf'); font-weight:
+normal; font-style: normal; } body { font-family: 'Roboto', sans-serif
+!important; }  [ **Hier Online ansehen** \- Falls die E-Mail nicht korrekt
+dargestellt wird ]({readonline|template:notemplate}{/readonline}) ORGA-MAPPEN
+ORGA-TABS ORGA-BOXEN FERTIG-SETS < Hallo {if:anrede~Herr} Herr {/if}
+{if:anrede~Frau} Frau {/if} {subtag:name},
 
 Ihre Kunden-Nr.: {subtag:adrnr}
 
@@ -52,13 +55,13 @@ Alle Termine und Projekte im Überblick halten.
 
 \- Mehr Infos zum Artikel -
 
-####  **Preis** 129,00 €
-
 pro **Set**  
 \- kostenloser Versand -  
 zuzgl. Mwst.
 
-[
+Listenpreis:  
+129,00 €  Aktionspreis:  
+109,65 €  \- 15,00 %  [
 
 ####  466070 Planer, Leder schwarz
 
@@ -81,12 +84,12 @@ Kalender A6 Art.Nr. 818009
 ####  **Preis** 17,85 €
 
 pro **Stck**  
-\- * zuzgl. Versandkosten -  
+\- kostenloser Versand -  
 zuzgl. Mwst.
 
 [
 
-####  806008 Planblätter weiß, 90 g/qm, lose/Pck./100Bl.
+####  806008 Planblätter weiß, 90 g/ [...]
 
 ](https://www.classei-shop.com/search?sSearch=806008)
 
@@ -106,12 +109,12 @@ geeignet.
 ####  **Preis** 3,45 €
 
 pro **Pck**  
-\- * zuzgl. Versandkosten -  
+\- kostenloser Versand -  
 zuzgl. Mwst.
 
 [
 
-####  806308 Planblätter-Sortiment (4 Farben) Pck./100Bl
+####  806308 Planblätter-Sortiment ( [...]
 
 ](https://www.classei-shop.com/search?sSearch=806308)
 
@@ -131,46 +134,6 @@ Prioritäten.
 ####  **Preis** 4,65 €
 
 pro **Pck**  
-\- * zuzgl. Versandkosten -  
-zuzgl. Mwst.
-
-[
-
-####  900001 Business-Set
-
-](https://www.classei-shop.com/search?sSearch=900001)
-
-Sofort mit der Ordnung starten ohne lange zu überlegen
-
-**Das Business-Set beinhaltet:**  
-3 Kunststoffboxen, lichtgrau mit Griffleisten,  
-170 verschiedenen Orga-Mappen,  
-Sammler, Dehnsammler,  
-6 verschied. Farben Quick-Tabs, Mappenstütze, Leitkarten, Folienschreiber und
-Zubehör
-
-\- Mehr Infos zum Artikel -
-
-####  **Preis** 139,00 €
-
-pro **Set**  
-\- kostenloser Versand -  
-zuzgl. Mwst.
-
-[
-
-####  900002 Business-Set-Pro
-
-](https://www.classei-shop.com/search?sSearch=900002) 6 Kunststoffboxen,
-lichtgrau mit Griffleisten, 250 verschied. Orga-Mappen,  
-10 Multifunktionsmappen, 3 Sammler,  
-3 Dehnsammler, 7 verschied. Farben Quick-Tabs,  
-2 Mappenstützen, 10 Leitkarten, Archivbox, Terminmappen-Set (1-31, Jan-Dez),
-Folienschreiber und **viel Zubehör!** \- Mehr Infos zum Artikel -
-
-####  **Preis** 349,00 €
-
-pro **Stck**  
 \- kostenloser Versand -  
 zuzgl. Mwst.
 
@@ -190,31 +153,26 @@ Strasse: | {subtag:strasse} |
 PLZ/Ort: | {subtag:plzort} |  
 Fon: | {subtag:fon} |  
 E-Mail: | {subtag:email} |  
-__x |  910000 Schreibtisch-Set (ZPM)  |  Listenpreis: 129,00 € netto  
+__x |  910000 Schreibtisch-Set (ZPM)  |  Listenpreis:  129,00 €  netto  
+Aktionspreis: 109,65 €  netto  
 pro **Set**  
 \- kostenloser Versand - zuzgl. Mwst. -  
 __x |  466070 Planer, Leder schwarz  |  Listenpreis: 17,85 € netto  
 pro **Stck**  
-\- * zuzgl. Versandkosten - zuzgl. Mwst. -  
+\- kostenloser Versand - zuzgl. Mwst. -  
 __x |  806008 Planblätter weiß, 90 g/qm, lose/Pck./100Bl.  |  Listenpreis:
 3,45 € netto  
 pro **Pck**  
-\- * zuzgl. Versandkosten - zuzgl. Mwst. -  
+\- kostenloser Versand - zuzgl. Mwst. -  
 __x |  806308 Planblätter-Sortiment (4 Farben) Pck./100Bl  |  Listenpreis:
 4,65 € netto  
 pro **Pck**  
-\- * zuzgl. Versandkosten - zuzgl. Mwst. -  
-__x |  900001 Business-Set  |  Listenpreis: 139,00 € netto  
-pro **Set**  
-\- kostenloser Versand - zuzgl. Mwst. -  
-__x |  900002 Business-Set-Pro  |  Listenpreis: 349,00 € netto  
-pro **Stck**  
 \- kostenloser Versand - zuzgl. Mwst. -  
 {autocontent:25-| max:1| order:created,DESC| type:intro|link|author|
 pict:resized| maxwidth:150| maxheight:150| invert| format:TOP_LEFT|
 template:tagcontent.php}
 
-* Versandkostenfrei ab Warenwert 99,00 € netto. Warenwert unter 99,00 € netto Versandkosten 5,95 € netto. Nur gültig mit deutscher Lieferadresse | [Nähere Infos zu Versandkosten hier ](https://www.classei-shop.com/Versandinformationen?sPartner=email)
+* Versandkostenfrei ab Warenwert 99,00 € netto. Warenwert unter 99,00 € netto Versandkosten 5,95 € netto. Nur gültig mit deutscher Lieferadresse | [Nähere Infos zu Versandkosten hier ](https://www.classei-shop.com/Versandinformationen?sPartner=email) Angebot gültig bis 30.06.2023 
 
 Classei-Organisation - Egon Heimann GmbH | Staudacher Str. 7e | 83250
 Marquartstein | Deutschland  

@@ -26,7 +26,7 @@ class SW6_2ObjectEntity:
         my_conf = ConfShopware6ApiBase
         my_api_client = Shopware6AdminAPIClientBase(config=my_conf)
 
-        my_api_client = Shopware6AdminAPIClientBase(use_docker_test_container=True)
+        # my_api_client = Shopware6AdminAPIClientBase(use_docker_test_container=False)
 
         self.api = my_api_client
 

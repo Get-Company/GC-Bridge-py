@@ -105,6 +105,9 @@ class ERPDatasetObjectEntity(object):
     def __repr__(self):
         return "Entity: %s, %s: %s" % (self.dataset_name, self.dataset_id_field, self.dataset_id_value)
 
+    def __del__(self):
+        print(f"Object {self.dataset_name} destroyed")
+
     """ CRUD Actions - set_, get_, update_, delete_ """
 
     def set_(self, field):
@@ -378,7 +381,11 @@ class ERPDatasetObjectEntity(object):
     """ Positioning/Finding/Filtering """
 
     def set_dataset_cursor_to_field_value(self):
-        return self.created_dataset.FindKey(self.dataset_id_field, self.dataset_id_value)
+        found = self.created_dataset.FindKey(self.dataset_id_field, self.dataset_id_value)
+        if not found:
+            self.set_dataset_infos()  # <-----|
+            #                                   |-- Creating the Dataset!!
+            self.set_created_dataset()  # <-----|
 
     def find_(self, field=None, value=None):
         """
@@ -441,17 +448,18 @@ class ERPDatasetObjectEntity(object):
         self.created_dataset.ApplyRange()
         # Check if we get results
         if self.range_count() == 0:
-            # print("\nNo", self.dataset_name, "in given range", start,"and", end)
+            print("\nNo", self.dataset_name, "in given range", start,"and", end)
             self.created_dataset.CancelRange()
             self.created_dataset = None
+
             return False
         # set the cursor to the first entry
         elif self.range_count() > 1:
-            # print("Found", self.range_count(), self.dataset_name, "between", start, end)
+            print("Found", self.range_count(), self.dataset_name, "between", start, end)
             self.range_first()
             return True
         elif self.range_count() == 1:
-            # print("Found 1 between", start, end)
+            print("Found 1 between", start, end)
             return True
 
     def range_next(self):
@@ -485,6 +493,9 @@ class ERPDatasetObjectEntity(object):
 
     def is_ranged(self):
         return self.created_dataset.IsRanged()
+
+    def is_empty(self):
+        return self.created_dataset.IsEmpty
 
     def filter_and(self, filter_field, filter_value):
         self.created_dataset.Filter = f"{filter_field} = '{filter_value}'"

@@ -15,6 +15,8 @@ import sys
 from sqlalchemy import and_
 from loguru import logger
 
+from datetime import date
+
 # from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import BridgeAdressenEntity
 # from main.src.Shopware6Bridge.process import sw6_cus, sw6_order
 
@@ -72,7 +74,7 @@ from main.src.Controller.Mappei.parser import *
 # SW5
 # from main.src.Controller.SW5.APIClient import client_from_env, APIClient
 from main.src.Entity.SW5_2.SW5_2OrderObjectEntity import SW5_2OrderObjectEntity
-
+from main.src.Entity.SW5_2.SW5_2CustomerObjectEntity import SW5_2CustomerObjectEntity
 # SW6
 from main.src.Entity.SW6_2.SW6_2ObjectEntity import SW6_2ObjectEntity
 
@@ -104,8 +106,9 @@ from main.src.Controller.Amazon.AmazonController import AmazonController
 from main.src.Controller.SW6_2.SW6_2ControllerObject import SW6_2ControllerObject
 
 # SW5_2
-from main.src.Controller.SW5_2.SW5_2CustomerController import SW5_2CustomerObjectController
+from main.src.Controller.SW5_2.SW5_2CustomerObjectController import SW5_2CustomerObjectController
 from main.src.Controller.SW5_2.SW5_2OrderObjectController import SW5_2OrderObjectController
+
 """
 ######################
 Tests
@@ -195,11 +198,68 @@ t1 = threading.Thread(target=sync_thread)
 t1.start()
 """
 
-SW5_2OrderObjectController().get_todays_open_orders()
+
+# SW5_2OrderObjectController().get_todays_open_orders()
+# SW5_2CustomerObjectController().delete_duplicates_by_adrnr(44760)
+
+# 1. Neuen Bestellungen
+# orders = SW5_2OrderObjectEntity().get_open_orders_by_startdate(date(year=2023, month=5, day=9))
+# for order in orders["data"]:
+#     #pprint(order)
+#     customer = SW5_2CustomerObjectEntity().get_customer(order["customerId"])
+#     # pprint(customer)
+#     SW5_2CustomerObjectController().get_new_customer(customer)
+#     order_details = SW5_2OrderObjectEntity().get_order_by_id(order["id"])
+#     order_data = SW5_2OrderObjectController().get_orders(order_details)
+#     #pprint(order)
+#     #pprint(order_data)
+#     SW5_2OrderObjectController().insert_order_data(order_data)
+
+
+def get_orders():
+    erp_obj = ERPConnectionEntity(mandant="58")
+    erp_obj.connect()
+
+    yesterday = datetime.today() - timedelta(days=1)
+    orders = SW5_2OrderObjectEntity().get_open_orders_by_startdate(startdate=yesterday)
+    for order in orders["data"]:
+        customer = SW5_2CustomerObjectEntity().get_customer(order["customerId"])
+        # Atti
+        SW5_2CustomerObjectController().get_new_customer(customer)
+        # Flo
+        # SW5_2CustomerObjectController().sync_customer(customer=customer["data"])
+        customer_double = SW5_2CustomerObjectEntity().get_all_customers_by_adrnr(adrnr=customer["data"]["number"])
+        if customer_double["total"] > 1:
+            print("Kein Sync! Doppelter Kunde:")
+            # SW5_2CustomerObjectController().delete_duplicates_by_adrnr(adrnr=customer["data"]["number"])
+        else:
+            print("Super, alles ok")
+            ERPCustomerController(erp_obj=erp_obj).sync_ranged(start=customer["data"]["number"],end=customer["data"]["number"])
+
+            # Write back the new customer_number
+            print("Forward Customer Number", customer["data"]["id"])
+            bridge_customer = BridgeCustomerEntity().query.filter_by(api_id=customer["data"]["id"]).one_or_none()
+
+            sw5_customer = SW5_2CustomerObjectEntity()
+            # number_added = sw5_customer.set_customer_number_by_id(customer_id=bridge_customer.api_id, number=bridge_customer.erp_nr)
+            # print(number_added)
+
+        order_details = SW5_2OrderObjectEntity().get_order_by_id(order["id"])
+        order_data = SW5_2OrderObjectController().get_orders(order_details)
+        SW5_2OrderObjectController().insert_order_data(order_data)
+
+    # Vorgänge
+    bestellungen = ERPOrderController(erp_obj=erp_obj)
+    bestellungen.get_new_orders()
+    bestellungen.create_new_orders_in_erp()
+
+    # ERP Close'
+    erp_obj.close()
+
 
 def main():
-    # erp_obj = ERPConnectionEntity(mandant="58")
-    # erp_obj.connect()
+    erp_obj = ERPConnectionEntity(mandant="58")
+    erp_obj.connect()
 
     # ATTI #
 
@@ -227,6 +287,40 @@ def main():
     # order = BridgeOrderEntity.query.get(2)
     # print(order.products[0].get_unit_price(order))
 
+    ############ ORDER FROM SW5 TO BRIDGE ######
+    # orders = SW5_2OrderObjectEntity().get_open_orders_by_startdate_and_enddate(
+    #     startdate=date(year=2023, month=4, day=19),
+    #     enddate=date(year=2023, month=4, day=20),
+    # )
+    # orders = SW5_2OrderObjectEntity().get_todays_open_orders()
+
+    yesterday = datetime.today() - timedelta(days=4)
+    orders = SW5_2OrderObjectEntity().get_open_orders_by_startdate(startdate=yesterday)
+    for order in orders["data"]:
+        customer = SW5_2CustomerObjectEntity().get_customer(order["customerId"])
+        # Atti
+        SW5_2CustomerObjectController().get_new_customer(customer)
+        # Flo
+        # SW5_2CustomerObjectController().sync_customer(customer=customer["data"])
+        customer_double = SW5_2CustomerObjectEntity().get_all_customers_by_adrnr(adrnr=customer["data"]["number"])
+        if customer_double["total"] > 1:
+            print("Kein Sync! Doppelter Kunde:")
+            # SW5_2CustomerObjectController().delete_duplicates_by_adrnr(adrnr=customer["data"]["number"])
+        else:
+            print("Super, alles ok")
+            ERPCustomerController(erp_obj=erp_obj).sync_ranged(start=customer["data"]["number"],end=customer["data"]["number"])
+
+            # Write back the new customer_number
+            print("Forward Customer Number", customer["data"]["id"])
+            bridge_customer = BridgeCustomerEntity().query.filter_by(api_id=customer["data"]["id"]).one_or_none()
+
+            sw5_customer = SW5_2CustomerObjectEntity()
+            # number_added = sw5_customer.set_customer_number_by_id(customer_id=bridge_customer.api_id, number=bridge_customer.erp_nr)
+            # print(number_added)
+
+        order_details = SW5_2OrderObjectEntity().get_order_by_id(order["id"])
+        order_data = SW5_2OrderObjectController().get_orders(order_details)
+        SW5_2OrderObjectController().insert_order_data(order_data)
 
 
     """
@@ -234,7 +328,6 @@ def main():
     Syncing
     ######################
     """
-
 
     # Tax
     # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_all()  # OK!
@@ -247,14 +340,15 @@ def main():
 
     # Products
     # Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()  #  sync_all_changed_products()
-    # sync_all_products()
+    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()
 
     # Adressen
     # ERPCustomerController(erp_obj=erp_obj).sync_changed()
+
     # Vorgänge
-    # bestellungen = ERPOrderController(erp_obj=erp_obj)
-    # bestellungen.get_new_orders()
-    # bestellungen.create_new_orders_in_erp()
+    bestellungen = ERPOrderController(erp_obj=erp_obj)
+    bestellungen.get_new_orders()
+    bestellungen.create_new_orders_in_erp()
 
     # History
     # erp_history = ERPHistoryEntity(erp_obj=erp_obj)
@@ -265,7 +359,7 @@ def main():
     # All
     # sync_all_to_db()
 
-    # erp_obj.close()
+    erp_obj.close()
 
     """
     ######################
@@ -331,6 +425,19 @@ def main():
     def show_customers():
         customers = BridgeCustomerEntity().query.all()
         return render_template('classei/customer/customers.html', customers=customers)
+
+    @app.route('/customer/compare/<adrnr>')
+    def show_customers_to_compare(adrnr: str):
+        sw_customer_raw = SW5_2CustomerObjectEntity().get_customer(customer_id=adrnr, is_number_not_id=True)
+        sw_customer = BridgeCustomerEntity().map_sw5_to_db(sw_customer_raw["data"])
+
+        
+
+        return render_template(
+            'classei/customer/customer_compare.html',
+            sw_customer=sw_customer,
+            adrnr=adrnr)
+
 
     @app.route('/customer/<customer_id>')
     def show_customer(customer_id):
@@ -431,4 +538,4 @@ if __name__ == "__main__":
     # localhost:5000
     # !IMPORTANT! Do not use reloader on Threaded Tasks, for it will use up erp licenses
 
-    # app.run(port=5000, debug=True, use_reloader=True)
+    # app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=True)

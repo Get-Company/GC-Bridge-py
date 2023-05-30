@@ -10,6 +10,7 @@ from sqlalchemy import UniqueConstraint
 from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
 
+from pprint import pprint
 
 # Is DataSet Anschrift in ERP
 class BridgeCustomerAddressEntity(db.Model):
@@ -93,7 +94,7 @@ class BridgeCustomerAddressEntity(db.Model):
         self.plz = erp_address_entity.get_('PLZ')
         self.city = erp_address_entity.get_('Ort')
         self.land = erp_address_entity.get_('Land')  # !! Integer Germany = 76 ?
-        self.land_ISO2 = self.get_land_ISO2_from_name_by_api(erp_address_entity.get_("LandBez"))
+        # self.land_ISO2 = self.get_land_ISO2_from_name_by_api(erp_address_entity.get_("LandBez"))
         self.email = erp_address_entity.get_('EMail1')
         self.company = erp_address_entity.get_('Na1')  # !! Do a company check!
         self.erp_ltz_aend = erp_address_entity.get_('LtzAend')
@@ -101,6 +102,36 @@ class BridgeCustomerAddressEntity(db.Model):
             self.api_id = uuid.uuid4().hex
 
         return self
+
+    def map_sw5_to_db(self, address):
+        self.api_id = address["id"]
+        self.erp_nr = address["customer"]["number"]
+        if address["company"] is not None and address["company"] != '':
+            self.na1 ="Firma"
+            self.na2 = address["company"]
+        else:
+            if address["salutation"] == 'mr':
+                self.na1 = "Herr"
+            elif address["salutation"] == 'ms':
+                self.na1 = "Frau"
+            self.na2 = address["firstname"] + " " + address["lastname"]
+        self.first_name = address["firstname"]
+        self.last_name = address["lastname"]
+        self.title = address["title"]
+        self.email = address["customer"]["email"]
+        self.str = address["street"]
+        self.plz = address["zipcode"]
+        self.city = address["city"]
+        self.land_ISO2 = address["country"]["iso"]
+        # Parse Date
+        date_firstLogin = datetime.strptime(address["attribute"]["lastmodified"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
+        date_changed = datetime.strptime(address["customer"]["changed"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
+
+        self.created_at = date_firstLogin
+        self.updated_at = date_changed
+
+        return self
+
 
     def map_sw6_to_db(self, customer, address=None):
         self.erp_nr = customer["customerNumber"]
@@ -160,12 +191,19 @@ class BridgeCustomerAddressEntity(db.Model):
         return updated_fields_list
 
     def map_db_to_erp_ansprechpartner(self):
+        anr = ""
+        if self.title == "Frau":
+            anr = "Frau"
+        elif self.title == "Herr":
+            anr = "Herrn"
+
         updated_fields_list = {
             "AnsNr": self.erp_ansnr,
             "AspNr": self.erp_aspnr,
-            "Anr": "Frau",
+            "Anr": anr,
             "VNa": self.first_name,
             "NNa": self.last_name,
+            "EMail1": self.email
         }
 
         return updated_fields_list

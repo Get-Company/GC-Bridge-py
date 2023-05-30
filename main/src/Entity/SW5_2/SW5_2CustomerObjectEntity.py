@@ -11,7 +11,7 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
             url += '?useNumberAsId=true'
         try:
             response = self.get(url)
-            return response['data']
+            return response
         except Exception as e:
             raise Exception(f"Error retrieving customer with ID '{customer_id}': {e}")
 
@@ -31,7 +31,7 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
 
         try:
             response = self.get(url)
-            return response['data']
+            return response
         except Exception as e:
             raise Exception(f"Error retrieving customers with same adrnr '{adrnr}': {e}")
 
@@ -41,7 +41,7 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
 
         try:
             response = self.get(url)
-            return response['data']
+            return response
         except Exception as e:
             raise Exception(f"Error retrieving customers with same email '{email}': {e}")
 
@@ -50,8 +50,23 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
     Addresses
     ###
     """
-    def get_all_addresses_by_customer(self, customer):
-        customer_id = customer["id"]
-        url = f"/customers/{customer_id}"
-        filter = f"?filter[status]=0&filter[0][property]=orderTime&filter[0][expression]=>=&filter[0][value]={startdate}"
+    def get_addresses(self, address_id):
+        url = f"/addresses/{address_id}"
+        try:
+            response = self.get(url)
+            return response['data']
+        except Exception as e:
+            raise Exception(f"Error retrieving address with ID '{address_id}': {e}")
+
+    def set_customer_number_by_id(self, customer_id, number):
+        url = '/customers/%s' % customer_id
+        data = {
+            'id': customer_id,
+            'number': number
+        }
+        try:
+            response = self.put('/customers/%s' % customer_id, data)['data']
+            return response
+        except Exception as e:
+            raise Exception(f"Error on updating Adrnr: {number} on Customer_ID: {customer_id}: {e}")
 

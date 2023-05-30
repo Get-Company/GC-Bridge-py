@@ -57,7 +57,12 @@ class ERPOrderController(ERPController):
         for order in self.new_orders:
             erp_order_id = self.create_new_order_in_erp(order)
             print(f"Order {erp_order_id} was created")
+            order.order_state.order_state = 1
+            order.erp_order_id = erp_order_id
+            db.session.add(order)
 
+        db.session.commit()
+        db.session.close()
         print(f"{len(self.new_orders)} new orders created in ERP.")
 
     def create_new_order_in_erp(self, order):
@@ -68,10 +73,7 @@ class ERPOrderController(ERPController):
         if erp_order_id:
             pass
 
-
         return erp_order_id
-
-
 
     def get_all_data_from_order(self, order):
         print("Searching for position from order", order.id)

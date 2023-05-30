@@ -126,6 +126,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
     def update_customer(self, update_fields_list, bridge_customer):
         self.edit_()
         for field_key, field_value in update_fields_list.items():
+            # print(f"Update {field_key}: {field_value}")
             self.update_(field_key, field_value)
 
         self.set_updated_fields(bridge_customer=bridge_customer)

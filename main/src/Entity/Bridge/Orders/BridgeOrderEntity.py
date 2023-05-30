@@ -24,9 +24,12 @@ class BridgeOrderEntity(db.Model):
     purchase_date = db.Column(db.DateTime(), nullable=False)
     description = db.Column(db.String(255), nullable=True)
     total_price = db.Column(db.Float(), nullable=False)
+    shipping_costs = db.Column(db.Float(), nullable=False)
     payment_method = db.Column(db.String(255), nullable=True)
+    shipping_method = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime(), nullable=True, default=datetime.now())
     edited_at = db.Column(db.DateTime(), nullable=False)
+    order_number = db.Column(db.String(255), nullable=True)
 
     """
     Relations

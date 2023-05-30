@@ -18,7 +18,7 @@ class BridgeCustomerEntity(db.Model):
     id = db.Column(db.Integer(), primary_key=True, nullable=False, autoincrement=True)
     api_id = db.Column(db.CHAR(36), nullable=False, default=uuid.uuid4().hex)
     erp_nr = db.Column(db.CHAR(36), nullable=True, unique=True)
-    email = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False, unique=True)
     ustid = db.Column(db.String(255), nullable=True)
     erp_reansnr = db.Column(db.Integer(), nullable=True)
     erp_liansnr = db.Column(db.Integer(), nullable=True)
@@ -107,8 +107,6 @@ class BridgeCustomerEntity(db.Model):
         updated_fields_list = {
             "ReAnsNr": self.erp_reansnr,
             "LiAnsNr": self.erp_liansnr,
-            # "WShopAdrKz": 1,
-            # "Memo": "Neuer Sync klappt"+self.updated_at.strftime("%d.%m.%Y %H:%M:%S"),
             "LtzAend": self.updated_at,
             "WShopAdrKz": 1,
             "WShopID": self.api_id
@@ -129,8 +127,11 @@ class BridgeCustomerEntity(db.Model):
         self.api_id = customer['id']
         self.ustid = customer['defaultBillingAddress']['vatId']
         self.email = customer["email"]
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        # Parse Date
+        date_firstLogin = datetime.strptime(customer["firstLogin"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
+        date_changed = datetime.strptime(customer["changed"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
+        self.created_at = date_firstLogin
+        self.updated_at = date_changed
         self.erp_reansnr = 0
         self.erp_liansnr = 0
 

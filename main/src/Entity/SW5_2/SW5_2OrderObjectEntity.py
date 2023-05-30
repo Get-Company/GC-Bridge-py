@@ -1,5 +1,5 @@
 from main.src.Entity.SW5_2.SW5_2ObjectEntity import SW5_2ObjectEntity
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
     def __init__(self):
@@ -71,13 +71,55 @@ class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
             # Get today's date
             startdate = date.today().isoformat()
 
-        filter = f"?filter[status]=0&filter[0][property]=orderTime&filter[0][expression]=>=&filter[0][value]={startdate}"
+        filter = f"?filter[0][property]=status" \
+                 f"&filter[0][value]=0" \
+                 f"&filter[1][property]=orderTime" \
+                 f"&filter[1][expression]=>=" \
+                 f"&filter[1][value]={startdate}"
         url = '/orders' + filter
 
         try:
             response = self.get(url)
-            return response['data']
+            return response
         except Exception as e:
             raise Exception(f"Error retrieving open orders from {startdate}: {e}")
 
 
+    def get_open_orders_by_startdate_and_enddate(self, startdate=None, enddate=None):
+        """
+        Retrieves open orders based on a specific start date.
+
+        Args:
+            startdate (str, optional): The start date to filter the orders. Defaults to today's date.
+            enddate (str, optional): The end date to filter the orders. Defaults to today's date + 1 day.
+
+        Returns:
+            list: A list of open order data.
+
+        Raises:
+            Exception: If there is an error retrieving the open orders.
+        """
+        if startdate is None:
+            # Get today's date
+            startdate = date.today().isoformat()
+
+        if enddate is None:
+            # Get tomorrow's date
+            enddate = (date.today() + timedelta(days=1)).isoformat()
+
+        filter = f"?filter[0][property]=status" \
+                 f"&filter[0][value]=0" \
+                 f"&filter[1][property]=orderTime" \
+                 f"&filter[1][expression]=>=" \
+                 f"&filter[1][value]={startdate}" \
+                 f"&filter[2][property]=orderTime" \
+                 f"&filter[2][expression]=<" \
+                 f"&filter[2][value]={enddate}"
+
+        url = '/orders' + filter
+
+        try:
+            response = self.get(url)
+            return response
+        except Exception as e:
+            raise Exception(f"Error retrieving open orders from {startdate} to {enddate}: {e}")

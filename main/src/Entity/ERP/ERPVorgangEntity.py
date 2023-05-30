@@ -53,42 +53,86 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
         self.order = self.erp_obj.get_erp().GetSpecialObject(1)
 
     def create_new_webshop_order(self, order, positions):
+        order_number = "SW6_" + order.api_id
         self.create_new_order()
         self.order.Append(111, order.customer.erp_nr)
         self.created_dataset = self.order.Dataset
-        self.create_("AuftrNr", "SW6_"+order.api_id)
-        self.prefill_from_file(
-            file=self.prefill_json_directory + "shopware6/rechnung/germany.yaml"
-        )
+        self.create_("AuftrNr", order_number)
+        self.create_("Bez", f"GC Webshop-Bestellung Nr. EC{order.order_number} vom {order.purchase_date} {order.payment_method} - Versand {order.shipping_method}")
+
+        payment_method = order.payment_method.replace(" ", "_").lower()
+        shipping_method = order.shipping_method.lower()
+        specific_path = f"shopware6/{payment_method}/{shipping_method}.yaml"
+        general_path = "shopware6/rechnung/de.yaml"
+        print("looking for", specific_path)
+        try:
+            self.prefill_from_file(
+                file=self.prefill_json_directory + specific_path
+            )
+        except FileNotFoundError as e:
+            print("Error:", e, "Could not open", specific_path, "Using:", general_path)
+            self.prefill_from_file(
+                file=self.prefill_json_directory + general_path
+            )
         for pos in positions['order_products']:
             print(pos["name"])
-            self.add_position(
-                quantity=pos["quantity"],
-                artnr=pos["erp_nr"]
+            if order.shipping_method == "CH":
+                self.add_position(
+                    quantity=pos["quantity"],
+                    artnr=pos["erp_nr"],
+                    price=pos["unit_price"],
+                    steuer="10 Umsatzsteuerfrei (Verkauf)"
+                )
+            else:
+                self.add_position(
+                    quantity=pos["quantity"],
+                    artnr=pos["erp_nr"],
+                    price=pos["unit_price"]
+                )
+        if order.shipping_costs:
+            self.add_position_shipping(
+                quantity=1,
+                artnr="V",
+                price=order.shipping_costs
             )
+
         self.post_dataset()
 
-    def create_new_webshop_order_v2(self, adrnr):
-        self.Append(111, adrnr)
-        self.prefill_from_file(
-            file=self.prefill_json_directory + "shopware6/rechnung/germany.yaml"
-        )
-        self.create_("AuftrNr", "SW6_"+self.order.api_id)
-        self.dataset.Positionen.Add(10, "St", 104014)
-        return self.get_("BelegNr")
+        return order_number
 
-    def add_position(self, quantity, artnr):
+    def add_position(self, quantity, artnr, price=None, steuer=None):
         """
         Adds a new row to self.order
         :param quantity: int Menge ex: 100
         :param unit: str Verpackungseinheit ex: "Stck" oder "% Stck"
         :param artnr: str Artikelnummer ex: "204116"
+        :Param price: float Preis: if none, the standard Price is used from büro+
         :return:
         """
         print("Add Position: ", quantity, artnr)
         artikel = ERPArtikelEntity(erp_obj=self.erp_obj, id_value=artnr)
         self.order.Positionen.Add(quantity, artikel.get_('Einh'), artnr)
+        if price:
+            self.order.Positionen.Dataset.Edit()
+            betrag = self.order.positionen.DataSet.Fields("EPr").GetEditObject(2)
+            betrag.clear()
+            betrag.GesNetto = price
+
+            betrag.Save()
+            self.order.Positionen.DataSet.Post()
         artikel = None
+
+    def add_position_shipping(self, quantity, artnr, price=None):
+        artikel = ERPArtikelEntity(erp_obj=self.erp_obj, id_value=artnr)
+        self.order.Positionen.Add(quantity, artikel.get_('Einh'), artnr)
+        self.order.Positionen.Dataset.Edit()
+        betrag = self.order.positionen.DataSet.Fields("EPr").GetEditObject(2)
+        betrag.clear()
+        betrag.GesNetto = price
+        betrag.Save()
+        self.order.Positionen.DataSet.Post()
+        artikel = None
+        betrag = None
 
     def post_dataset(self):
         try:
@@ -97,5 +141,3 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
             self.created_dataset.Cancel()
             logging.warning("Post/Commit could not execute. Rollback was called. Regarding Dataset: %s" %
                             self.get_dataset_name())
-
-

@@ -14,8 +14,8 @@ class BridgePriceEntity(db.Model):
     special_start_date = db.Column(db.DateTime, nullable=True)
     special_end_date = db.Column(db.DateTime, nullable=True)
     is_current = db.Column(db.Boolean, nullable=False, default=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now(), onupdate=datetime.now())
 
     # Price Product Relation one - to - one
     # Todo: Make a history of prices. The field is_current should show the current price.
@@ -50,13 +50,12 @@ class BridgePriceEntity(db.Model):
         """
         vk = f"VK{price_level}."  # <-- Mind the dot at the end!
         rab = f"Rab{special_price_level}."  # <-- Mind the dot at the end!
-
         self.price = erp_entity.get_(vk + "Preis")
         self.rebate_quantity = erp_entity.get_(vk + rab + "Mge")
         self.rebate_price = erp_entity.get_(vk + rab + "Pr")
         self.special_price = erp_entity.get_(vk + "SPr")
-        self.special_start_date = erp_entity.get_(vk + "SVonDat")
-        self.special_end_date = erp_entity.get_(vk + "SBisDat")
+        self.special_start_date = erp_entity.get_(vk + "SVonDat").replace(tzinfo=None)
+        self.special_end_date = erp_entity.get_(vk + "SBisDat").replace(tzinfo=None)
         self.is_current = 1
 
         return self

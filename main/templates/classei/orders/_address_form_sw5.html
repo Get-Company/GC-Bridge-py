@@ -1,0 +1,108 @@
+<div class="card text-center">
+
+    <div class="card-header">
+        <h5 class="card-title">Bestellung {{ order.number }} | {{ order.orderDetails.payment.description }}</h5>
+        <h6 class="card-subtitle">Shop: {{ order.orderDetails.languageSubShop.name }} | vom {{ order.orderTime }}</h6>
+    </div>
+
+    <div class="card-body text-start">
+        <div class="row">
+            <div class="col-6">
+                <h6 class="card-title">
+
+                    {% if order.orderDetails.billing.country %}
+                        <span class="flag-icon flag-icon-{{ order.orderDetails.billing.country.iso|lower }}"></span>
+                    {% endif %}
+
+                    Rechnungsanschrift</h6>
+                <p class="card-text">
+                    {{ order.orderDetails.billing.company }}<br />
+                    {{ order.orderDetails.billing.salutation }}
+                    {{ order.orderDetails.billing.firstName }}
+                    {{ order.orderDetails.billing.lastName }}<br />
+                    {{ order.orderDetails.billing.street }}
+                </p>
+                <p class="card-text">
+                    {{ order.orderDetails.billing.zipCode }} {{ order.orderDetails.billing.city }}
+                    {% if order.orderDetails.billing.country %}
+                        <br/>
+                        <strong>{{ order.orderDetails.billing.country.name }}</strong>
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {{ order.orderDetails.billing.phone }}
+                </p>
+            </div>
+            <div class="col-6">
+                <h6 class="card-title">
+
+                    {% if order.orderDetails.shipping.country %}
+                        <span class="flag-icon flag-icon-{{ order.orderDetails.shipping.country.iso|lower }}"></span>
+                    {% endif %}
+
+                    Lieferanschrift</h6>
+                <p class="card-text">
+                    {{ order.orderDetails.shipping.company }}<br />
+                    {{ order.orderDetails.shipping.salutation }}
+                    {{ order.orderDetails.shipping.firstName }}
+                    {{ order.orderDetails.shipping.lastName }}<br />
+                    {{ order.orderDetails.shipping.street }}
+                </p>
+                <p class="card-text">
+                    {{ order.orderDetails.shipping.zipCode }} {{ order.orderDetails.shipping.city }}
+                    {% if order.orderDetails.shipping.country %}
+                        <br/>
+                        <strong>{{ order.orderDetails.shipping.country.name }}</strong>
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {{ order.orderDetails.shipping.phone }}
+                </p>
+            </div>
+            <p class="card-text"><a href="mailto:{{ order.customer.email }}">{{ order.customer.email }}</a></p>
+            <h6>Positionen:</h6>
+            <ul class="list-group">
+                {% for pos in order.orderDetails.details %}
+                    <li class="list-group-item">
+                        <strong>{{ pos.quantity }} x </strong>{{ pos.articleName }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="card-footer">
+
+        <div class="row select_fields">
+            <div class="col-md-4 form-group">
+                <label for="state">Bestell-Status</label>
+                <select class="form-select state-select" id="state">
+                    <option value="-1" {% if order.orderStatusId == -1 %}selected{% endif %}>Abgebrochen</option>
+                    <option value="0" {% if order.orderStatusId == 0 %}selected{% endif %}>Offen</option>
+                    <option value="1" {% if order.orderStatusId == 1 %}selected{% endif %}>In Bearbeitung (Wartet)</option>
+                    <option value="2" {% if order.orderStatusId == 2 %}selected{% endif %}>Komplett abgeschlossen</option>
+                    <option value="4" {% if order.orderStatusId == 4 %}selected{% endif %}>Storniert / Abgelehnt</option>
+                </select>
+            </div>
+            <div class="col-md-4 form-group">
+                <label for="payment">Zahlungs-Status</label>
+                <select class="form-select payment-select" id="payment">
+                    <option value="10" {% if order.paymentStatusId == 10 %}selected{% endif %}>Komplett in Rechnung gestellt</option>
+                    <option value="12" {% if order.paymentStatusId == 12 %}selected{% endif %}>Komplett bezahlt</option>
+                    <option value="17" {% if order.paymentStatusId == 17 %}selected{% endif %}>Offen</option>
+                    <option value="35" {% if order.paymentStatusId == 35 %}selected{% endif %}>Vorgang wurde abgebrochen.</option>
+                </select>
+            </div>
+            <div class="col-md-4 form-group d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="submit_button btn btn-outline-primary" data-orderid="{{ order.id }}">
+                    Speichern
+                    <span id="spinner_state" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                          style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>

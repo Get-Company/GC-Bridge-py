@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+{% endblock css %}
+
+{% block body %}
+
+{% if orders.total >=1 %}
+<div class="row my-4 justify-content-center">
+    <hr class="border border-danger border-2 opacity-50">
+    <div class="col-6">
+        <h2>{{ orders.total }} Offene Bestellungen der letzten 7 Tage</h2>
+    </div>
+    <hr class="border border-danger border-2 opacity-50">
+</div>
+{% endif %}
+
+{% for order in orders["data"] %}
+<div class="row my-4 justify-content-center">
+    <div class="col-6">
+        <div class="card">
+            <!-- Card Header -->
+            <div class="card-header text-center">
+                <h5 class="card-title">Bestellung {{ order.number }} | {{ order.orderDetails.payment.description }}</h5>
+                <h6 class="card-subtitle">Shop: {{ order.orderDetails.languageSubShop.name }} | vom {{
+                        order.orderTime
+                    }}</h6>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body text-start">
+                <div class="row">
+                    <div class="col-6">
+                        <h6 class="card-title">
+
+                            {% if order.orderDetails.billing.country %}
+                            <span class="flag-icon flag-icon-{{ order.orderDetails.billing.country.iso|lower }}"></span>
+                            {% endif %}
+
+                            Rechnungsanschrift</h6>
+                        <p class="card-text">
+                            {{ order.orderDetails.billing.company }}<br/>
+                            {{ order.orderDetails.billing.salutation }}
+                            {{ order.orderDetails.billing.firstName }}
+                            {{ order.orderDetails.billing.lastName }}<br/>
+                            {{ order.orderDetails.billing.street }}
+                        </p>
+                        <p class="card-text">
+                            {{ order.orderDetails.billing.zipCode }} {{ order.orderDetails.billing.city }}
+                            {% if order.orderDetails.billing.country %}
+                            <br/>
+                            <strong>{{ order.orderDetails.billing.country.name }}</strong>
+                            {% endif %}
+                        </p>
+                        <p class="card-text">
+                            {{ order.orderDetails.billing.phone }}
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="card-title">
+
+                            {% if order.orderDetails.shipping.country %}
+                            <span class="flag-icon flag-icon-{{ order.orderDetails.shipping.country.iso|lower }}"></span>
+                            {% endif %}
+
+                            Lieferanschrift</h6>
+                        <p class="card-text">
+                            {{ order.orderDetails.shipping.company }}<br/>
+                            {{ order.orderDetails.shipping.salutation }}
+                            {{ order.orderDetails.shipping.firstName }}
+                            {{ order.orderDetails.shipping.lastName }}<br/>
+                            {{ order.orderDetails.shipping.street }}
+                        </p>
+                        <p class="card-text">
+                            {{ order.orderDetails.shipping.zipCode }} {{ order.orderDetails.shipping.city }}
+                            {% if order.orderDetails.shipping.country %}
+                            <br/>
+                            <strong>{{ order.orderDetails.shipping.country.name }}</strong>
+                            {% endif %}
+                        </p>
+                        <p class="card-text">
+                            {{ order.orderDetails.shipping.phone }}
+                        </p>
+                    </div>
+                    <p class="card-text"><a href="mailto:{{ order.customer.email }}">{{ order.customer.email }}</a></p>
+                    <h6>Bestellte Artikel:</h6>
+                    <ul class="list-group mb-5">
+                        {% for pos in order.orderDetails.details %}
+                        <li class="list-group-item">
+                            <strong>{{ pos.quantity }} x </strong>{{ pos.articleName }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+
+                </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer">
+
+                <!-- Adressnummern Suche -->
+                <div class="row mb-5">
+                    <h5>Doppelte Adressen suchen</h5>
+                    <div class="col-4">
+                        <h6>Aktuelle Adressnummer</h6>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="adrnNrInput" placeholder="AdrnNr"
+                                   value="{{ order.orderDetails.billing.number }}">
+                            <button
+                                    id="search_adrnr_{{ order.id }}"
+                                    class="submit_button btn btn-outline-info"
+                                    type="button"
+                                    onclick="changeAdrNrInSw5(
+                                                 '{{ order.id }}',
+                                                 '{{ order.orderDetails.billing.number }}',
+                                                 '{{ order.orderDetails.billing.company }}',
+                                                 '{{ order.orderDetails.billing.firstName }} {{ order.orderDetails.billing.lastName}}',
+                                                 '{{ order.orderDetails.billing.street }}',
+                                                 '{{ order.orderDetails.billing.zipCode }}'
+                                                 )">
+                                Suche
+                                <span id="spinner_addreass_search_{{order.id}}" class="spinner-border spinner-border-sm"
+                                      role="status" aria-hidden="true"
+                                      style="display: none;"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-8">
+                        <h6>Gleiche Strasse oder Na2</h6>
+                        <ul class="list-group" id="resultsContainer_{{order.id}}"></ul>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <!-- Status ändern -->
+                <div class="row select_fields">
+                    <h5>Status ändern</h5>
+                    <div class="col-md-4 form-group">
+                        <label for="state">Bestell-Status</label>
+                        <select class="form-select state-select" id="state">
+                            <option value="-1" {% if order.orderStatusId== -1 %}selected{% endif %}>Abgebrochen</option>
+                            <option value="0" {% if order.orderStatusId== 0 %}selected{% endif %}>Offen</option>
+                            <option value="1" {% if order.orderStatusId== 1 %}selected{% endif %}>In Bearbeitung
+                                (Wartet)
+                            </option>
+                            <option value="2" {% if order.orderStatusId== 2 %}selected{% endif %}>Komplett abgeschlossen
+                            </option>
+                            <option value="4" {% if order.orderStatusId== 4 %}selected{% endif %}>Storniert / Abgelehnt
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="payment">Zahlungs-Status</label>
+                        <select class="form-select payment-select" id="payment">
+                            <option value="10" {% if order.paymentStatusId== 10 %}selected{% endif %}>Komplett in
+                                Rechnung
+                                gestellt
+                            </option>
+                            <option value="12" {% if order.paymentStatusId== 12 %}selected{% endif %}>Komplett bezahlt
+                            </option>
+                            <option value="17" {% if order.paymentStatusId== 17 %}selected{% endif %}>Offen</option>
+                            <option value="35" {% if order.paymentStatusId== 35 %}selected{% endif %}>Vorgang wurde
+                                abgebrochen.
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group d-flex align-items-end d-grid d-block">
+                        <button type="submit" class="submit_button change_order_status btn btn-outline-primary"
+                                data-orderid="{{ order.id }}">
+                            Speichern
+                            <span id="spinner_state" class="spinner-border spinner-border-sm" role="status"
+                                  aria-hidden="true"
+                                  style="display: none;"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- hidden form for the order -->
+                <form id="hidden_order_{{order.id}}" class="invisible">
+                    {% for key, value in order.items() %}
+                    <input type="hidden" id="{{ key }}_{{ order.id }}" name="{{ key }}_{{ order.id }}" value="{{ value }}">
+                    {% endfor %}
+                </form>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<hr class="border border-dark border-2 opacity-25">
+{% endfor %}
+
+<!-- Bestellungen holen -->
+<div class="row justify-content-center my-5">
+    <div class="col-6">
+
+        <div class="card text-center">
+            <div class="card-header">
+                <h5 class="card-title">Bestellungen holen</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Startdatum nicht vergessen ;-)</p>
+                <input class="form-control" type="datetime-local" id="startdate">
+                <button class="btn btn-primary mt-3" id="getOrdersBtn">
+                    Bestellungen in Büro+ anlegen
+                    <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                          style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+{% endblock body%}
+
+{% block javascript %}
+<script>
+    // Get Orders
+    $(document).ready(function () {
+        // Set now() as date in datepicker
+        var currentDate = new Date();
+        var dateTimeString = currentDate.getFullYear() + "-"
+            + ("0" + (currentDate.getMonth() + 1)).slice(-2) + "-"
+            + ("0" + currentDate.getDate()).slice(-2) + "T"
+            + ("00:00");
+
+        $('#startdate').val(dateTimeString);
+
+        $("#getOrdersBtn").click(function () {
+            // Show the spinner
+            $('#spinner').show();
+
+            // Disable the button
+            $(this).addClass('disabled');
+            $(this).prop('disabled', true);
+
+            var startdate = $("#startdate").val();
+
+            $.ajax({
+                url: '/gc-bridge/get-orders/' + startdate + '/_action',
+                type: 'GET',
+                timeout: 20000, // Set the timeout to 20 sec.
+                success: function (response) {
+                    console.log(response);
+                    // Enable the button and hide the spinner
+                    $('#getOrdersBtn').prop('disabled', false);
+                    $('#getOrdersBtn').removeClass('disabled');
+                    $('#spinner').hide();
+
+
+                },
+                error: function (error) {
+                    console.log(error);
+                    // Enable the button and hide the spinner
+                    $('#getOrdersBtn').prop('disabled', false);
+                    $('#getOrdersBtn').removeClass('disabled');
+                    $('#spinner').hide();
+                }
+            });
+        });
+    });
+
+    // Change the order status
+    $(document).ready(function () {
+        $(".change_order_status").click(function () {
+
+            var orderId = $(this).data("orderid");
+            var orderStatusId = $(this).closest('.select_fields').find('.state-select').val();
+            var paymentStatusId = $(this).closest('.select_fields').find('.payment-select').val();
+            console.log("OrderID:", orderId, "Payment Status:", paymentStatusId, "Order Status:", orderStatusId)
+
+            // Show the spinner
+            var spinner = $(this).closest('.select_fields').find('#spinner_state')
+            var button = $(this)
+
+            // Disable the button
+            $(this).addClass('disabled');
+            $(this).prop('disabled', true);
+
+            var url = "/gc-bridge/set_states/" + orderId + "/" + paymentStatusId + "/" + orderStatusId;
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    // Enable the button and hide the spinner
+                    button.prop('disabled', false);
+                    button.removeClass('disabled');
+                    spinner.hide();
+                    location.reload();
+                },
+                error: function (error) {
+                    console.log(error);
+                    // Enable the button and hide the spinner
+                    button.prop('disabled', false);
+                    button.removeClass('disabled');
+                    spinner.hide();
+                }
+            });
+        });
+    });
+
+    // Search the Adrnr
+    function changeAdrNrInSw5(id, adrnr, company, na2, street, plz) {
+        // Disable the button
+        var address_search_button = $("#search_adrnr_" + id);
+        var address_search_spinner = $("#spinner_addreass_search_" + id)
+
+        address_search_button.addClass('disabled');
+        address_search_button.prop('disabled', true);
+
+        address_search_spinner.show()
+
+
+        $.ajax({
+            url: '/gcbridge/erp/adresse/alternative_adrnrs/_action',
+            type: 'POST',
+            data: {
+                adrnr: adrnr,
+                company: company,
+                na2: na2,
+                street: street,
+                plz: plz
+            },
+            timeout: 20000, // Set the timeout to 20 sec.
+            success: function (response) {
+                displayResults(response, id, adrnr);
+                // Enable the button and hide the spinner
+                address_search_button.removeClass('disabled');
+                address_search_button.prop('disabled', false);
+                address_search_spinner.hide()
+            },
+            error: function (error) {
+                console.log(error);
+                // Enable the button and hide the spinner
+                address_search_button.removeClass('disabled');
+                address_search_button.prop('disabled', false);
+                address_search_spinner.hide()
+            }
+        });
+    }
+
+    // Display the results as a Bootstrap list
+    function displayResults(response, field_id, search_adrnr) {
+        // Set the container
+        var resultsContainer = $('#resultsContainer_' + field_id);
+        // Empty the container
+        resultsContainer.empty()
+        // Sort the object, delete every double AdrNr = search_adrnr
+        let newData = [];
+        for (let i = 0; i < response.data.length; i++) {
+            if (response.data[i].AdrNr !== search_adrnr) {
+                newData.push(response.data[i]);
+            }
+        }
+        response.data = newData;
+
+        if (response.data.length >= 1) {
+            response.data.forEach(function (item) {
+                if (search_adrnr !== item.AdrNr) {
+                    var listItem = $('<a href="#" class="list-group-item list-group-item-action"></a>');
+                    listItem.text(item.AdrNr + ' | ' + item.Na2 + ' ' + item.Str);
+                    resultsContainer.append(listItem);
+                }
+
+            });
+        }
+        // Check for no results
+        else {
+            var alert_info = $('<div class="alert alert-info alert-dismissible fade show" role="alert">\n' +
+                '  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>\n' +
+                '</div>');
+            alert_info.append("<p>Keine weiteren Adressnummern</p>");
+            resultsContainer.append(alert_info);
+        }
+
+
+    }
+
+
+</script>
+
+{% endblock %}

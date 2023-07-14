@@ -32,6 +32,13 @@ class ERPAnschriftenEntity(ERPDatasetObjectEntity):
             prefill_json_directory=self.prefill_json_directory
         )
 
+    def set_created_dataset(self):
+        """
+        Get the content of the fields by calling CreateDatasetEx(). All related tables are included
+        :return:
+        """
+        self.created_dataset = self.get_dataset_infos().CreateDataSetEx()
+
     def get_ansprechpartner(self):
         ansprechpartner_ntt = ERPAnsprechpartnerEntity(erp_obj=self.erp_obj)
         ansprechpartner_ntt.set_range(field='AdrNrAnsNrAspNr', start=[self.get_("AdrNr"), self.get_("AnsNr")])
@@ -43,7 +50,13 @@ class ERPAnschriftenEntity(ERPDatasetObjectEntity):
         anschrift = {
             'Na1': self.get_('Na1'),
             'Na2': self.get_('Na2'),
-            'Na3': self.get_('Na3')
+            'Na3': self.get_('Na3'),
+            "Str": self.get_("Str"),
+            "PLZ": self.get_("PLZ"),
+            "Ort": self.get_("Ort"),
+            "Land": self.get_country_name(),
+            "E-Mail": self.get_("EMail1"),
+            "AdrNr": self.get_("AdrNr")
         }
         return anschrift
 
@@ -84,6 +97,9 @@ class ERPAnschriftenEntity(ERPDatasetObjectEntity):
             self.create_(field_key, field_value)
 
         self.post_()
+
+
+
 
 
 

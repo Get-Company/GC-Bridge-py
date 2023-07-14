@@ -22,4 +22,14 @@ class BridgeOrderStateEntity(db.Model):
     # Relation one-to-one
     order = db.relationship("BridgeOrderEntity", back_populates="order_state", uselist=False)
 
+    def set_open(self):
+        self.payment_state = 0
+        self.shipping_state = 0
+        self.order_state = 0
+        return True
 
+    def set_open_sw5(self):
+        self.payment_state = 17
+        self.shipping_state = 0
+        self.order_state = 0
+        return True

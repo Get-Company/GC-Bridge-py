@@ -220,7 +220,7 @@ class BridgeProductEntity(db.Model):
             str or float: The shipping cost if applicable, or 0 if the price is above the threshold for free shipping.
                 If the shipping cost is returned as a float, it will be rounded to two decimal places.
         """
-        if self.shipping_cost_per_bundle is not None:
+        if self.shipping_cost_per_bundle:
             # If the product has a fixed shipping cost per bundle, return that value.
             return self.shipping_cost_per_bundle
         elif self.prices:
@@ -266,6 +266,7 @@ class BridgeProductTranslationEntity(db.Model):
         self.image = entity.image
         self.description = entity.description
         return True
+
 
 
 def map_product_erp_language_to_bridge(dataset, entity, language, img=None):

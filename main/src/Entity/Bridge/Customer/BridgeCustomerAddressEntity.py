@@ -124,14 +124,13 @@ class BridgeCustomerAddressEntity(db.Model):
         self.city = address["city"]
         self.land_ISO2 = address["country"]["iso"]
         # Parse Date
-        date_firstLogin = datetime.strptime(address["attribute"]["lastmodified"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
+        date_firstLogin = datetime.strptime(address["customer"]["changed"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
         date_changed = datetime.strptime(address["customer"]["changed"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
 
         self.created_at = date_firstLogin
         self.updated_at = date_changed
 
         return self
-
 
     def map_sw6_to_db(self, customer, address=None):
         self.erp_nr = customer["customerNumber"]
@@ -226,6 +225,51 @@ class BridgeCustomerAddressEntity(db.Model):
         response = requests.get(url)
         data = response.json()
         return data['geonames'][0]['countryCode']
+
+    def get_address_as_html_row(self):
+
+        html = "<b>" + self.erp_nr + "</b> - "
+        if self.company:
+            html += self.company + " "
+        if self.na1:
+            html += self.na1 + " "
+        if self.na2:
+            html += self.na2 + " "
+        if self.na3:
+            html += self.na3
+        html += self.first_name + " " + self.last_name + " "
+        html += self.str + " " + self.plz + " " + self.city + " | " + self.land_ISO2
+
+        if len(html) >= 5:
+            return html
+        else:
+            return "Keine Adresse gefunden!"
+
+    def get_address_as_html_paragraph(self):
+        html = "<p>"
+        html += self.erp_nr + " "
+        if self.company:
+            html += self.company + "<br />"
+            html += self.na1 + " " + self.na2 + " "
+            if self.na3:
+                html += self.na3 + "<br />"
+        if self.company:
+            html += self.company + "<br />"
+        if self.na1:
+            html += self.na1 + " "
+        if self.na2:
+            html += self.na2 + " "
+        if self.na3:
+            html += self.na3
+        html += "<br />"
+        html += self.first_name + " " + self.last_name + "<br />"
+        html += self.str + "<br />"
+        html += self.plz + " " + self.city + "<br />"
+        html += self.land_ISO2
+        html += "</p>"
+
+        return html
+
 
     def __repr__(self):
         # text = f"BridgeCustomerAddressEntity ID {self.id}: - {self.na1} {self.na2} {self.na3} - {self.erp_nr}.{self.erp_ansnr}"

@@ -1,10 +1,10 @@
-<tr style="border-bottom: 1px dotted #ff9933">
+<tr style="border-bottom: 1px dotted #ff9933; margin: 10px 0 10px 0" >
     <td width="10%">__x</td>
-    <td width="45%" style="color: #ff9933; font-weight: bold; font-size: 12px; line-height:1">
+    <td width="35%" style="color: #ff9933; font-weight: bold; font-size: 12px; line-height:1">
         {{product.name}}
     </td>
-    <td width="45%">
-        <mj-text align="right" padding="0px" font-size="14px">
+    <td width="55%" align="right">
+        <mj-text  align="right" font-size="14px">
 
             {% if product.get_special_price() %}
                 Listenpreis:

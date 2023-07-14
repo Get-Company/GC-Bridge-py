@@ -1,0 +1,203 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">
+                        <h4>Kunden Adresse {{address.data.id}}</h4>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-body">
+                <!-- Company | VAT-ID | Department -->
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="company_{{address.data.id}}" class="form-label">Company
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="Company"
+                                    data-bs-content="Dies ist der Name des Unternehmens dieser Adresses"></i>
+                        </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="company_{{address.data.id}}"
+                                name="data[company]"
+                                value="{{ address.data.company }}" />
+                    </div>
+                    <div class="col">
+                        <label for="vatid_{{address.data.id}}" class="form-label">VAT ID
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="VAT ID"
+                                    data-bs-content="Dies ist die Umsatzsteuer-Identifikationsnummer dieser Addresse"></i>
+                        </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="vatid_{{address.data.id}}"
+                                name="data[vatId]"
+                                value="{{ address.data.vatId }}" />
+                    </div>
+                    <div class="col">
+                        <label for="department_{{address.data.id}}" class="form-label">Department
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="Department"
+                                    data-bs-content="Dies ist die Abteilung, dieser Adresse."></i>
+                        </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="department_{{address.data.id}}"
+                                name="data[department]"
+                                value="{{ address.data.department }}" />
+                    </div>
+                </div>
+
+                <!-- Salutation | Firstname | Title | Lastname -->
+                <div class="row mb-3">
+                    <div class="col"><label for="salutation_{{address.data.id}}" class="form-label">Anrede
+                        <i
+                                class="fas fa-info-circle"
+                                data-bs-placement="right"
+                                data-bs-toggle="popover"
+                                data-bs-title="Salutation"
+                                data-bs-content="Dies ist die Anrede dieser Adresse."></i>
+                    </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="salutation_{{address.data.id}}"
+                                name="data[salutation]"
+                                value="{{ address.data.salutation }}" /></div>
+                    <div class="col">
+                        <label for="firstname_{{address.data.id}}" class="form-label">Vorname
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="First Name"
+                                    data-bs-content="Dies ist der Vorname dieser Adresse."></i>
+                        </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="firstname_{{address.data.id}}"
+                                name="data[firstname]"
+                                value="{{ address.data.firstname }}" /></div>
+                    <div class="col"><label for="title_{{address.data.id}}" class="form-label">Titel
+                        <i
+                                class="fas fa-info-circle"
+                                data-bs-placement="right"
+                                data-bs-toggle="popover"
+                                data-bs-title="Title"
+                                data-bs-content="Dies ist der Titel in dieser Adresse."></i>
+                    </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="title_{{address.data.id}}"
+                                name="data[title]"
+                                value="{{ address.data.title }}" /></div>
+                    <div class="col"><label for="lastname_{{address.data.id}}" class="form-label">Nachname
+                        <i
+                                class="fas fa-info-circle"
+                                data-bs-placement="right"
+                                data-bs-toggle="popover"
+                                data-bs-title="Last Name"
+                                data-bs-content="Dies ist der Nachname dieser Adresse."></i>
+                    </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="lastname_{{address.data.id}}"
+                                name="data[lastname]"
+                                value="{{ address.data.lastname }}" /></div>
+                </div>
+
+                <!-- Street | Zip-Code | City -->
+                <div class="row mb-3">
+                    <div class="col"><label for="street_{{address.data.id}}" class="form-label">Strasse
+                        <i
+                                class="fas fa-info-circle"
+                                data-bs-placement="right"
+                                data-bs-toggle="popover"
+                                data-bs-title="Street"
+                                data-bs-content="Dies ist die Straße dieser Adresse."></i>
+                    </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="street_{{address.data.id}}"
+                                name="data[street]"
+                                value="{{ address.data.street }}" />
+                    </div>
+                    <div class="col">
+                        <label for="zipcode_{{address.data.id}}" class="form-label">PLZ
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="ZIP Code"
+                                    data-bs-content="Dies ist die Postleitzahl dieser Adresse."></i>
+                        </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="zipcode_{{address.data.id}}"
+                                name="data[zipcode]"
+                                value="{{ address.data.zipcode }}" />
+                    </div>
+                    <div class="col">
+
+                        <label for="city_{{address.data.id}}" class="form-label">Stadt
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="City"
+                                    data-bs-content="Dies ist die Stadt dieser Adresse."></i>
+                        </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="city_{{address.data.id}}"
+                                name="data[city]"
+                                value="{{ address.data.city }}" />
+                    </div>
+                </div>
+
+                <!-- Country -> Select field -->
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="country_{{address.data.id}}" class="form-label">Country
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="Country"
+                                    data-bs-content="Dies ist das Land dieser Adresse."></i>
+                        </label>
+                        <select class="form-select" id="country_{{address.data.id}}" name="sw_countries[data]">
+                            {% for country in sw_countries.data %}
+                            <option value="{{ country.id }}">{{ country.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <p>Footer</p>
+            </div>
+        </div>
+
+    </div>
+</div>

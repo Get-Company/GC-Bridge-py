@@ -21,10 +21,9 @@ class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
         url = f'/orders/{id}'
         try:
             response = self.get(url)
-            return response['data']
+            return response
         except Exception as e:
             raise Exception(f"Error retrieving Order id {id}: {e}")
-
 
     def get_orders_by_customerId(self, customerId):
         """
@@ -42,7 +41,6 @@ class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
 
         return self.get(url)['data']
 
-
     def get_todays_open_orders(self):
         """
         Retrieves today's open orders.
@@ -52,7 +50,6 @@ class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
 
         """
         return self.get_open_orders_by_startdate()
-
 
     def get_open_orders_by_startdate(self, startdate=None):
         """
@@ -83,7 +80,6 @@ class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
             return response
         except Exception as e:
             raise Exception(f"Error retrieving open orders from {startdate}: {e}")
-
 
     def get_open_orders_by_startdate_and_enddate(self, startdate=None, enddate=None):
         """
@@ -123,3 +119,17 @@ class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
             return response
         except Exception as e:
             raise Exception(f"Error retrieving open orders from {startdate} to {enddate}: {e}")
+
+    def set_order_and_payment_status(self, order_id, payment_status_id, order_status_id):
+        url = '/orders/%s' % order_id
+        print(f"Try updating order {order_id} with payment status: {payment_status_id} and order status: {order_status_id}")
+        data = {
+            'paymentStatusId': payment_status_id,
+            'orderStatusId': order_status_id
+        }
+        try:
+            response = self.put('/orders/%s' % order_id, data)['data']
+            return response
+        except Exception as e:
+            raise Exception(f"Error on updating Order- and Payment-Status for OrderId: {order_id}: {e}")
+

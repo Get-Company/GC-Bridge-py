@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}GeCo - Order {{ sw_order["number"] }} {% endblock %}
+
+{% block container %}
+    <div class="container-fluid"> {% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col">
+            <a href="/gc-bridge/get-orders" type="button" class="btn btn-info">Zurück zur Übersicht</a>
+        </div>
+    </div>
+        <div class="row">
+            <div class="col">
+                <h1 class="mb-5">Details der Bestellung {{ sw_order.data.number }}</h1>
+            </div>
+        </div>
+
+    <div class="row">
+        <!-- SW5 -->
+        <div class="col-6">
+            <h2 class="mb-4">Shopware 5</h2>
+            <h3>Kundenkonto</h3>
+
+            {% with customer=sw_customer %}
+                {% include 'classei/_includes/sw5/customer.html' %}
+            {% endwith %}
+
+            <h3>Adressen</h3>
+            <div class="accordion accordion-flush" id="accordionFlush-addresses">
+
+                {% for address in sw_addresses %}
+                    {% with address=address %}
+                            {% include 'classei/_includes/sw5/customer_address_accordion.html' %}
+                    {% endwith %}
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <!-- ERP -->
+        <div class="col-6">
+            <h2>Details von ERP</h2>
+            <form>
+                <div class="row">
+                    <div class="col">
+                        <h3>Standard Rechnungsadresse</h3>
+                        <p id="erp_adrnr">
+                            Keine Daten
+                        </p>
+                        <a id="erp_search_adresse" href="#">Adressen in ERP suchen</a>
+                        {% include 'classei/_includes/erp/customer.html' %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+
+
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        $(function () {
+            $('[data-bs-toggle="popover"]').popover()
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#erp_search_adresse").click(function (event) {
+                event.preventDefault();  // Prevent the default action of the link
+                var adrnr = {{ sw_customer.data.number }}  // Get the value of the input field
+                $.ajax({
+                    url: '/gc-bridge/erp/adresse/' + adrnr + '/_action',
+                    type: 'GET',
+                    success: function (response) {
+                        // Konvertiere den JSON-String in ein JavaScript-Objekt
+                        var customer = JSON.parse(response);
+
+                        $("#erp_card_title").empty().text(
+                            customer.adrnr + ' - ' +
+                            customer.salutation + ' ' +
+                            customer.firstname + ' ' +
+                            customer.lastname
+                        )
+                    },
+                    error: function (error) {
+                        console.log(error);
+                        $("#erp_adrnr").text('An error occurred.');
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('.address').each(function() {
+                var addressId = $(this).data('id');
+                $.ajax({
+                    url: '/gc-bridge/sw5/customer/address/' + addressId + '/_action',
+                    type: 'GET',
+                    success: function(response) {
+                        // Hier können Sie den Inhalt Ihres <p>-Elements basierend auf der Antwort aktualisieren.
+                        // Dies ist nur ein einfaches Beispiel, in dem die vollständige Antwort als Text angezeigt wird.
+                        // Sie möchten wahrscheinlich etwas spezifischer sein und nur bestimmte Teile der Antwort anzeigen.
+                        $('.address[data-id="' + addressId + '"]').text('Adress ID: ' + addressId + ', Response: ' + JSON.stringify(response));
+                    },
+                    error: function(error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

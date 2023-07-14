@@ -38,6 +38,7 @@ Examples:
 
 """
 import csv
+import json
 import logging
 import re
 from pprint import pprint
@@ -120,7 +121,6 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         # Return a boolean indicating whether the range was set successfully.
         return range_set_success
 
-
     """ Create and Update Customer """
 
     def update_customer(self, update_fields_list, bridge_customer):
@@ -189,14 +189,18 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
             erp_ansprechpartner.create_("AnsNr", address.erp_ansnr)
             erp_ansprechpartner.create_("AspNr", address.erp_aspnr)
             erp_ansprechpartner.create_("StdKz", 1)
-            erp_ansprechpartner.create_("Anr", "Frau")
+
+            # Aufbau Ansprechpartner
+            ansp = ""
+            if address.title:
+                ansp += address.title + " "
+            ansp += address.first_name
+            ansp += " " + address.last_name
+
+            erp_ansprechpartner.create_("Ansp", ansp)
+            erp_ansprechpartner.create_("Anr", address.title)
             erp_ansprechpartner.create_("VNa", address.first_name)
             erp_ansprechpartner.create_("NNa", address.last_name)
-
-            # fields_ansprechpartner = address.map_db_to_erp_ansprechpartner()
-            # for field_ansprechpartner_key, field_ansprechpartner_value in fields_ansprechpartner.items():
-            #     erp_ansprechpartner.create_(field_ansprechpartner_key, field_ansprechpartner_value)
-
             erp_ansprechpartner.post_()
 
         customer_info = {
@@ -220,6 +224,9 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
     def map_bridge_to_erp(self, bridge_entity):
         pass
+
+    def find_by_webshop_id(self, webshop_id):
+        return self.find_("WSHopID", webshop_id)
 
     def remove_webshop_id(self, block=False, message=None):
         """ Easy remove when a client wants to have his account deleted """
@@ -340,7 +347,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
     def get_anschriften(self):
         anschriften_ntt = ERPAnschriftenEntity(erp_obj=self.erp_obj)
-        anschriften_ntt.set_range(field='AdrNrAnsNr', start=[self.get_('AdrNr'),0], end=[self.get_('AdrNr'), 999])
+        anschriften_ntt.set_range(field='AdrNrAnsNr', start=[self.get_('AdrNr'), 0], end=[self.get_('AdrNr'), 999])
 
         if anschriften_ntt.is_ranged():
             anschriften_ntt.range_first()
@@ -360,13 +367,33 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
     def get_special_standard_shipping_address(self):
         """
-        Get the standard billing address
+        Get the standard shipping address
         :return: obj ERPAnschriftenEntity
         """
         anschriften_ntt = ERPAnschriftenEntity(erp_obj=self.erp_obj)
         anschriften_ntt.find_('AdrNrAnsNr', [self.get_('AdrNr'), self.get_('LiAnsNr')])
 
         return anschriften_ntt
+
+    def get_address_json(self):
+        """
+        Gedacht für die Detailansicht von Order
+        """
+        billing = self.get_special_standard_billing_address()
+        billing_contact = billing.get_ansprechpartner()
+        addresses = self.get_anschriften()
+
+        erp_customer = {
+            'adrnr': self.get_("AdrNr"),
+            'salutation': billing_contact.get_("Anr"),
+            'firstname': billing_contact.get_("VNa"),
+            'title': billing_contact.get_("Tit"),
+            'lastname': billing_contact.get_("NNa"),
+            'company': billing.get_("Na2")
+        }
+
+
+        return json.dumps(erp_customer)
 
     def get_login(self):
         """

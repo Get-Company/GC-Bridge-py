@@ -29,15 +29,6 @@
                     href="https://www.classei-shop.com/search?sSearch={{product.erp_nr}}">
                 - Mehr Infos zum Artikel -
             </mj-button>
-        </mj-column>
-        <mj-column>
-            <mj-carousel>
-                {% for img in product.images %}
-                <mj-carousel-image target="https://www.classei-shop.com/search?sSearch={{product.erp_nr}}"
-                                   src="https://assets.classei.de/img/{{img.name}}.{{img.type}}"
-                                   alt="Beispiel"/>
-                {% endfor %}
-            </mj-carousel>
 
             {% if not product.get_special_price() %}
             <mj-text align="center" padding-top="20px">
@@ -78,6 +69,19 @@
                     zuzgl. Mwst.
                 </p>
             </mj-text>
+        </mj-column>
+        <mj-column>
+            <mj-carousel>
+                {% for img in product.images %}
+                    {% if offset_img == loop.index0 %}
+                    {% else %}
+                        <mj-carousel-image target="https://www.classei-shop.com/search?sSearch={{product.erp_nr}}"
+                                           src="https://assets.classei.de/img/{{img.name}}.{{img.type}}"
+                                           alt="Beispiel"/>
+                    {% endif %}
+
+                {% endfor %}
+            </mj-carousel>
         </mj-column>
     </mj-section>
 

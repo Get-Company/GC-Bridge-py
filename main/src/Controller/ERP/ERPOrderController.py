@@ -1,3 +1,5 @@
+from sqlalchemy import or_
+
 from main.src.Controller.ERP.ERPController import ERPController
 from main.src.Entity.ERP.ERPVorgangEntity import ERPVorgangEntity
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
@@ -26,7 +28,10 @@ class ERPOrderController(ERPController):
         """
         try:
             new_orders = BridgeOrderEntity.query.join(BridgeOrderStateEntity).filter(
-                BridgeOrderStateEntity.payment_state == 0,
+                or_(
+                    BridgeOrderStateEntity.payment_state == 0,
+                    BridgeOrderStateEntity.payment_state == 17,
+                ),
                 BridgeOrderStateEntity.shipping_state == 0,
                 BridgeOrderStateEntity.order_state == 0
             ).all()

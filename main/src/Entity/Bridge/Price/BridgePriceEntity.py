@@ -10,7 +10,7 @@ class BridgePriceEntity(db.Model):
     price = db.Column(db.Float, nullable=False)
     rebate_quantity = db.Column(db.Integer, nullable=False)
     rebate_price = db.Column(db.Float, nullable=False)
-    special_price = db.Column(db.Float, nullable=True)
+    special_price = db.Column(db.Float, nullable=False)
     special_start_date = db.Column(db.DateTime, nullable=True)
     special_end_date = db.Column(db.DateTime, nullable=True)
     is_current = db.Column(db.Boolean, nullable=False, default=True)
@@ -22,6 +22,7 @@ class BridgePriceEntity(db.Model):
     product = db.relationship(
         "BridgeProductEntity",
         back_populates="prices")
+    # Necessary?
     product_id = db.Column(db.Integer(), db.ForeignKey('bridge_product_entity.id'), unique=True)
 
     def update_entity(self, entity):

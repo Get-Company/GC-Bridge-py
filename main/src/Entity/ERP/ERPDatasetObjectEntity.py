@@ -420,7 +420,7 @@ class ERPDatasetObjectEntity(object):
 
         :param start: list Could be a unique value: 10026 or a list [10026,1]
         :param end:  list Could be a unique value: 10026 or a list [10026,1]
-        :param field: The indicy or index of the DataSet
+        :param field: The index of the DataSet
         :return:
         """
         if field is None:
@@ -461,6 +461,11 @@ class ERPDatasetObjectEntity(object):
         elif self.range_count() == 1:
             print("Found 1 between", start, end)
             return True
+
+    def set_range_wildcard(self, index_field, value):
+        self.created_dataset.Indices(index_field).Select()
+        self.created_dataset.WildcardRange(value)
+
 
     def range_next(self):
         self.created_dataset.Next()

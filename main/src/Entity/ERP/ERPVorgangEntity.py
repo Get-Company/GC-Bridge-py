@@ -83,6 +83,8 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
                     price=pos["unit_price"],
                     steuer="10 Umsatzsteuerfrei (Verkauf)"
                 )
+                info_blatt = self.created_dataset.NestedDataSets('VIBls')
+
             else:
                 self.add_position(
                     quantity=pos["quantity"],

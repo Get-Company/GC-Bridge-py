@@ -13,8 +13,6 @@ class Bridge2ObjectOrderController:
         self.__sw6_client = Shopware6AdminAPIClientBase(use_docker_test_container=True)
         self.__sw6_client = Shopware6AdminAPIClientBase(config=self.__sw6_conf)
 
-
-
     def get_orders(self):
         """
                 Get all orderID ( API ID ) from Shopware via API
@@ -208,12 +206,3 @@ class Bridge2ObjectOrderController:
         list = self.make_order_dict_customers()
         result_list_c = list[orderid]
         return result_list_c
-
-
-
-
-
-
-
-
-

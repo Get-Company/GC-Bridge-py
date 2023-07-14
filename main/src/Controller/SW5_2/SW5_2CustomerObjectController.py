@@ -1,13 +1,17 @@
 from datetime import datetime
 
+from sqlalchemy import or_, and_
+
 from main.src.Controller.SW5_2.SW5_2ObjectController import SW5_2ObjectController
 from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
 from main.src.Entity.SW5_2.SW5_2CustomerObjectEntity import SW5_2CustomerObjectEntity
+from main.src.Entity.SW5_2.SW5_2AddressObjectEntity import SW5_2AddressObjectEntity
 from main.src.Entity.ERP.ERPAdressenEntity import ERPAdressenEntity
 from pprint import pprint
 
 from main import db
+
 
 class SW5_2CustomerObjectController(SW5_2ObjectController):
     def __init__(self):
@@ -26,7 +30,6 @@ class SW5_2CustomerObjectController(SW5_2ObjectController):
             for dcba in double_customers_by_adrnr["data"]:
                 pprint(dcba)
                 double_customers_detail_list.append(dcba)
-
 
             double_customers_by_email = SW5_2CustomerObjectEntity().get_all_customers_by_email(customer["email"])
             print("Found", double_customers_by_email["total"], "doubles for", customer["email"])
@@ -74,14 +77,15 @@ class SW5_2CustomerObjectController(SW5_2ObjectController):
 
         db.session.add(for_db)
 
-
-
     """
     Atti
     """
 
     def get_new_customer(self, data):
-        customer = db.session.query(BridgeCustomerEntity).filter_by(erp_nr=data['data']['number']).first()
+        customer = db.session.query(BridgeCustomerEntity).filter(
+            (BridgeCustomerEntity.erp_nr == data['data']['number']) |
+            (BridgeCustomerEntity.api_id == data['data']['id'])
+        ).one_or_none()
 
         if customer:
             print("Existing customer found! Updating information.")
@@ -120,8 +124,8 @@ class SW5_2CustomerObjectController(SW5_2ObjectController):
                     new_address = BridgeCustomerAddressEntity(
                         api_id=address['id'],
                         erp_nr=data['data']['number'],
-                        #erp_ansnr=erp_ansnr,
-                        #erp_aspnr=0,
+                        # erp_ansnr=erp_ansnr,
+                        # erp_aspnr=0,
                         na1=salutation,
                         title=salutation,
                         first_name=address['firstname'],
@@ -147,10 +151,10 @@ class SW5_2CustomerObjectController(SW5_2ObjectController):
                     customer.erp_liansnr = erp_ansnr
 
             db.session.commit()
-            print(f"Customer data updated: {data['data']['id']}")
+            print(f"Customer updated ID: {data['data']['id']}")
 
         else:
-            print("Creating new customer.")
+            print(f"Creating new customer by ID:{data['data']['id']}")
 
             created_at = datetime.strptime(data["data"]["firstLogin"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
             updated_at = datetime.strptime(data["data"]["changed"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
@@ -209,4 +213,88 @@ class SW5_2CustomerObjectController(SW5_2ObjectController):
             db.session.commit()
             print(f"New customer added: {data['data']['id']}")
 
+    """
+    Flo 2.0
+    """
 
+    def upsert_customer(self, customer_data):
+        """
+        Search for a customer in the database and add them if they do not exist.
+
+        Parameters:
+            customer_data (dict): A dictionary that contains the customer data.
+
+        Returns:
+            bool: True if the operation was successful, False otherwise.
+        """
+        mapped_bridge_customer = BridgeCustomerEntity().map_sw5_to_db(customer_data["data"])
+        customer_in_db = None
+        try:
+            # Validate the extracted data
+            if not mapped_bridge_customer.email or not mapped_bridge_customer.erp_nr:
+                print("Invalid customer data.")
+                return None
+
+            # Search for the customer in the database
+            customer_in_db = BridgeCustomerEntity.query.filter(
+                or_(
+                    BridgeCustomerEntity.email == mapped_bridge_customer.email,
+                    BridgeCustomerEntity.erp_nr == mapped_bridge_customer.erp_nr
+                )
+            ).one_or_none()
+
+        except Exception as e:
+            print(f"Error processing customer data: {e}")
+            return False
+
+        if customer_in_db:
+            customer_for_db = customer_in_db.update_entity(mapped_bridge_customer)
+        else:
+            customer_for_db = mapped_bridge_customer
+
+        address_index = 0
+        for address in customer_data["data"]["addresses"]:
+            address_data = SW5_2AddressObjectEntity().get_address(address["id"])
+            address = address_data["data"]
+            mapped_bridge_address = BridgeCustomerAddressEntity().map_sw5_to_db(address)
+
+            mapped_bridge_address.erp_ansnr = address_index
+            mapped_bridge_address.erp_aspnr = 0
+            address_index += 1
+            customer_address_in_db = None
+            try:
+                # Validate the extracted data
+                if not mapped_bridge_address.erp_nr or not mapped_bridge_address.api_id:
+                    print("Invalid customer data.")
+                    return None
+
+                # Search the customer address in the database
+                customer_address_in_db = BridgeCustomerAddressEntity.query.filter(
+                    and_(
+                        BridgeCustomerAddressEntity.erp_nr == mapped_bridge_address.erp_nr,
+                        BridgeCustomerAddressEntity.api_id == mapped_bridge_address.api_id
+                    )
+                ).one_or_none()
+            except Exception as e:
+                print(f"Error processing customer address data: {e}")
+                return False
+
+            if customer_address_in_db:
+                customer_address_for_db = customer_address_in_db.update_entity(mapped_bridge_address)
+            else:
+                customer_address_for_db = mapped_bridge_address
+
+            customer_for_db.addresses.append(customer_address_for_db)
+
+            # Set the standard billing and shipping address
+            # if customer_data["data"]["defaultBillingAddress"] == address["id"]:
+            #     customer_for_db.billing_address = customer_address_for_db
+            # if customer_data["data"]["defaultShippingAddress"] == address["id"]:
+            #     customer_for_db.shipping_address = customer_address_for_db
+
+        customer_for_return = customer_for_db
+        db.session.add(customer_for_db)
+
+        self.commit_with_errors()
+
+        return customer_for_return

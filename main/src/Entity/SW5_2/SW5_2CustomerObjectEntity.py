@@ -15,15 +15,13 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
         except Exception as e:
             raise Exception(f"Error retrieving customer with ID '{customer_id}': {e}")
 
-    def get_customer_addresses(self, customer_id, is_number_not_id=False):
-        url = f"/customers/{customer_id}/addresses"
-        if is_number_not_id:
-            url += '?useNumberAsId=true'
+    def get_customer_addresses_by_id(self, address_id):
+        url = f"/addresses/{address_id}"
         try:
             response = self.get(url)
-            return response['data']
+            return response
         except Exception as e:
-            raise Exception(f"Error retrieving customer with ID '{customer_id}': {e}")
+            raise Exception(f"Error retrieving address with ID '{address_id}': {e}")
 
     def get_all_customers_by_adrnr(self, adrnr):
         url = "/customers"
@@ -31,7 +29,16 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
 
         try:
             response = self.get(url)
-            return response
+            customer_list = []
+            if response["success"]:
+                for customer in response["data"]:
+                    customer_detail = self.get_customer(customer_id=customer["id"])
+                    if customer_detail["success"]:
+                        customer_list.append(customer_detail["data"])
+                    else:
+                        return {"total": len(customer_list), "success": False, "data": customer_list}
+
+            return {"total": len(customer_list), "success": True, "data": customer_list}
         except Exception as e:
             raise Exception(f"Error retrieving customers with same adrnr '{adrnr}': {e}")
 
@@ -69,4 +76,3 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
             return response
         except Exception as e:
             raise Exception(f"Error on updating Adrnr: {number} on Customer_ID: {customer_id}: {e}")
-

@@ -1,0 +1,486 @@
+{% extends "base.html" %}
+
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+{% endblock css %}
+
+{% block body %}
+<div class="row mt-5">
+
+    <!-- Bestellungen in DB anlegen -->
+    <div class="col-4">
+        <h2>1. Bestellungen Übersicht</h2>
+        <p>Alle neuen Bestellungen in die Übersicht laden</p>
+        <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text">Ab dem:&nbsp;</span>
+            <input type="datetime-local" id="date-input" name="date-input" class="form-control"
+                   {% if orders %}
+                   value="{{orders[-1].purchase_date}}"
+                   {% else %}
+                   value="{{yesterday}}"
+                   {% endif %}>
+            <button id="get-orders-button" class="btn btn-sm btn-outline-primary spinner-button">Anlegen
+                <span id="spinner_state" class="d-none spinner-border spinner-border-sm" role="status"
+                      aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bestellungen sortieren -->
+    <div class="col-8">
+        <h2>2. Bestellungen sortieren</h2>
+        <p>Die Liste der Bestellungen sortieren</p>
+        <form class="row g-3" action="{{request.path}}" method="GET">
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text">Datum ab:</span>
+                <input type="datetime-local" class="form-control w-25" id="start_date" name="start_date"
+                       value="{{yesterday.strftime('%Y-%m-%dT%H:%M')}}">
+                <span class="input-group-text">Bestell Status</span>
+                <select class="form-select state_select form-select-sm" id="order_state" name="order_state">
+                    <option value="" {% if order_state is none %}selected{% endif %}>Alle anzeigen</option>
+                    <option value="0" {% if order_state is not none and order_state|int== 0 %}selected{% endif %}>Offen</option>
+                    <option value="-1" {% if order_state is not none and order_state|int== -1 %}selected{% endif %}>Abgebrochen</option>
+                    <option value="1" {% if order_state is not none and order_state|int== 1 %}selected{% endif %}>In Bearbeitung (Wartet)</option>
+                    <option value="2" {% if order_state is not none and order_state|int== 2 %}selected{% endif %}>Komplett abgeschlossen</option>
+                    <option value="4" {% if order_state is not none and order_state|int== 4 %}selected{% endif %}>Storniert / Abgelehnt</option>
+                </select>
+                <span class="input-group-text">Zahlungs Status</span>
+                <select class="form-select payment_select form-select-sm" id="payment_state" name="payment_state">
+                    <option value="" {% if payment_state is none %}selected{% endif %}>Alle anzeigen</option>
+                    <option value="17" {% if payment_state|int== 17 %}selected{% endif %}>Offen</option>
+                    <option value="10" {% if payment_state|int== 10 %}selected{% endif %}>Komplett in Rechnung
+                        gestellt
+                    </option>
+                    <option value="12" {% if payment_state|int== 12 %}selected{% endif %}>Komplett bezahlt</option>
+                    <option value="35" {% if payment_state|int== 35 %}selected{% endif %}>Vorgang wurde abgebrochen.
+                    </option>
+                </select>
+                <button id="sort-orders-button" class="btn btn-sm btn-outline-primary spinner-button">Anzeigen
+                    <span id="spinner_state" class="d-none spinner-border spinner-border-sm" role="status"
+                          aria-hidden="true"></span>
+                </button>
+            </div>
+        </form>
+
+
+    </div>
+
+</div>
+
+<hr class="border-1">
+
+<div class="accordion accordion-flush" id="accordion_order">
+
+    {% for order in orders %}
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#flush-collapse-{{order.id}}" aria-expanded="false"
+                    aria-controls="flush-collapse-{{order.id}}">
+
+                {% for address in order.customer.addresses %}
+                {% if address.erp_ansnr == order.customer.erp_reansnr %}
+                {% if address.get_address_as_html_row() %}
+                <span class="flag-icon flag-icon-{{ address.land_ISO2|lower }}"></span>&nbsp;
+                {{ order.order_number }}
+                |&nbsp;
+                {{ address.get_address_as_html_row()|safe|truncate(50) }}
+                |&nbsp;
+                {{ order.purchase_date.strftime('%d.%m.%Y %H:%m') }}
+                |&nbsp;
+                <strong>{{ order.payment_method }}</strong>
+                {% else %}}
+                <p>Keine Standard-Rechnungsadresse hinterlegt!</p>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+
+            </button>
+        </h2>
+
+        <div id="flush-collapse-{{order.id}}" class="accordion-collapse collapse"
+             data-bs-parent="#accordion-flush-orders">
+            <div class="accordion-body">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>{{ order.number }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h4>
+                                    Rechnungsadresse:
+                                </h4>
+                                {% for address in order.customer.addresses %}
+                                {% if address.erp_ansnr == order.customer.erp_reansnr %}
+                                <span class="flag-icon flag-icon-{{ address.land_ISO2|lower }}"></span>
+                                {{ address.get_address_as_html_paragraph()|safe }}
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="col">
+                                <h4>Lieferadresse:</h4>
+                                {% for address in order.customer.addresses %}
+                                {% if address.erp_ansnr == order.customer.erp_liansnr %}
+                                <span class="flag-icon flag-icon-{{ address.land_ISO2|lower }}"></span>
+                                {{ address.get_address_as_html_paragraph()|safe }}
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <h4>Adressen</h4>
+                        <ul class="list-group list-group-flush">
+                            {% for address in order.customer.addresses %}
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-10">
+                                        {{ address.get_address_as_html_row()|safe }}
+                                    </div>
+                                    <div class="col-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="delivery"
+                                                   id="delivery-{{address.erp_ansnr}}"
+                                                   {% if address.erp_ansnr== order.customer.erp_liansnr %} checked {%
+                                                   endif %}>
+                                            <label class="form-check-label"
+                                                   for="delivery-{{address.erp_ansnr}}">L</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="billing"
+                                                   id="billing-{{address.erp_ansnr}}"
+                                                   {% if address.erp_ansnr== order.customer.erp_reansnr %} checked {%
+                                                   endif %}>
+                                            <label class="form-check-label"
+                                                   for="billing-{{address.erp_ansnr}}">R</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                        <div class="row my-3">
+                            <div class="col-6">
+                                <div class="accordion accordion-flush" id="productAccordion">
+                                    <div class="accordion-item">
+                                        <h5 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button p-0 collapsed" type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseOne" aria-expanded="false"
+                                                    aria-controls="collapseOne">
+                                                Bestellung
+                                            </button>
+                                        </h5>
+                                        <div id="collapseOne" class="accordion-collapse collapse"
+                                             aria-labelledby="headingOne"
+                                             data-bs-parent="#productAccordion">
+                                            <div class="accordion-body">
+                                                <ul class="list-group list-group-flush">
+                                                    {% for product in order.products %}
+                                                    <li class="list-group-item">
+                                                        <img width=50px"
+                                                             src="https://assets.classei.de/img/{{ product.image[0]['name'] + '.' + product.image[0]['type'] }}">
+                                                        {{ product.quantity }} x {{ product.name }}
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="card-footer">
+                        <div class="row mb-3">
+                            <div class="col-4">
+
+                                <h5>Adressnummer ändern
+                                    <a
+                                            target="_blank"
+                                            href="/customer/is_duplicate/{% for address in order.customer.addresses %}{{ address.erp_nr }}{% if not loop.last %},{% endif %}{% endfor %}">
+                                        <i class="fas fa-theater-masks"></i>
+                                    </a>
+
+                                </h5>
+                                <!-- Addressnummer ändern -->
+                                <form class="updateForm">
+                                    <input type="hidden" class="customerId" value="{{order.customer.id}}">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" autocomplete="off"
+                                               class="form-control form-control-sm newErpNr"
+                                               placeholder="Neue Kundenr.">
+                                        <button type="submit"
+                                                class="btn change_adrnr btn-sm btn-outline-primary spinner-button">
+                                            AdrNr ändern
+                                            <span class="d-none spinner-border spinner-border-sm" role="status"
+                                                  aria-hidden="true"></span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <h5>Bestellung anlegen</h5>
+                                <!-- Bestellung erstellen -->
+                                <button type="button" class="btn btn-sm btn-primary order-button"
+                                        data-customer-id="{{order.customer.id}}"
+                                        data-order-id="{{order.id}}">
+                                    Bestellung erstellen
+                                    <span class="d-none spinner-border spinner-border-sm" role="status"
+                                          aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Status ändern -->
+                        <div class="row select_fields mt-4">
+                            <h5>Status ändern {{ order.payment_method }}</h5>
+                            <div class="col form-group">
+                                <form class="order-form">
+                                    <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="state">Bestell-Status</label>
+                                        </div>
+                                        <select class="form-select state-select" id="state">
+                                            <option value="-1" {% if order.order_state.order_state== -1 %}selected{%
+                                                    endif
+                                                    %}>Abgebrochen
+                                            </option>
+                                            <option value="0" {% if order.order_state.order_state== 0 %}selected{% endif
+                                                    %}>
+                                                Offen
+                                            </option>
+                                            <option value="1" {% if order.order_state.order_state== 1 %}selected{% endif
+                                                    %}>
+                                                In Bearbeitung
+                                                (Wartet)
+                                            </option>
+                                            <option value="2" {% if order.order_state.order_state== 2 %}selected{% endif
+                                                    %}>
+                                                Komplett abgeschlossen
+                                            </option>
+                                            <option value="4" {% if order.order_state.order_state== 4 %}selected{% endif
+                                                    %}>
+                                                Storniert / Abgelehnt
+                                            </option>
+                                        </select>
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="payment">Zahlungs-Status</label>
+                                        </div>
+                                        <select class="form-select payment-select" id="payment">
+                                            <option value="10" {% if order.order_state.payment_state== 10 %}selected{%
+                                                    endif
+                                                    %}>Komplett in
+                                                Rechnung
+                                                gestellt
+                                            </option>
+                                            <option value="12" {% if order.order_state.payment_state== 12 %}selected{%
+                                                    endif
+                                                    %}>Komplett bezahlt
+                                            </option>
+                                            <option value="17" {% if order.order_state.payment_state== 17 %}selected{%
+                                                    endif
+                                                    %}>Offen
+                                            </option>
+                                            <option value="35" {% if order.order_state.payment_state== 35 %}selected{%
+                                                    endif
+                                                    %}>Vorgang wurde
+                                                abgebrochen.
+                                            </option>
+                                        </select>
+                                        <button type="submit"
+                                                class="submit_button change_order_status btn btn-outline-primary spinner-button"
+                                                data-orderid="{{ order.id }}">
+                                            Speichern
+                                            <span class="spinner_state d-none spinner-border spinner-border-sm"
+                                                  role="status" aria-hidden="true"></span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock body %}
+
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        // Bestellungen in db anlegen
+        $("#get-orders-button").click(function () {
+            var spinner_button = $("#get-orders-button")
+            showSpinner(spinner_button);
+            var date = new Date($("#date-input").val());
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1; // JavaScript months are 0-11
+            var day = date.getDate();
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+
+            // Pad to two digits if necessary
+            month = month < 10 ? '0' + month : month;
+            day = day < 10 ? '0' + day : day;
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+
+            var formattedDate = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes;
+
+            $.ajax({
+                url: "/gcbridge/get-orders/" + formattedDate + "/_action",
+                type: 'GET',
+                success: function (result) {
+                    console.log(result);
+                    hideSpinner(spinner_button);
+
+                    // reload the page to show new results after adding orders
+                    // the parameters for the filter, show all open orders in the db
+                    var params = "?start_date=" + formattedDate + "&order_state=0&payment_state=17";
+                    var baseUrl = window.location.href.split('?')[0];
+                    window.location.href = baseUrl + "" + params;
+                    // Behandeln Sie die Antwort hier...
+                },
+                error: function (error) {
+                    hideSpinner(spinner_button);
+                    // Show an error message
+                    console.error(error);
+                }
+            });
+        });
+
+        // AdrNr ändern
+        $('.updateForm').on('submit', function (e) {
+            e.preventDefault();
+
+            var spinner_button = $(this).find(".change_adrnr")
+            showSpinner(spinner_button)
+
+            var form = $(this);
+            var customerId = form.find('.customerId').val();
+            var newErpNr = form.find('.newErpNr').val();
+
+            console.log(form);
+            console.log("CustomerID: " + customerId + "new erp: " + newErpNr);
+
+            // Überprüfen Sie, ob customerId und newErpNr Werte haben
+            if (!customerId || !newErpNr) {
+                console.error("Both Customer ID and new ERP number must be provided.");
+                hideSpinner(spinner_button);
+                return;  // Beenden Sie die Funktion, wenn einer von ihnen leer ist
+            }
+
+            $.ajax({
+                url: '/update_erp_nr/',  // Update this to your actual update endpoint
+                type: 'POST',
+                data: {
+                    'customerId': customerId,
+                    'newErpNr': newErpNr,
+                },
+                success: function (response) {
+                    // Update the page or show a success message
+                    hideSpinner(spinner_button)
+                    console.log(response);
+                },
+                error: function (error) {
+                    // Show an error message
+                    hideSpinner(spinner_button)
+                    console.error(error);
+                }
+            });
+        });
+
+        // Bestellung und Kunden anlegen
+        $('.order-button').click(function () {
+            var customer_id = $(this).data('customer-id');
+            var order_id = $(this).data('order-id');
+
+            var spinner_button = $(this)
+            showSpinner(spinner_button)
+
+            $.ajax({
+                url: '/gcbridge/create_order/' + customer_id + '/' + order_id + '/_action',
+                type: 'GET',
+                success: function (response) {
+                    hideSpinner(spinner_button)
+                    console.log(response);
+                },
+                error: function (error) {
+                    hideSpinner(spinner_button)
+                    console.error(error);
+                }
+            });
+        });
+
+        // Order Status ändern
+        $(".order-form").on('submit', function (e) {
+            e.preventDefault();
+
+            var button = $(this).find('.change_order_status');
+            showSpinner(button);
+            var orderId = button.data("orderid");
+            var orderStatusId = $(this).find('.state-select').val();
+            var paymentStatusId = $(this).find('.payment-select').val();
+            console.log("OrderID:", orderId, "Payment Status:", paymentStatusId, "Order Status:", orderStatusId);
+
+            // Show the spinner
+            var spinner = $(this).find('.spinner_state');
+
+
+            var url = "/gcbridge/set_states/" + orderId + "/" + paymentStatusId + "/" + orderStatusId;
+            console.log("States URL:", url);
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    // Enable the button and hide the spinner
+                    button.prop('disabled', false);
+                    button.removeClass('disabled');
+                    hideSpinner(button);
+                    console.log(response);
+                    location.reload();
+                },
+                error: function (error) {
+                    console.log(error);
+                    // Enable the button and hide the spinner
+                    button.prop('disabled', false);
+                    button.removeClass('disabled');
+                    hideSpinner(button);
+                }
+            });
+        });
+
+        // Show and hide spinner
+        function showSpinner(spinner_button) {
+            spinner_button.find('.spinner-border').removeClass('d-none');
+        }
+
+        function hideSpinner(spinner_button) {
+            spinner_button.find('.spinner-border').addClass('d-none');
+        }
+
+        function reload_page_show_open_orders() {
+            let params = new URLSearchParams();
+            params.append('order_state', '0');  // Die ID für "Offen" bei Order State
+            params.append('payment_state', '17');  // Die ID für "Offen" bei Payment State
+            window.location.href = window.location.pathname + '?' + params.toString();
+        }
+    });
+</script>
+{% endblock %}

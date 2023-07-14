@@ -16,16 +16,16 @@
     </mj-section>
 
     <!-- Kontaktdaten -->
-    <mj-section >
-        <mj-column>
+    <mj-section>
+        <mj-column padding="0">
             <mj-text>
                 <p style="font-weight: bold;">Stimmen ihre Daten noch? Bitte berichtigen Sie:</p>
             </mj-text>
-            <mj-table css-class="contact_table" line-height="40px">
+            <mj-table css-class="contact_table" line-height="40px" padding="10">
                 <tr>
-                    <td width="15%" class="ct_text">Vorname:</td>
-                    <td width="30%" class="ct_value">{subtag:vorname}</td>
-                    <td width="50%" style="border-bottom: 1px dotted #000000" class="ct_user">&nbsp;</td>
+                    <td width="20%" class="ct_text">Vorname:</td>
+                    <td width="40%" class="ct_value">{subtag:vorname}</td>
+                    <td width="40%" style="border-bottom: 1px dotted #000000" class="ct_user">&nbsp;</td>
                 </tr>
                 <tr>
                     <td class="ct_text">Nachname:</td>

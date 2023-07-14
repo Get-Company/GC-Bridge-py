@@ -1,0 +1,37 @@
+---
+  #
+  # Tab Adresse
+  #
+  Status: Webshop-Kunde
+  #
+  # Tab Bank / Zahlungsmodalität
+  #
+  VsdArt: 10 # Parameter Versand/Arten Nr
+  VsdZWeise: 1
+  ZahlHBk:  0 # Parameter Abrechnung/Zahlungsarten
+  ZahlBed: "30 Tage rein netto"
+  SktoTg1: 14
+  SktoSz1: 2,00
+  NettoTg: 30
+  #
+  # Tab Kennzeichen
+  #
+  VtrNr: 99
+  #
+  # Tab Gesperrt / Händler / Euro
+  #
+  GspKz: 1
+  #
+  # Tab Rabatt
+  #
+  RabKz: 1
+  #
+  # Tab Artikelvorgabe
+  #
+  ArtPrGrp: 0
+  TextKz1: 0
+  TextKz2: 0
+  TextKz3: 1
+  TextKz4: 0
+  TextKz5: 0
+  HistKz: 1

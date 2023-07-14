@@ -1,0 +1,122 @@
+<div class="row mb-3">
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">
+                        <h4>
+                            {{ customer.data.number }} - {{ customer.data.salutation }} {{ customer.data.firstname }} {{ customer.data.lastname}}
+                            {% if customer.data.defaultBillingAddress.company %}
+                            <br/><small>{{ customer.data.defaultBillingAddress.company }}</small>
+                            {% endif %}
+                        </h4>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-body">
+                <!-- Adrnr | WebshopId -->
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="number_{{ customer.data.id }}" class="form-label">AdrNr
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="Number"
+                                    data-bs-content="Die AdrNr aus Büro+"></i>
+                        </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="number_{{ customer.data.id }}"
+                                name="data[number]"
+                                value="{{ customer.data.number }}"/>
+                    </div>
+                    <div class="col">
+                        <label for="id_{{customer.data.id}}" class="form-label">Webshop ID
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="ID"
+                                    data-bs-content="Die Webshop ID"></i>
+                        </label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="id_{{ customer.data.id}}"
+                                name="data[Id]"
+                                value="{{ customer.data.id }}"/>
+                    </div>
+
+                    <!-- Salutation | Firstname | Title | Lastname -->
+                    <div class="row mb-3">
+                        <div class="col"><label for="salutation_{{ customer.data.id}}" class="form-label">Anrede
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="Salutation"
+                                    data-bs-content="Dies ist die Anrede dieser Adresse."></i>
+                        </label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="salutation_{{customer.data.id}}"
+                                    name="data[salutation]"
+                                    value="{{ customer.data.salutation }}"/></div>
+                        <div class="col">
+                            <label for="firstname_{{customer.data.id}}" class="form-label">Vorname
+                                <i
+                                        class="fas fa-info-circle"
+                                        data-bs-placement="right"
+                                        data-bs-toggle="popover"
+                                        data-bs-title="First Name"
+                                        data-bs-content="Dies ist der Vorname dieser Adresse."></i>
+                            </label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="firstname_{{customer.data.id}}"
+                                    name="data[firstname]"
+                                    value="{{ customer.data.firstname }}"/></div>
+                        <div class="col"><label for="title_{{customer.data.id}}" class="form-label">Titel
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="Title"
+                                    data-bs-content="Dies ist der Titel in dieser Adresse."></i>
+                        </label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="title_{{customer.data.id}}"
+                                    name="data[title]"
+                                    value="{{ customer.data.title }}"/></div>
+                        <div class="col"><label for="lastname_{{customer.data.id}}" class="form-label">Nachname
+                            <i
+                                    class="fas fa-info-circle"
+                                    data-bs-placement="right"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="Last Name"
+                                    data-bs-content="Dies ist der Nachname dieser Adresse."></i>
+                        </label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="lastname_{{customer.data.id}}"
+                                    name="data[lastname]"
+                                    value="{{ customer.data.lastname }}"/></div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <p>Footer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

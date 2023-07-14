@@ -50,7 +50,6 @@ class ERPCustomerController(ERPController):
         self._sync()
         return True
 
-
     def _get_ranged_bridge(self, start, end):
         bridge_customers = BridgeCustomerEntity.query.filter(BridgeCustomerEntity.erp_nr.between(start, end)).all()
 
@@ -109,7 +108,7 @@ class ERPCustomerController(ERPController):
             # 2 Sync Bridge->ERP
             print("###\n", "Bridge->ERP")
             print("###\n")
-            self._sync_bridge_customer_to_erp()
+            self._sync_bridge_customers_to_erp()
         else:
             print("No new or updated Customer in Bridge")
 
@@ -289,60 +288,79 @@ class ERPCustomerController(ERPController):
 
     """ #### Bridge ---> ERP #### """
 
-    def _sync_bridge_customer_to_erp(self):
+    def _sync_single_bridge_customer_to_erp(self, bridge_customer):
+        self.bridge_customer_list.append(bridge_customer)
+        self._sync_bridge_customers_to_erp()
+
+    def _sync_bridge_customers_to_erp(self):
         """
         :return:
         """
         for bridge_customer in self.bridge_customer_list:
-            # Atti is setting the api_id 36 char into the erp_nr field
-            # when the customer is new.
-            if len(bridge_customer.erp_nr) > 5:
-                erp_customer = None
-            else:
-                erp_customer = ERPAdressenEntity(erp_obj=self.erp_obj, id_value=bridge_customer.erp_nr)
-                if bridge_customer.erp_nr != erp_customer.get_("AdrNr"):
-                    erp_customer = None
-            # Customer Update
-            if erp_customer:
-                bridge_date = bridge_customer.updated_at
-                erp_date = erp_customer.get_('LtzAend').replace(tzinfo=None)
-                # If Bridge is newer
-                if bridge_date > erp_date:
-                    # Adresses
-                    for bridge_address in bridge_customer.addresses:
-                        self._sync_bridge_customer_addresses_to_erp(bridge_address=bridge_address)
-
-                    # Customer
-                    updated_fields_list = bridge_customer.map_db_to_erp()
-                    erp_customer.update_customer(
-                        update_fields_list=updated_fields_list,
-                        bridge_customer=bridge_customer
-                    )
-                # Else Bridge is not newer, pass
-                else:
-                    pass
-
-            # New Customer, Create
-            else:
-                print("Create new Customer")
-                new_customer = ERPAdressenEntity(erp_obj=self.erp_obj)
-                new_customer_info = new_customer.create_new_customer(bridge_customer=bridge_customer,
-                                                                     customer_file='webshop.yaml')
-
-                if new_customer_info["adrnr"]:
-                    print(f"New Customer in ERP created!")
-
-                    bridge_customer.erp_nr = new_customer_info["adrnr"]
-                    for address in bridge_customer.addresses:
-                        address.erp_nr = new_customer_info["adrnr"]
-                        address.erp_ltz_aend = new_customer_info["erp_ltz_aend"]
-                    bridge_customer.erp_ltz_aend = new_customer_info["erp_ltz_aend"]
-                    db.session.add(bridge_customer)
-                    self.commit_with_errors()
-                else:
-                    print("New Customer was not created!", new_customer)
+            self.sync_bridge_customer_to_erp(bridge_customer=bridge_customer)
 
         return True
+
+    def sync_bridge_customer_to_erp(self, bridge_customer):
+        # Atti is setting the api_id 36 char into the erp_nr field
+        # when the customer is new.
+        if len(bridge_customer.erp_nr) > 5:
+            erp_customer = None
+        else:
+            erp_customer = ERPAdressenEntity(erp_obj=self.erp_obj, id_value=bridge_customer.erp_nr)
+            if bridge_customer.erp_nr != erp_customer.get_("AdrNr"):
+                erp_customer = None
+        # Customer Update
+        if erp_customer:
+            bridge_date = bridge_customer.updated_at
+            erp_date = erp_customer.get_('LtzAend').replace(tzinfo=None)
+            # If Bridge is newer
+            if bridge_date > erp_date:
+                # Adresses
+                for bridge_address in bridge_customer.addresses:
+                    self._sync_bridge_customer_addresses_to_erp(bridge_address=bridge_address)
+
+                # Customer
+                updated_fields_list = bridge_customer.map_db_to_erp()
+                erp_customer.update_customer(
+                    update_fields_list=updated_fields_list,
+                    bridge_customer=bridge_customer
+                )
+                return erp_customer.get_("AdrNr")
+            # Else Bridge is not newer, pass
+            else:
+                pass
+            return erp_customer.get_("AdrNr")
+
+        # New Customer, Create
+        else:
+            print("Create new Customer")
+            new_customer = ERPAdressenEntity(erp_obj=self.erp_obj)
+
+            customer_file = "webshop.yaml"
+            default_billing_address = bridge_customer.get_default_billing_address()
+            if default_billing_address.land_ISO2 and default_billing_address.land_ISO2 == "CH":
+                customer_file = f"webshop_ch.yaml"
+
+            new_customer_info = new_customer.create_new_customer(
+                bridge_customer=bridge_customer,
+                customer_file=customer_file
+            )
+
+            if new_customer_info["adrnr"]:
+                print(f"New Customer in ERP created!")
+
+                bridge_customer.erp_nr = new_customer_info["adrnr"]
+                for address in bridge_customer.addresses:
+                    address.erp_nr = new_customer_info["adrnr"]
+                    address.erp_ltz_aend = new_customer_info["erp_ltz_aend"]
+                bridge_customer.erp_ltz_aend = new_customer_info["erp_ltz_aend"]
+                db.session.add(bridge_customer)
+                self.commit_with_errors()
+                return True
+            else:
+                print("New Customer was not created!", new_customer)
+                return False
 
     def _sync_bridge_customer_addresses_to_erp(self, bridge_address: BridgeCustomerAddressEntity):
         return

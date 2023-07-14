@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+{% block javascript_include %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.js') }}"></script>
+{% endblock %}
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     {% block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/gc_styles_compound.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
     {% endblock %}
 
 </head>
@@ -15,7 +21,6 @@
 
 {% block end_of_body %}
     {% block javascript %}
-    <script src="https://kit.fontawesome.com/42ebd07a81.js" crossorigin="anonymous"></script>
     {% endblock %}
 {% endblock %}
 </div>

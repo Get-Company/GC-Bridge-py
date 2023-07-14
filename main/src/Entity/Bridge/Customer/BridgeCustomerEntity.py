@@ -132,8 +132,17 @@ class BridgeCustomerEntity(db.Model):
         date_changed = datetime.strptime(customer["changed"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
         self.created_at = date_firstLogin
         self.updated_at = date_changed
+
         self.erp_reansnr = 0
         self.erp_liansnr = 0
+
+        def _find_address_index(customer):
+            for index, address in enumerate(customer["addresses"]):
+                if address["id"] == customer["defaultBillingAdress"]["id"]:
+                    self.erp_reansnr = index
+
+                if address["id"] == customer["defaultShippingAddress"]["id"]:
+                    self.erp_liansnr = index
 
         return self
 

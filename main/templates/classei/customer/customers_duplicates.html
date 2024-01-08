@@ -2,64 +2,846 @@
 
 {% block body %}
 
-<div class="row">
-    <h1 class="display-5">Suche nach {%for nr in erp_nrs%}{{ nr }} {% endfor %}</h1>
+<div class="row mb-4">
+    <h1 class="display-5 d-flex align-items-center">
+        Suche nach: &nbsp;
+        <form method="post" action="/customer/is_duplicate">
+            <div class="input-group">
+                <input
+                        type="text"
+                        name="manual_search"
+                        class="form-control"
+                        placeholder="ERP-Nummern (getrennt durch Komma)"
+                        value="{% for erp_nr, data in data.items() %}{{ erp_nr }}{% if not loop.last %},{% endif %}{% endfor %}">
+                <button type="submit" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-theater-masks"></i> Suche
+                </button>
+            </div>
+        </form>
+    </h1>
 </div>
+
 <div class="row">
+    <ul class=flashes>
+
+    </ul>
+</div>
+<div class="toast-container fixed-top text-bg-light p-3">
+
+</div>
+
+{% set last_sw5_account = data.keys() %}
+{% for erp_nr, data in data.items() %}
+<div class="row mb-3">
+    <h2>ERP Nr: {{ erp_nr }}</h2>
     <!-- SW5 -->
-    <div class="col-6">
-        <h2>SW5</h2>
-        {% for sw5_customer in sw5_customers %}
+    <div class="col-4">
         <div class="card">
             <div class="card-header">
-                <h3>{{ sw5_customer.number }}-{{ sw5_customer.id }}</h3>
+                <h3>SW5</h3>
             </div>
-            <div class="card-body"></div>
-            <div class="card-footer"></div>
+            <div class="card-body">
+                {% for sw5_account in data.sw5_customer %}
+
+                    <p>
+                        AdrNr: {{ sw5_account.number }}
+                        <br/>
+                        SW5 ID: {{ sw5_account.id }}
+                        <br/>
+                        E-Mail: {{ sw5_account.email }}
+                    </p>
+                <!-- Addressnummer ändern -->
+                <form class="sw5UpdateForm">
+                    <input type="hidden" class="customerId" value="{{sw5_account.id}}">
+                    <div class="input-group input-group-sm">
+                        <input type="text" autocomplete="off"
+                               class="form-control form-control-sm newErpNr"
+                               placeholder="Neue Kundenr.">
+                        <button type="submit"
+                                class="btn change_sw5_adrnr btn-sm btn-outline-primary spinner-button">
+                            AdrNr ändern
+                            <span class="d-none spinner-border spinner-border-sm" role="status"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+                <!-- Falsche mit richtiger Adressnr merge -->
+                <form class="sw5MergeForm">
+                    <div class="input-group input-group-sm">
+                        <input type="text" autocomplete="off"
+                               class="form-control form-control-sm falseErpNr"
+                               value="{{sw5_account.number}}"
+                               placeholder="Falsche Kundenr.">
+                        <input type="text" autocomplete="off"
+                               class="form-control form-control-sm rightErpNr"
+                               value="{{last_sw5_account|last}}"
+                               placeholder="Richtige Kundenr.">
+                        <button type="submit"
+                                class="btn merge_sw5_adrnr btn-sm btn-outline-primary spinner-button">
+                            Merge AdrNr
+                            <span class="d-none spinner-border spinner-border-sm" role="status"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+
+                <hr>
+                <!-- Kunden löschen -->
+                <form class="deleteCustomerForm">
+                    <button type="submit"
+                            class="btn delete-customer-button btn-sm btn-outline-danger spinner-button"
+                            data-customer-id="{{sw5_account.id}}">
+                        Kunde {{ sw5_account.number }} löschen
+                        <span class="d-none spinner-border spinner-border-sm" role="status"
+                              aria-hidden="true"></span>
+                    </button>
+                </form>
+
+                <hr>
+
+                <!-- Adresses -->
+                {% for sw5_address in sw5_account.addresses %}
+                <p>
+                    {{ sw5_address.company }}<br/>
+                    - {{ sw5_address.department }} -<br/>
+                    {{ sw5_address.street }} {{ sw5_address.city }}<br/>
+                    &nbsp;<br>
+                    User ID: {{ sw5_address.customer.id }}<br>
+                    SW5 ID: {{ sw5_address.id }}
+                </p>
+
+                <hr>
+                {% endfor %}
+                {% endfor %}
+
+
+            </div>
+            <div class="card-footer">
+                <h6 data-bs-target="#collapseFooterSW5" data-bs-toggle="collapse">Adress Details</h6>
+                <div class="collapse" id="collapseFooterSW5">
+                    {% if data.sw5_customer %}
+                    {{ data.sw5_customer }}
+                    {% else %}
+                    <p>Keinen Kunden gefunden</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        {% endfor %}
     </div>
 
     <!-- Bridge -->
-    <div class="col-6">
-        <h2>Bridge</h2>
-        {% for bridge_customer in bridge_customers %}
+    <div class="col-4">
         <div class="card">
             <div class="card-header">
-                <h3>{{ bridge_customer.erp_nr }} - {{ bridge_customer.id }}</h3>
+                <h3>Bridge</h3>
             </div>
             <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    <h4>Adresses</h4>
-                    {% for address in bridge_customer_addresses %}
-                    <li class="list-group-item">
-                        {{ address.erp_nr }} - {{ address.id }} von Kunde {{address.customer.erp_nr}} - {{address.customer.id}}
-                    </li>
-                    {% endfor %}
-                </ul>
+                {% if data.bridge_customer.id %}
+                <p>
+                    AdrNr: {{ data.bridge_customer.erp_nr }}
+                    <br/>
+                    SW5 ID: {{ data.bridge_customer.api_id }}
+                    <br/>
+                    Bridge ID: {{ data.bridge_customer.id }}
+                </p>
+                {% else %}
+                    <h5>{{erp_nr}} Gibts ned - sorry</h5>
+                    <img class='img-thumbnail mx-auto d-block' src='https://loremflickr.com/g/320/200/beach,mountain/all?random={{loop.index + 20}}'>
+                {% endif %}
+                <!-- Addressnummer ändern -->
+                <form class="bridgeUpdateForm">
+                    <input type="hidden" class="customerId" value="{{data.bridge_customer.id}}">
+                    <div class="input-group input-group-sm">
+                        <input type="text" autocomplete="off"
+                               class="form-control form-control-sm newErpNr"
+                               title="Neue AdrNr"
+                               placeholder="Neue AdrNr">
+                        <input type="text" autocomplete="off"
+                               value="{{data.bridge_customer.api_id}}"
+                               title="Neue ApiId"
+                               class="form-control form-control-sm newApiId"
+                               placeholder="Neue ApiId">
+
+                        <button type="submit"
+                                class="btn change_adrnr btn-sm btn-outline-primary spinner-button">
+                            Nr ändern
+                            <span class="d-none spinner-border spinner-border-sm" role="status"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+                <!-- Kunden zusammenführen -->
+                <form class="mergeCustomersForm">
+                    <input type="hidden" class="customerId" value="{{data.bridge_customer.id}}">
+                    <div class="input-group input-group-sm">
+                        <input type="text" value="{{data.bridge_customer.id}}" autocomplete="off"
+                               class="form-control form-control-sm falseCustomerId" placeholder="Falsche Kunden-ID">
+                        <input type="text" autocomplete="off" class="form-control form-control-sm rightCustomerId"
+                               placeholder="Richtige Kunden-ID">
+                        <button type="submit" class="btn merge_customers btn-sm btn-outline-primary spinner-button">
+                            Merge
+                            <span class="d-none spinner-border spinner-border-sm" role="status"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+                <!-- Kunden und Bestellungen löschen -->
+                <!-- Formular zum Löschen eines Kunden -->
+                <form class="customerDeleteForm">
+                    <input type="hidden" class="customerId" value="{{data.bridge_customer.id}}">
+                    <button type="submit" class="btn delete-customer btn-sm btn-outline-danger spinner-button">
+                        Kunde löschen
+                        <span class="d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    </button>
+                </form>
+
+                <hr>
+                {% for bridge_address in data.bridge_customer.addresses %}
+                <h4>Adresse erp_nr: {{ bridge_address.erp_nr }}</h4>
+                <p>
+                    {{ bridge_address.na1 }} {{ bridge_address.na2 }}<br>
+                    {{ bridge_address.str }} {{ bridge_address.city }}<br>
+                    {{ bridge_address.land_ISO2 }}<br>
+                    {{ bridge_address.email }}<br>
+                    &nbsp; <br>
+                    Api ID: {{ bridge_address.api_id }}
+
+                </p>
+                <button class="btn btn-sm btn-outline-primary delete-address-button"
+                        data-address-id="{{ bridge_address.id }}">
+                    Delete Address
+                    <span class="spinner-border spinner-border-sm d-none"></span>  <!-- Spinner icon -->
+                </button>
+                <hr>
+                {% endfor %}
             </div>
-            <div class="card-footer"></div>
+            <div class="card-footer">
+                <h6 data-bs-target="#collapseFooterBridge" data-bs-toggle="collapse">Adress Details</h6>
+                <div class="collapse" id="collapseFooterBridge">
+                    {% if data.bridge_customer %}
+                    {{ data.bridge_customer }}
+                    {% else %}
+                    <p>Keinen Kunden gefunden</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        {% endfor %}
     </div>
 
-</div>
+    <!-- ERP -->
+    <div class="col-4">
+        <div class="card">
+            <div class="card-header">
+                <h3>ERP</h3>
+            </div>
+            <div class="card-body">
+                <div id="erp_body_{{ erp_nr }}">
+
+                </div>
+                <!-- Change Webshop ID Form -->
+                <form class="changeWebshopIdForm">
+                    <div class="input-group input-group-sm">
+                        <input value="{{erp_nr}}" type="text" autocomplete="off"
+                               class="form-control form-control-sm adrnr" placeholder="Adressnummer">
+                        <input type="text" autocomplete="off" class="form-control form-control-sm webshopId"
+                               placeholder="Neue Webshop-ID">
+                        <button type="submit" class="btn change_webshop_id btn-sm btn-outline-primary spinner-button">
+                            Webshop-ID ändern
+                            <span class="d-none spinner-border spinner-border-sm" role="status"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Remove Webshop ID Form -->
+                <form class="removeWebshopIdForm">
+                    <div class="input-group input-group-sm">
+                        <input value="{{erp_nr}}" type="text" autocomplete="off"
+                               class="form-control form-control-sm adrnr" placeholder="Adressnummer">
+                        <button type="submit" class="btn remove_webshop_id btn-sm btn-outline-primary spinner-button">
+                            Webshop-ID entfernen
+                            <span class="d-none spinner-border spinner-border-sm" role="status"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+                <hr/>
+
+                <!-- Delete Customer -->
+                <form class="deleteCustomerFormERP">
+                    <div class="input-group input-group-sm">
+                        <input type="text" value="{{erp_nr}}" autocomplete="off"
+                               class="form-control form-control-sm custId" placeholder="Kundennummer">
+                        <button type="submit" class="btn delete_customer btn-sm btn-outline-danger spinner-button">
+                            Kunden löschen
+                            <span class="d-none spinner-border spinner-border-sm" role="status"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+                <hr />
 
 
-<div class="row">
-    <h2>Tools</h2>
-    <div class="card">
-        <div class="card-header">Remove/Change WebshopId</div>
-        <div class="card-body">
+            </div>
+            <div class="card-footer" id="erp_footer_{{ erp_nr }}">
 
+            </div>
         </div>
-        <div class="card-footer"></div>
     </div>
 </div>
+{% endfor %}
 
 {% endblock body %}
 
 
 {% block javascript %}
+<script>
 
+    // Delete Address in Bridge
+    $(".delete-address-button").on('click', function (e) {
+        e.preventDefault();
+
+        const $button = $(this);
+        const addressId = $button.data('address-id');
+
+        showSpinner($button);  // Show the spinner on the button
+
+        // Construct the URL for the AJAX request
+        const url = `/customer/bridge/delete/address/${addressId}/_action`;
+        addToast('Info', `Deleting address with URL: ${url}`);
+
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function (response) {
+                console.log(response);
+                if (response.status === 'success') {
+                    // Delete Address in Bridge
+                    // You can add further actions here, e.g., remove the address from the page
+                } else {
+                    addToast('Error', 'Error deleting address: ' + response.message);
+                }
+                hideSpinner($button);  // Hide the spinner
+            },
+            error: function (error) {
+                console.error('There was an error:', error);
+                alert('Error deleting address.');
+                hideSpinner($button);  // Hide the spinner
+            }
+        });
+    });
+
+    // AdrNr/ApiId in Bridge ändern
+    $('.bridgeUpdateForm').on('submit', function (e) {
+        e.preventDefault();
+
+        var spinner_button = $(this).find(".change_adrnr")
+        showSpinner(spinner_button)
+
+        var form = $(this);
+        var customerId = form.find('.customerId').val();
+        var newErpNr = form.find('.newErpNr').val();
+        var newApiId = form.find('.newApiId').val();
+
+        console.log(form);
+        console.log("CustomerID: " + customerId + "new erp: " + newErpNr);
+        console.log("New API ID:" + newApiId)
+
+        // Überprüfen Sie, ob customerId und newErpNr Werte haben
+        if (!customerId || !newErpNr) {
+            console.error("Both Customer ID and new ERP number must be provided.");
+            hideSpinner(spinner_button);
+            return;  // Beenden Sie die Funktion, wenn einer von ihnen leer ist
+        }
+
+        $.ajax({
+            url: '/customer/bridge/update_erp_nr_and_api_id/',  // Update this to your actual update endpoint
+            type: 'POST',
+            data: {
+                'customerId': customerId,
+                'newErpNr': newErpNr,
+                'newApiId': newApiId
+            },
+            success: function (response) {
+                // Update the page or show a success message
+                hideSpinner(spinner_button)
+                console.log(response);
+                addToast('Info', `Response: ${response}`);
+                main_form_resend();
+            },
+            error: function (error) {
+                // Show an error message
+                hideSpinner(spinner_button)
+                console.error(error);
+                addToast('Error', `Error: ${error.statusText}`);
+            }
+        });
+    });
+
+    // Merge Customers SW5
+    $('.sw5MergeForm').on('submit', function (e) {
+        e.preventDefault();
+
+        var spinner_button = $(this).find(".merge_sw5_adrnr")
+        showSpinner(spinner_button)
+
+        var form = $(this);
+        var rightErpNr = form.find('.rightErpNr').val();
+        var falseErpNr = form.find('.falseErpNr').val();
+
+
+        // Überprüfen Sie, ob customerId und newErpNr Werte haben
+        if (!falseErpNr || !rightErpNr || falseErpNr === rightErpNr) {
+            console.error("Both false and right erp number must be provided. Or both are the same");
+            hideSpinner(spinner_button);
+            addToast('Error', 'Falsche oder Richtige Adressnummer(n) fehl(t/en)');
+            return;  // Beenden Sie die Funktion, wenn einer von ihnen leer ist
+        }
+
+        // Bestätigungsdialog
+        var confirmation = confirm('Sicher? Richtige AdrNr: ' + rightErpNr + ' und Falsche Adrnr: ' + falseErpNr);
+        if (!confirmation) {
+            addToast('Error', 'Merging wurde abgebrochen');
+            console.error("User canceled");
+            hideSpinner(spinner_button);
+            return;
+        }
+
+        const url = '/customer/sw5/merge/' + falseErpNr + '/' + rightErpNr + '/_action';
+        console.log("Merging customers with URL:", url);
+
+        $.ajax({
+            url: url,  // Update this to your actual update endpoint
+            type: 'POST',
+            success: function (response) {
+                console.log("Success")
+                console.log(response)
+                // Update the page or show a success message
+                hideSpinner(spinner_button)
+                if (response.message) {
+                    response.message.forEach(function (message) {
+                        addToast('Success', message);
+                    });
+                }
+
+                if (response.errors) {
+                    response.errors.forEach(function (error) {
+                        addToast('Error', error);
+                    });
+                }
+
+                main_form_resend()
+
+            },
+            error: function (error) {
+                console.log("Error")
+                // Show an error message
+                hideSpinner(spinner_button)
+                var ul = document.querySelector(".flashes");
+                if (ul) {
+                    // Löscht vorhandene Nachrichten
+                    ul.innerHTML = '';
+                    // Fügt die Fehlermeldung hinzu
+                    var li = document.createElement("li");
+                    li.textContent = error.responseJSON ? error.responseJSON.message : 'Unbekannter Fehler';
+                    ul.appendChild(li);
+                }
+            }
+        });
+    });
+
+    // Merge Customers Bridge
+    $(".mergeCustomersForm").on('submit', function (e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const falseCustomerId = $form.find('.falseCustomerId').val();
+        const rightCustomerId = $form.find('.rightCustomerId').val();
+        const $button = $form.find('.merge_customers');
+
+        showSpinner($button);  // Show the spinner on the button
+
+        // Construct the URL for the AJAX request
+        const url = `/customer/bridge/merge_customers/${falseCustomerId}/${rightCustomerId}/_action`;
+        console.log("Merging customers with URL:", url);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                false_customer_id: falseCustomerId,
+                right_customer_id: rightCustomerId
+            },
+            success: function (response) {
+                console.log(response);
+                if (response.status === 'success') {
+                    alert('Customers successfully merged!');
+                    // You can add further actions here, e.g., update the page
+                } else {
+                    alert('Error merging customers: ' + response.message);
+                }
+                hideSpinner($button);  // Hide the spinner
+            },
+            error: function (error) {
+                console.error('There was an error:', error);
+                alert('Error merging customers.');
+                hideSpinner($button);  // Hide the spinner
+            }
+        });
+    });
+
+    // Change Webshop ID
+    $(".changeWebshopIdForm").on('submit', function (e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const adrnr = $form.find('.adrnr').val();
+        const webshopId = $form.find('.webshopId').val();
+        const $button = $form.find('.change_webshop_id');
+
+        showSpinner($button);  // Show the spinner on the button
+
+        // Construct the URL for the AJAX request
+        const url = `/customer/erp/change_webshop_id/${adrnr}/${webshopId}/_action`;
+        console.log("Changing Webshop ID with URL:", url);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                adrnr: adrnr,
+                webshop_id: webshopId
+            },
+            success: function (response) {
+                console.log(response);
+                if (response.status === 'success') {
+                    alert('Webshop ID successfully changed!');
+                    addToast('Success', `Webshop ID successfully changed to ${webshopId}`);
+                    // You can add further actions here, e.g., update the page
+                } else {
+                    addToast('Error', 'Error changing Webshop ID: ' + response.message);
+                    alert('Error changing Webshop ID: ' + response.message);
+                }
+                hideSpinner($button);  // Hide the spinner
+                main_form_resend()
+            },
+            error: function (error) {
+                console.error('There was an error:', error);
+                alert('Error changing Webshop ID.');
+                hideSpinner($button);  // Hide the spinner
+            }
+        });
+    });
+
+    // Remove Webshop ID
+    $(".removeWebshopIdForm").on('submit', function (e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const adrnr = $form.find('.adrnr').val();
+        const $button = $form.find('.remove_webshop_id');
+
+        showSpinner($button);  // Show the spinner on the button
+
+        // Construct the URL for the AJAX request
+        const url = `/customer/erp/remove_webshop_id/${adrnr}/_action`;
+        console.log("Removing Webshop ID with URL:", url);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                adrnr: adrnr
+            },
+            success: function (response) {
+                console.log(response);
+                if (response.status === 'success') {
+                    alert('Webshop ID successfully removed!');
+                    // You can add further actions here, e.g., update the page
+                } else {
+                    alert('Error removing Webshop ID: ' + response.message);
+                }
+                hideSpinner($button);  // Hide the spinner
+                main_form_resend()
+            },
+            error: function (error) {
+                console.error('There was an error:', error);
+                alert('Error removing Webshop ID.');
+                hideSpinner($button);  // Hide the spinner
+            }
+        });
+    });
+
+    // AdrNr in SW5 ändern
+    $('.sw5UpdateForm').on('submit', function (e) {
+        e.preventDefault();
+
+        var spinner_button = $(this).find(".change_sw5_adrnr")
+        showSpinner(spinner_button)
+
+        var form = $(this);
+        var customerId = form.find('.customerId').val();
+        var newErpNr = form.find('.newErpNr').val();
+
+        console.log(form);
+        console.log("CustomerID: " + customerId + "new erp: " + newErpNr);
+
+        // Überprüfen Sie, ob customerId und newErpNr Werte haben
+        if (!customerId || !newErpNr) {
+            console.error("Both Customer ID and new ERP number must be provided.");
+            hideSpinner(spinner_button);
+            return;  // Beenden Sie die Funktion, wenn einer von ihnen leer ist
+        }
+
+        $.ajax({
+            url: '/customer/sw5/update_customernumber/_action',  // Update this to your actual update endpoint
+            type: 'POST',
+            data: {
+                'customerId': customerId,
+                'newErpNr': newErpNr,
+            },
+            success: function (response) {
+                // Update the page or show a success message
+                hideSpinner(spinner_button)
+                addToast('Success', `Customers new AdrNr: ${newErpNr}`)
+                console.log(response);
+                main_form_resend(5000)
+            },
+            error: function (error) {
+                // Show an error message
+                hideSpinner(spinner_button)
+                console.error(error);
+                addToast('Error', `Could not change AdrNr to: ${newErpNr}`)
+            }
+        });
+    });
+
+    // Search customer in ERP
+    document.addEventListener('DOMContentLoaded', function () {
+
+        {% for erp_nr, erpData in data.items() %}
+
+        fetch("/customer/erp/search/{{erp_nr}}/_action")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(fetchedData => {
+                if (!fetchedData.data.address) {
+                    document.getElementById("erp_body_{{erp_nr}}").innerHTML =
+                        "<h5>{{erp_nr}} Gibts ned - sorry</h5>" +
+                        "<img class='img-thumbnail mx-auto d-block' src='https://loremflickr.com/g/320/200/beach,mountain/all?random={{loop.index}}'>";
+                    return;
+                }
+                console.log(fetchedData)
+                // Parse the address JSON string to an object
+                const addressObject = JSON.parse(fetchedData.data.address);
+
+                // Now you can access the properties of addressObject
+                const content = `
+                <p>
+                AdrNr: ${addressObject.adrnr}
+                <br />
+                SW5 ID: ${fetchedData.data.webshop_id}
+                </p>
+                <p>
+                Name: ${addressObject.salutation} ${addressObject.firstname} ${addressObject.lastname}
+                </p>
+                <p>
+                Company: ${addressObject.company}
+                <br>
+                </p>
+                <p>
+                Address:
+                <br />
+                ${addressObject.street}, ${addressObject.city}
+                </p>
+            `;
+                document.getElementById("erp_body_{{erp_nr}}").innerHTML = content;
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error.message);
+                document.getElementById("erp_body_{{erp_nr}}").innerText = "An error occurred while fetching data.";
+            });
+
+        {% endfor %}
+    });
+
+    // Deleting Customer
+    $('.deleteCustomerFormERP').on('submit', function (e) {
+        e.preventDefault();
+
+        var spinner_button = $(this).find(".delete_customer");
+        showSpinner(spinner_button)
+
+        var form = $(this);
+        var custId = form.find('.custId').val();
+
+        console.log(form);
+        console.log("custId: " + custId);
+
+        // Überprüfen Sie, ob custId einen Wert hat
+        if (!custId) {
+            console.error("Customer ID must be provided.");
+            hideSpinner(spinner_button);
+            return;  // Beenden Sie die Funktion, wenn custId leer ist
+        }
+
+        $.ajax({
+            url: '/customer/delete_in_erp/' + custId + '/_action',
+            type: 'POST',
+            success: function (response) {
+                // Update the page or show a success message
+                hideSpinner(spinner_button)
+                if (response.message) {
+                    response.message.forEach(function (message) {
+                        addToast('Success', message);
+                    });
+                }
+                main_form_resend()
+            },
+            error: function (error) {
+                // Show an error message
+                hideSpinner(spinner_button)
+                console.error(error);
+                addToast('Error', `Could not delete customer with ID: ${custId}`)
+            }
+        });
+    });
+
+    // Delete Customer and Orders in Bridge
+    $(".customerDeleteForm").on('submit', function (e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const customerId = $form.find('.customerId').val();
+        const $button = $form.find('.delete-customer');
+
+        showSpinner($button);  // Show the spinner on the button
+
+        // Construct the URL for the AJAX request
+        const url = `/customer/delete_in_bridge/${customerId}/_action`;
+        console.log("Deleting customer with URL:", url);
+
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function (response) {
+                console.log(response);
+                if (response.status === 'success') {
+                    alert('Kunde erfolgreich gelöscht!');
+                    // Weitere Aktionen können hier hinzugefügt werden, z.B. den Kunden von der Seite entfernen
+                } else {
+                    alert('Fehler beim Löschen des Kunden: ' + response.message);
+                }
+                hideSpinner($button);  // Hide the spinner
+            },
+            error: function (error) {
+                console.error('There was an error:', error);
+                alert('Fehler beim Löschen des Kunden.');
+                hideSpinner($button);  // Hide the spinner
+            }
+        });
+    });
+
+    // Delete Customer in Shopware 5
+    $('.delete-customer-button').on('click', function (e) {
+        e.preventDefault();
+
+        const $button = $(this);
+        const customerId = $button.data('customer-id'); // Die Kunden-ID wird vom data-Attribut des Buttons geholt
+
+        // Bestätigungsabfrage
+        const confirmDeletion = confirm("Möchten Sie diesen Kunden wirklich löschen?");
+        if (!confirmDeletion) {
+            return; // Abbrechen, falls der Benutzer nicht bestätigt
+        }
+
+        showSpinner($button); // Zeige den Lade-Indikator am Button
+
+        // URL für den AJAX-Request konstruieren
+        const url = `/customer/delete_in_sw5/${customerId}/_action`;
+        addToast("Info", "Deleting customer with URL: " + url);
+
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function (response) {
+                console.log(response);
+                if (response.status === 'success') {
+                    addToast("Success", response.messages);
+                    // Weitere Aktionen hier hinzufügen, z.B. Entfernen des Kunden von der Seite
+                } else {
+                    addToast("Error", 'Error deleting customer: ' + response.message);
+                }
+                hideSpinner($button); // Lade-Indikator verstecken
+
+                main_form_resend()
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', status, error);
+                alert('Error deleting customer.');
+                hideSpinner($button); // Lade-Indikator verstecken
+            }
+        });
+    });
+
+    // Show and hide spinner
+    function showSpinner(spinner_button) {
+        spinner_button.find('.spinner-border').removeClass('d-none');
+    }
+    function hideSpinner(spinner_button) {
+        spinner_button.find('.spinner-border').addClass('d-none');
+    }
+
+    // Add Toasts
+    function addToast(title, message, timeout) {
+        var toastContainer = document.querySelector(".toast-container");
+
+        var countdownTemplate = timeout ? `<strong><small class="fs-3 text-danger countdown">${timeout / 1000}s</small></strong>` : '<small class="text-muted">just now</small>';
+
+        var toastTemplate = `
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">${title}</strong>
+                    ${countdownTemplate}
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            </div>`;
+
+        // Append the toast
+        toastContainer.insertAdjacentHTML('beforeend', toastTemplate);
+        var toastElement = toastContainer.lastChild;
+
+        if(timeout) {
+            var countdown = timeout / 1000;
+            // Start countdown
+            var countdownInterval = setInterval(function() {
+                countdown -= 1;
+                toastElement.querySelector('.countdown').textContent = countdown + 's';
+                if(countdown <= 0) clearInterval(countdownInterval);
+            }, 1000);
+
+        }
+
+        var toast = new bootstrap.Toast(toastElement);
+        toast.show();
+    }
+
+    // Resend the main form
+    function main_form_resend(timeout=2000){
+        // Send the form again, to reload the results
+        addToast('Reload', `Die Seite wird in ${timeout/1000}s neu geladen`, timeout)
+        var form = document.querySelector('form[action="/customer/is_duplicate"]');
+        setTimeout(function() {
+            form.submit();
+        }, timeout); // ms delay 5s = 5000
+    }
+
+</script>
 {% endblock %}

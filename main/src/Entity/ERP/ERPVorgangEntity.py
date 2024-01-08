@@ -76,6 +76,7 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
             )
         for pos in positions['order_products']:
             print(pos["name"])
+            # This is a test to recognise the order as CH - no tax!
             if order.shipping_method == "CH":
                 self.add_position(
                     quantity=pos["quantity"],

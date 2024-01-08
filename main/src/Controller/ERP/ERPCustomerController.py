@@ -21,6 +21,8 @@ from pprint import pprint
 from datetime import datetime, timedelta
 import time
 
+from main.src.Entity.SW5_2.SW5_2CustomerObjectEntity import SW5_2CustomerObjectEntity
+
 
 class ERPCustomerController(ERPController):
     def __init__(self, erp_obj):
@@ -341,11 +343,13 @@ class ERPCustomerController(ERPController):
             default_billing_address = bridge_customer.get_default_billing_address()
             if default_billing_address.land_ISO2 and default_billing_address.land_ISO2 == "CH":
                 customer_file = f"webshop_ch.yaml"
-
-            new_customer_info = new_customer.create_new_customer(
-                bridge_customer=bridge_customer,
-                customer_file=customer_file
-            )
+            try:
+                new_customer_info = new_customer.create_new_customer(
+                    bridge_customer=bridge_customer,
+                    customer_file=customer_file
+                )
+            except Exception as e:
+                print(e)
 
             if new_customer_info["adrnr"]:
                 print(f"New Customer in ERP created!")
@@ -357,10 +361,26 @@ class ERPCustomerController(ERPController):
                 bridge_customer.erp_ltz_aend = new_customer_info["erp_ltz_aend"]
                 db.session.add(bridge_customer)
                 self.commit_with_errors()
+
+                # Now lets forward the new adrnr to the shop
+                # but only if it is not already there
+
+                # get the customer again from the bridge
+                in_db = BridgeCustomerEntity().query.filter_by(erp_nr=new_customer_info["adrnr"]).one_or_none()
+                if in_db:
+                    # Synch the new adrnr to shopware
+                    adrn_in_sw5 = SW5_2CustomerObjectEntity().get_customer(
+                        customer_id=new_customer_info["adrnr"],
+                        is_number_not_id=True)
+                    if adrn_in_sw5['success']:
+                        print(f'AdrNr {new_customer_info["adrnr"]} existiert bereits in der DB')
+                    else:
+                        response = SW5_2CustomerObjectEntity().set_customer_number_by_id(customer_id=in_db.api_id,number=new_customer_info["adrnr"])
+
                 return True
             else:
-                print("New Customer was not created!", new_customer)
-                return False
+                print("New Customer was not created!", new_customer_info)
+                return new_customer_info
 
     def _sync_bridge_customer_addresses_to_erp(self, bridge_address: BridgeCustomerAddressEntity):
         return

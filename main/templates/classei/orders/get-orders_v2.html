@@ -10,17 +10,20 @@
 <div class="row mt-5">
 
     <!-- Bestellungen in DB anlegen -->
-    <div class="col-4">
+    <div class="col-5">
         <h2>1. Bestellungen Übersicht</h2>
         <p>Alle neuen Bestellungen in die Übersicht laden</p>
         <div class="input-group input-group-sm mb-3">
-            <span class="input-group-text">Ab dem:&nbsp;</span>
+            <span class="input-group-text">Ab:&nbsp;</span>
             <input type="datetime-local" id="date-input" name="date-input" class="form-control"
                    {% if orders %}
                    value="{{orders[-1].purchase_date}}"
                    {% else %}
-                   value="{{yesterday}}"
+                   value="{{yesterday.strftime('%Y-%m-%dT%H:%M')}}"
                    {% endif %}>
+            <span class="input-group-text">Bis:&nbsp;</span>
+            <input type="datetime-local" id="end-date-input" name="end-date-input" class="form-control"
+                   placeholder="Optional">
             <button id="get-orders-button" class="btn btn-sm btn-outline-primary spinner-button">Anlegen
                 <span id="spinner_state" class="d-none spinner-border spinner-border-sm" role="status"
                       aria-hidden="true"></span>
@@ -29,14 +32,14 @@
     </div>
 
     <!-- Bestellungen sortieren -->
-    <div class="col-8">
+    <div class="col-7">
         <h2>2. Bestellungen sortieren</h2>
         <p>Die Liste der Bestellungen sortieren</p>
         <form class="row g-3" action="{{request.path}}" method="GET">
             <div class="input-group input-group-sm mb-3">
-                <span class="input-group-text">Datum ab:</span>
+                <span class="input-group-text">Ab:</span>
                 <input type="datetime-local" class="form-control w-25" id="start_date" name="start_date"
-                       value="{{yesterday.strftime('%Y-%m-%dT%H:%M')}}">
+                       value="{{start_date.strftime('%Y-%m-%dT%H:%M')}}">
                 <span class="input-group-text">Bestell Status</span>
                 <select class="form-select state_select form-select-sm" id="order_state" name="order_state">
                     <option value="" {% if order_state is none %}selected{% endif %}>Alle anzeigen</option>
@@ -91,7 +94,7 @@
                 {{ order.purchase_date.strftime('%d.%m.%Y %H:%m') }}
                 |&nbsp;
                 <strong>{{ order.payment_method }}</strong>
-                {% else %}}
+                {% else %}
                 <p>Keine Standard-Rechnungsadresse hinterlegt!</p>
                 {% endif %}
                 {% endif %}
@@ -130,6 +133,22 @@
                                 {% endif %}
                                 {% endfor %}
                             </div>
+                            <div class="col">
+                                <h4>GLS Zoll-Datei</h4>
+                                <form class="csvForm">
+                                    <input type="hidden" class="orderId" value="{{order.id}}">
+                                    <input type="hidden" id="baseFileUrl" value="{{ url_for('static', filename='downloads/') }}">
+                                    <div class="input-group input-group-sm">
+                                        <button type="submit"
+                                                class="btn download_csv btn-sm btn-outline-primary spinner-button">
+                                            Datei herunterladen
+                                            <span class="d-none spinner-border spinner-border-sm" role="status"
+                                                  aria-hidden="true"></span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
                         </div>
                         <h4>Adressen</h4>
                         <ul class="list-group list-group-flush">
@@ -139,6 +158,7 @@
                                     <div class="col-10">
                                         {{ address.get_address_as_html_row()|safe }}
                                     </div>
+                                    <!--
                                     <div class="col-1">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="delivery"
@@ -159,6 +179,7 @@
                                                    for="billing-{{address.erp_ansnr}}">R</label>
                                         </div>
                                     </div>
+                                    -->
                                 </div>
                             </li>
                             {% endfor %}
@@ -185,7 +206,7 @@
                                                     <li class="list-group-item">
                                                         <img width=50px"
                                                              src="https://assets.classei.de/img/{{ product.image[0]['name'] + '.' + product.image[0]['type'] }}">
-                                                        {{ product.quantity }} x {{ product.name }}
+                                                        {{ product.quantity }} x {{ product.name }} = {{ product.total_price|round(2) }}
                                                     </li>
                                                     {% endfor %}
                                                 </ul>
@@ -202,17 +223,22 @@
                         <div class="row mb-3">
                             <div class="col-4">
 
-                                <h5>Adressnummer ändern
-                                    <a
-                                            target="_blank"
-                                            href="/customer/is_duplicate/{% for address in order.customer.addresses %}{{ address.erp_nr }}{% if not loop.last %},{% endif %}{% endfor %}">
-                                        <i class="fas fa-theater-masks"></i>
-                                    </a>
-
+                                <h5 class="d-flex align-items-center">Adressnummer ändern &nbsp;
+                                    <form method="post" action="/customer/is_duplicate" target="_blank">
+                                        {% for address in order.customer.addresses %}
+                                        <input type="hidden" name="erp_num_list[]" value="{{ address.erp_nr }}">
+                                        {% endfor %}
+                                        <button
+                                                type="submit"
+                                                class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-theater-masks"></i>
+                                        </button>
+                                    </form>
                                 </h5>
                                 <!-- Addressnummer ändern -->
                                 <form class="updateForm">
                                     <input type="hidden" class="customerId" value="{{order.customer.id}}">
+                                    <input type="hidden" class="newApiId" value="{{order.customer.api_id}}">
                                     <div class="input-group input-group-sm">
                                         <input type="text" autocomplete="off"
                                                class="form-control form-control-sm newErpNr"
@@ -342,8 +368,31 @@
 
             var formattedDate = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes;
 
+            // if Enddate
+            var endDateValue = $("#end-date-input").val();
+            var formattedEndDate = "";
+
+            if (endDateValue) {
+                var endDate = new Date(endDateValue);
+                var endYear = endDate.getFullYear();
+                var endMonth = endDate.getMonth() + 1;
+                var endDay = endDate.getDate();
+                var endHours = endDate.getHours();
+                var endMinutes = endDate.getMinutes();
+
+                // Pad to two digits if necessary
+                endMonth = endMonth < 10 ? '0' + endMonth : endMonth;
+                endDay = endDay < 10 ? '0' + endDay : endDay;
+                endHours = endHours < 10 ? '0' + endHours : endHours;
+                endMinutes = endMinutes < 10 ? '0' + endMinutes : endMinutes;
+
+                formattedEndDate = endYear + '-' + endMonth + '-' + endDay + 'T' + endHours + ':' + endMinutes;
+            }
+
+            var ajaxUrl = "/gcbridge/get-orders/" + formattedDate + "/" + (formattedEndDate || "None") + "/_action";
+
             $.ajax({
-                url: "/gcbridge/get-orders/" + formattedDate + "/_action",
+                url:ajaxUrl,
                 type: 'GET',
                 success: function (result) {
                     console.log(result);
@@ -354,11 +403,54 @@
                     var params = "?start_date=" + formattedDate + "&order_state=0&payment_state=17";
                     var baseUrl = window.location.href.split('?')[0];
                     window.location.href = baseUrl + "" + params;
-                    // Behandeln Sie die Antwort hier...
+
                 },
                 error: function (error) {
                     hideSpinner(spinner_button);
                     // Show an error message
+                    console.error(error);
+                }
+            });
+        });
+
+        // CSV Formular
+        // AdrNr ändern
+        $('.csvForm').on('submit', function (e) {
+            e.preventDefault();
+
+            var spinner_button = $(this).find(".download_csv")
+            showSpinner(spinner_button)
+
+            var form = $(this);
+            var orderId = form.find('.orderId').val();
+            var baseFileUrl = $('#baseFileUrl').val();
+
+            console.log(form);
+            console.log("Order ID: " + orderId);
+
+            // Überprüfen Sie, ob orderId einen Wert hat
+            if (!orderId) {
+                console.error("Order ID must be provided.");
+                hideSpinner(spinner_button);
+                return;  // Beenden Sie die Funktion, wenn es leer ist
+            }
+
+            $.ajax({
+                url: '/gcbridge/csv_zoll/ch/' + orderId + '/_action',  // Update this to your actual update endpoint
+                type: 'POST',
+                success: function (response) {
+                    // Update the page or show a success message
+                    hideSpinner(spinner_button)
+                    console.log(response);
+                    // Prüfen Sie, ob die Antwort erfolgreich ist und ob eine Datei-URL vorhanden ist
+                    if(response.status === "success" && response.data) {
+                        var fileUrl = baseFileUrl + response.data;
+                        window.open(fileUrl);
+                    }
+                },
+                error: function (error) {
+                    // Show an error message
+                    hideSpinner(spinner_button)
                     console.error(error);
                 }
             });
@@ -373,7 +465,9 @@
 
             var form = $(this);
             var customerId = form.find('.customerId').val();
-            var newErpNr = form.find('.newErpNr').val();
+            var newErpNr = form.find('.newErpNr').val() || null;  // Fallback to null if it doesn't exist
+            var newApiId = form.find('.newApiId').val() || null;  // Fallback to null if it doesn't exist
+
 
             console.log(form);
             console.log("CustomerID: " + customerId + "new erp: " + newErpNr);
@@ -386,11 +480,12 @@
             }
 
             $.ajax({
-                url: '/update_erp_nr/',  // Update this to your actual update endpoint
+                url: '/customer/bridge/update_erp_nr_and_api_id/',  // Update this to your actual update endpoint
                 type: 'POST',
                 data: {
                     'customerId': customerId,
                     'newErpNr': newErpNr,
+                    'newApiId': newApiId
                 },
                 success: function (response) {
                     // Update the page or show a success message
@@ -470,7 +565,6 @@
         function showSpinner(spinner_button) {
             spinner_button.find('.spinner-border').removeClass('d-none');
         }
-
         function hideSpinner(spinner_button) {
             spinner_button.find('.spinner-border').addClass('d-none');
         }

@@ -2,6 +2,8 @@ import datetime
 import logging
 import string
 import json
+from pprint import pprint
+
 import yaml
 
 # Tools
@@ -284,6 +286,8 @@ class ERPDatasetObjectEntity(object):
         except Exception as e:
             print(f"ERP Post gone wrong - Cancel | Error: {e}")
             self.cancel_()
+            return e
+        return True
 
     def cancel_(self):
         """
@@ -365,18 +369,32 @@ class ERPDatasetObjectEntity(object):
     def get_created_dataset(self):
         return self.created_dataset
 
-    def delete_dataset(self, check_delete=True):
+    def delete_dataset(self, check_delete=False):
         """ Delete with checks
         The delete without checks works fine
         """
-        # Todo: Why is delete with checks not working? A window is shown in büro+ but no delete happens
-        self.edit_()
-        self.update_("GspKz", 0)
         if check_delete:
-            self.created_dataset.Delete(aMeld=1, aIgnoreWarnings=1)
-        else:
+            self.edit_()
             self.created_dataset.Delete()
-        self.post_()
+            self.post_()
+
+    def delete_dataset_with_check(self, gspkz="GspKz"):
+        self.edit_()
+        print(f"Is customer {self.get_('AdrNr')} locked?:", self.get_(gspkz))
+        if self.get_(gspkz) == 1:
+            self.update_(field=gspkz, value=0)
+            self.post_()
+
+        result = self.created_dataset.CheckDelete(aMeld=0, aIgnoreWarnings=0)
+        result = True
+        print("Result:", result)
+        if result:
+            self.delete_dataset(check_delete=result)
+        else:
+            self.edit_()
+            self.update_(field=gspkz, value=1)
+            self.post_()
+        return result
 
     """ Positioning/Finding/Filtering """
 
@@ -465,7 +483,6 @@ class ERPDatasetObjectEntity(object):
     def set_range_wildcard(self, index_field, value):
         self.created_dataset.Indices(index_field).Select()
         self.created_dataset.WildcardRange(value)
-
 
     def range_next(self):
         self.created_dataset.Next()

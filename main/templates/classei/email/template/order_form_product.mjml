@@ -21,13 +21,11 @@
             <br/>
             <!-- Verkaufseinheit -->
             pro
-            <strong>
                 {% if product.factor and product.factor > 0 %}
                 {{ product.factor }} St.
                 {% else %}
                 {{ product.unit|default('St.') }}
                 {% endif %}
-            </strong>
 
             <br/>
             {% if product.min_purchase > 1 and product.purchase_unit > 1 %}

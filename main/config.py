@@ -13,8 +13,7 @@ class Config:
 
     #  Docker localhost:3306
     SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://root:password@localhost:3306/gc-bridge_db'
-
-
+    SESSION_TYPE = 'filesystem'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

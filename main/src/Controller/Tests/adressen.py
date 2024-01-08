@@ -3,7 +3,7 @@ from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntit
 from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPConnectionEntity import ERPConnectionEntity
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
-from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeAddressEntity
+from main.src.Entity.Bridge.Customer.BridgeCustomerAddressEntity import BridgeCustomerAddressEntity
 from main import db
 
 erp_obj = ERPConnectionEntity()
@@ -22,8 +22,8 @@ def save_address_to_db():
 
 
     bridge_customer_entity = BridgeCustomerEntity().map_erp_to_db(erp_add_ntt)
-    bridge_address_entity = BridgeAddressEntity().map_erp_to_db(erp_ans_ntt)
-    bridge_contact_entity = BridgeContactEntity().map_erp_to_db(erp_ansp_ntt)
+    bridge_address_entity = BridgeCustomerAddressEntity.map_erp_to_db(erp_ans_ntt)
+    bridge_contact_entity = BridgeCustomerAddressEntity.map_erp_to_db(erp_ansp_ntt)
 
     bridge_customer_entity.addresses = [bridge_address_entity]
     bridge_address_entity.contacts = [bridge_contact_entity]

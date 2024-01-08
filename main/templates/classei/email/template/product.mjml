@@ -22,10 +22,10 @@
     <!-- Product Body -->
     <mj-section background-color="#ffffff">
         <mj-column>
-            <mj-text>
+            <mj-text line-height="26px">
                 {{product.description_short}}
             </mj-text>
-            <mj-button
+            <mj-button padding="20px 0 0 0"
                     href="https://www.classei-shop.com/search?sSearch={{product.erp_nr}}">
                 - Mehr Infos zum Artikel -
             </mj-button>
@@ -43,13 +43,11 @@
                 <p style="font-size: 14px;">
                     <!-- Verkaufseinheit -->
                     pro
-                    <strong>
                         {% if product.factor and product.factor > 0 %}
                         {{ product.factor }} St.
                         {% else %}
                         {{ product.unit|default('St.') }}
                         {% endif %}
-                    </strong>
                     <br/>
                     {% if product.min_purchase > 1 and product.purchase_unit > 1 %}
                     <!-- Mindestbestellwert und Bestellschritte ? -->
@@ -71,17 +69,25 @@
             </mj-text>
         </mj-column>
         <mj-column>
+            {% if product.images|length > 1 %}
+            {% for imgs in product.images %}
+
+            {% endfor %}
             <mj-carousel>
                 {% for img in product.images %}
-                    {% if offset_img == loop.index0 %}
-                    {% else %}
-                        <mj-carousel-image target="https://www.classei-shop.com/search?sSearch={{product.erp_nr}}"
-                                           src="https://assets.classei.de/img/{{img.name}}.{{img.type}}"
-                                           alt="Beispiel"/>
-                    {% endif %}
-
+                {% if offset_img != loop.index0 %}
+                <mj-carousel-image target="https://www.classei-shop.com/search?sSearch={{product.erp_nr}}"
+                                   src="https://assets.classei.de/img/{{img.name}}.{{img.type}}"
+                                   alt="{{product.description|striptags}}"/>
+                {% endif %}
                 {% endfor %}
             </mj-carousel>
+            {% else %}
+            {% set img = product.images[0] %}
+            <mj-image href="https://www.classei-shop.com/search?sSearch={{product.erp_nr}}"
+                      src="https://assets.classei.de/img/{{img.name}}.{{img.type}}"
+                      alt="{{product.description|striptags}}l"/>
+            {% endif %}
         </mj-column>
     </mj-section>
 
@@ -112,8 +118,9 @@
         <mj-column padding="0" width="35%">
             <mj-text align="right" padding="0" font-size="30px" line-height="40px" font-weight="bold"
                      color="#ff9933">
-                - {{ "%.2f"|format(
-                (product.get_list_price() - product.get_special_price()) / product.get_list_price() * 100
+                - {{ "%.0f"|format(
+                (
+                    product.get_list_price() - product.get_special_price()) / product.get_list_price() * 100
                 )
                 |replace('.', ',')
                 }} %

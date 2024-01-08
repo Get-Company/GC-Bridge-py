@@ -3,9 +3,11 @@ from sqlalchemy import and_
 from main import db
 from datetime import datetime
 import pprint
+import csv
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
 from main.src.Entity.Bridge.Orders.BridgeOrderStateEntity import BridgeOrderStateEntity
 
+import xml.etree.ElementTree as ET
 # Many-To-Many for Order/Product
 order_product = db.Table('bridge_order_product_entity',
                          db.Column('id', db.Integer(), primary_key=True, nullable=False),
@@ -15,6 +17,7 @@ order_product = db.Table('bridge_order_product_entity',
                          db.Column('unit_price', db.Float()),
                          db.Column('total_price', db.Float())
                          )
+
 
 # Order Entity
 class BridgeOrderEntity(db.Model):
@@ -110,7 +113,6 @@ class BridgeOrderEntity(db.Model):
 
         return True
 
-
     def get_open_orders(self):
         """
         Query the database to get all orders with payment_state, shipping_state, and order_state equal to 0 (new orders).
@@ -142,6 +144,209 @@ class BridgeOrderEntity(db.Model):
 
         return self
 
+    def map_bridge_to_gls_csv(self):
+        """ This export needs to be called """
+        field_names = [
+            "customerReference",
+            "parcelNumbers",
+            "isExportDeclarationRequested",
+            "exportDeclarationNumbers",
+            "transitMRNs",
+            "transitType",
+            "glsIncotermCode",
+            "totalGrossWeightInKg",
+            "exporter.address.name1",
+            "exporter.address.name2",
+            "exporter.address.street1",
+            "exporter.address.street2",
+            "exporter.address.houseNumber",
+            "exporter.address.postcode",
+            "exporter.address.city1",
+            "exporter.address.stateOrRegion",
+            "exporter.address.countryCode",
+            "exporter.contactPerson.name",
+            "exporter.contactPerson.emailAddress",
+            "exporter.contactPerson.phoneCountryPrefix",
+            "exporter.contactPerson.phoneNumber",
+            "exporter.contactPerson.mobileCountryPrefix",
+            "exporter.contactPerson.mobileNumber",
+            "exporter.eoriNumber",
+            "exporter.swissUid",
+            "exporter.taxId",
+            "exporter.vatRegistrationNumber",
+            "exporter.isCommercial",
+            "exporter.authorizationNumber",
+            "exporter.loadingPlaceCode",
+            "importer.address.name1",
+            "importer.address.name2",
+            "importer.address.street1",
+            "importer.address.street2",
+            "importer.address.houseNumber",
+            "importer.address.postcode",
+            "importer.address.city1",
+            "importer.address.stateOrRegion",
+            "importer.address.countryCode",
+            "importer.contactPerson.name",
+            "importer.contactPerson.emailAddress",
+            "importer.contactPerson.phoneCountryPrefix",
+            "importer.contactPerson.phoneNumber",
+            "importer.contactPerson.mobileCountryPrefix",
+            "importer.contactPerson.mobileNumber",
+            "importer.eoriNumber",
+            "importer.taxId",
+            "importer.isCommercial",
+            "consignee.address.name1",
+            "consignee.address.name2",
+            "consignee.address.street1",
+            "consignee.address.street2",
+            "consignee.address.houseNumber",
+            "consignee.address.postcode",
+            "consignee.address.city1",
+            "consignee.address.stateOrRegion",
+            "consignee.address.countryCode",
+            "consignee.contactPerson.name",
+            "consignee.contactPerson.emailAddress",
+            "consignee.contactPerson.phoneCountryPrefix",
+            "consignee.contactPerson.phoneNumber",
+            "consignee.contactPerson.mobileCountryPrefix",
+            "consignee.contactPerson.mobileNumber",
+            "invoice.invoiceNumber",
+            "invoice.invoiceDate",
+            "invoice.totalGoodsValue.amount",
+            "invoice.totalGoodsValue.currency",
+            "lineItem.quantity.amount",
+            "lineItem.quantity.unit",
+            "lineItem.commodityCode",
+            "lineItem.goodsDescription",
+            "lineItem.countryOfOrigin",
+            "lineItem.valueInInvoiceCurrency",
+            "lineItem.preferentialTrade.isEligibleForPreference",
+            "lineItem.preferentialTrade.proofOfPreference.type",
+            "lineItem.preferentialTrade.proofOfPreference.referenceNumber",
+            "lineItem.statisticalValue.amount",
+            "lineItem.statisticalValue.currency",
+            "lineItem.statisticalQuantity",
+            "lineItem.nationalCustomsFieldsDE.regionOfOrigin",
+            "lineItem.nationalCustomsFieldsBE.regionOfOrigin",
+            "lineItem.grossWeightInKg",
+            "lineItem.netWeightInKg"
+        ]
+        self.add_order_product_fields_to_product()
+
+        # Get the shipping address
+        shipping_address = self.customer.get_default_shipping_address()
+
+        rows = []
+        invoice_total_dummy = len(self.products)
+        invoice_lineitem_dummy = 1
+
+        weight_total_dummy = len(self.products)
+        weight_lineitem_dummy = 1
+
+        for i, product in enumerate(self.products):
+            row = {
+                "customerReference": self.customer.erp_nr,
+                "parcelNumbers": "18309142057",
+                "isExportDeclarationRequested": False,
+                "exportDeclarationNumbers": "",
+                "transitMRNs": "",
+                "transitType": "",
+                "glsIncotermCode": 10,
+                "totalGrossWeightInKg": weight_total_dummy,
+                # Sender
+                "exporter.address.name1": "Egon Heimann GmbH Classei",
+                "exporter.address.name2": "",
+                "exporter.address.street1": "Staudacherstr. 7e",
+                "exporter.address.street2": "",
+                "exporter.address.houseNumber": "7e",
+                "exporter.address.postcode": "83250",
+                "exporter.address.city1": "Marquartstein",
+                "exporter.address.stateOrRegion": "",
+                "exporter.address.countryCode": "DE",
+                "exporter.contactPerson.name": "Rita Angermeier",
+                "exporter.contactPerson.emailAddress": "rangermeier@classei.de",
+                "exporter.contactPerson.phoneCountryPrefix": "49",
+                "exporter.contactPerson.phoneNumber": "8641975911",
+                "exporter.contactPerson.mobileCountryPrefix": "",
+                "exporter.contactPerson.mobileNumber": "",
+                "exporter.eoriNumber": "DE4936795",
+                "exporter.swissUid": "",
+                "exporter.taxId": "DE131554917",
+                "exporter.vatRegistrationNumber": "DE131554917",
+                "exporter.isCommercial": True,
+                "exporter.authorizationNumber": "",
+                "exporter.loadingPlaceCode": "",
+                # Importer
+                "importer.address.name1": shipping_address.na2 if shipping_address.na1 == "Firma" else shipping_address.first_name + " " + shipping_address.last_name,
+                "importer.address.name2": shipping_address.first_name + " " + shipping_address.last_name if shipping_address.na1 == "Firma" else "",
+                "importer.address.street1": shipping_address.str,
+                "importer.address.street2": "",
+                "importer.address.houseNumber": "",
+                "importer.address.postcode": shipping_address.plz,
+                "importer.address.city1": shipping_address.city,
+                "importer.address.stateOrRegion": "",
+                "importer.address.countryCode": shipping_address.land_ISO2,
+                "importer.contactPerson.name": shipping_address.first_name + " " + shipping_address.last_name,
+                "importer.contactPerson.emailAddress": self.customer.email,
+                "importer.contactPerson.phoneCountryPrefix": "",
+                "importer.contactPerson.phoneNumber": "",
+                "importer.contactPerson.mobileCountryPrefix": "",
+                "importer.contactPerson.mobileNumber": "",
+                "importer.eoriNumber": "",
+                "importer.taxId": self.customer.ustid if self.customer.ustid else "",
+                "importer.isCommercial": True if shipping_address.na1 == "Firma" else False,
+                # Receiver
+                "consignee.address.name1": shipping_address.na2 if shipping_address.na1 == "Firma" else shipping_address.first_name + " " + shipping_address.last_name,
+                "consignee.address.name2": shipping_address.first_name + " " + shipping_address.last_name if shipping_address.na1 == "Firma" else "",
+                "consignee.address.street1": shipping_address.str,
+                "consignee.address.street2": "",
+                "consignee.address.houseNumber": "",
+                "consignee.address.postcode": shipping_address.plz,
+                "consignee.address.city1": shipping_address.city,
+                "consignee.address.stateOrRegion": "",
+                "consignee.address.countryCode": shipping_address.land_ISO2,
+                "consignee.contactPerson.name": shipping_address.first_name + " " + shipping_address.last_name,
+                "consignee.contactPerson.emailAddress": self.customer.email,
+                "consignee.contactPerson.phoneCountryPrefix": "",
+                "consignee.contactPerson.phoneNumber": "",
+                "consignee.contactPerson.mobileCountryPrefix": "",
+                "consignee.contactPerson.mobileNumber": "",
+                "invoice.invoiceNumber": self.erp_order_id,
+                "invoice.invoiceDate": self.created_at.strftime("%d.%m.%Y"),
+                "invoice.totalGoodsValue.amount": invoice_total_dummy,
+                "invoice.totalGoodsValue.currency": "EUR",
+                "lineItem.quantity.amount": product.quantity,
+                "lineItem.quantity.unit": product.unit,
+                "lineItem.commodityCode": "",
+                "lineItem.goodsDescription": product.name,
+                "lineItem.countryOfOrigin": "",
+                "lineItem.valueInInvoiceCurrency": invoice_lineitem_dummy,
+                "lineItem.preferentialTrade.isEligibleForPreference": False,
+                "lineItem.preferentialTrade.proofOfPreference.type": "",
+                "lineItem.preferentialTrade.proofOfPreference.referenceNumber": "",
+                "lineItem.statisticalValue.amount": invoice_lineitem_dummy,
+                "lineItem.statisticalValue.currency": "EUR",
+                "lineItem.statisticalQuantity": "",
+                "lineItem.nationalCustomsFieldsDE.regionOfOrigin": "",
+                "lineItem.nationalCustomsFieldsBE.regionOfOrigin": "",
+                "lineItem.grossWeightInKg": weight_lineitem_dummy,
+                "lineItem.netWeightInKg": weight_lineitem_dummy
+            }
+            # On the last item, add + Versandkosten since they have to be added to one item
+            if i == len(self.products) - 1:
+                row["lineItem.goodsDescription"] += " + Versandkosten"
+            rows.append(row)
+        path = "main/static/downloads/"
+        file = self.order_number + " " + shipping_address.na2 + ".csv"
+
+        with open(path + file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=field_names)
+            writer.writeheader()
+            writer.writerows(rows)
+
+        return file
+
+
     def __repr__(self):
         return f"" \
                f"Order: {self.api_id} " \
@@ -150,14 +355,3 @@ class BridgeOrderEntity(db.Model):
                f"Shipping:{self.shipping_costs} - Land: {self.shipping_method} " \
                f"ERP Order ID: {self.erp_order_id} - Order Number:{self.order_number} " \
                f"Payment: {self.payment_method}"
-
-
-
-
-
-
-
-
-
-
-

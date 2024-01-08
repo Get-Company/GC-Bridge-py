@@ -157,7 +157,10 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         # Fill out the fields given rom the json file
         self.prefill_from_file(file=self.prefill_json_directory + customer_file)
 
-        self.post_()
+        was_post_successfull = self.post_()
+
+        if not was_post_successfull:
+            return was_post_successfull
 
         for address in bridge_customer.addresses:
 
@@ -175,7 +178,10 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
             for field_anschrift_key, field_anschrift_value in fields_anschrift.items():
                 erp_anschrift.create_(field_anschrift_key, field_anschrift_value)
 
-            erp_anschrift.post_()
+            was_anschrift_successfull = erp_anschrift.post_()
+
+            if not was_anschrift_successfull:
+                return was_anschrift_successfull
 
             # Create Dataset for Ansprechpartner
             erp_ansprechpartner = ERPAnsprechpartnerEntity(erp_obj=self.erp_obj)
@@ -194,13 +200,13 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
             ansp = ""
             if address.title:
                 ansp += address.title + " "
-            ansp += address.first_name
-            ansp += " " + address.last_name
+            ansp += f'{address.first_name} {address.last_name}'
 
             erp_ansprechpartner.create_("Ansp", ansp)
             erp_ansprechpartner.create_("Anr", address.title)
             erp_ansprechpartner.create_("VNa", address.first_name)
             erp_ansprechpartner.create_("NNa", address.last_name)
+            erp_ansprechpartner.create_("EMail1", address.email)
             erp_ansprechpartner.post_()
 
         customer_info = {
@@ -381,7 +387,6 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         """
         billing = self.get_special_standard_billing_address()
         billing_contact = billing.get_ansprechpartner()
-        addresses = self.get_anschriften()
 
         erp_customer = {
             'adrnr': self.get_("AdrNr"),
@@ -389,10 +394,10 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
             'firstname': billing_contact.get_("VNa"),
             'title': billing_contact.get_("Tit"),
             'lastname': billing_contact.get_("NNa"),
-            'company': billing.get_("Na2")
+            'company': billing.get_("Na2"),
+            'street': billing.get_('Str'),
+            'city': billing.get_('Ort')
         }
-
-
         return json.dumps(erp_customer)
 
     def get_login(self):

@@ -12,3 +12,11 @@ class SW5_2AddressObjectEntity(SW5_2ObjectEntity):
             return response
         except Exception as e:
             raise Exception(f"Error retrieving address with ID '{address_id}': {e}")
+
+    def update(self, address):
+        data = address
+        try:
+            response = self.put('/addresses/%s' % address['data']['id'], data)['data']
+            return response
+        except Exception as e:
+            raise Exception(f"Error on updating Address: {address['data']['id']} on Address_ID: {address['data']['id']}: {e}")

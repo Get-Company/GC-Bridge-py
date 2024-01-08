@@ -29,6 +29,7 @@ class BridgeCustomerAddressEntity(db.Model):
     last_name = db.Column(db.String(255), nullable=True)
     title = db.Column(db.String(255), nullable=True)
     email = db.Column(db.String(255), nullable=True)
+    tel = db.Column(db.String(255), nullable=True)
     str = db.Column(db.String(255), nullable=True)
     plz = db.Column(db.CHAR(12), nullable=True)
     city = db.Column(db.String(255), nullable=True)
@@ -109,28 +110,41 @@ class BridgeCustomerAddressEntity(db.Model):
         if address["company"] is not None and address["company"] != '':
             self.na1 ="Firma"
             self.na2 = address["company"]
+            self.company = address["company"]
         else:
             if address["salutation"] == 'mr':
                 self.na1 = "Herr"
             elif address["salutation"] == 'ms':
                 self.na1 = "Frau"
             self.na2 = address["firstname"] + " " + address["lastname"]
+        if address["department"] is not None:
+            self.na3 = address["department"]
+        else:
+            self.na3 = ''
         self.first_name = address["firstname"]
         self.last_name = address["lastname"]
-        self.title = address["title"]
+        self.title = address["salutation"]
+
         self.email = address["customer"]["email"]
+        self.tel = address["phone"]
         self.str = address["street"]
         self.plz = address["zipcode"]
         self.city = address["city"]
         self.land_ISO2 = address["country"]["iso"]
         # Parse Date
-        date_firstLogin = datetime.strptime(address["customer"]["changed"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
-        date_changed = datetime.strptime(address["customer"]["changed"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
+        date_firstLogin = self._get_date_or_none(address["customer"]["changed"])
+        date_changed = self._get_date_or_none(address["customer"]["changed"])
 
         self.created_at = date_firstLogin
         self.updated_at = date_changed
 
         return self
+
+    def _get_date_or_none(self, date):
+        if date:
+            return datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
+        else:
+            return None
 
     def map_sw6_to_db(self, customer, address=None):
         self.erp_nr = customer["customerNumber"]
@@ -161,13 +175,15 @@ class BridgeCustomerAddressEntity(db.Model):
 
     def map_db_to_erp_anschrift(self):
         updated_fields_list = {
+            "Na1": self.na1,
+            "Na2": self.na2,
+            "Na3": self.na3,
             "AnsNr": self.erp_ansnr,
             "EMail1": self.email,
             "Ort": self.city,
             "PLZ": self.plz,
             "Str": self.str,
-            "Na2": self.na2,
-            "Na3": self.na3,
+            "Tel": self.tel
         }
         # Standard Billing Address
         if self.customer.erp_reansnr == self.erp_ansnr:
@@ -181,28 +197,26 @@ class BridgeCustomerAddressEntity(db.Model):
         else:
             updated_fields_list["StdLiKz"] = 0
 
-        # Company or Private
-        if self.customer.ustid:
-            updated_fields_list["Na1"] = self.company
-        else:
-            updated_fields_list["Na1"] = self.na1
-
         return updated_fields_list
 
     def map_db_to_erp_ansprechpartner(self):
         anr = ""
-        if self.title == "Frau":
+        if self.title == "ms":
             anr = "Frau"
-        elif self.title == "Herr":
+        elif self.title == "mr":
             anr = "Herrn"
 
         updated_fields_list = {
             "AnsNr": self.erp_ansnr,
             "AspNr": self.erp_aspnr,
             "Anr": anr,
+            "AnspAufbau": 6,  # 6 Pos in Dropdown - means: Title Vorname Zusatz Vorsatz Nachname
+            "Ansp": f"{anr} {self.first_name} {self.last_name}",
+            "tit": anr,
             "VNa": self.first_name,
             "NNa": self.last_name,
-            "EMail1": self.email
+            "EMail1": self.email,
+            "Tel1": self.tel
         }
 
         return updated_fields_list

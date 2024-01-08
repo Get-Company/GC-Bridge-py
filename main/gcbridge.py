@@ -1,18 +1,18 @@
 import os
 from io import StringIO
 from pprint import pprint
-000
+
 import html2text
 import subprocess
 import sqlalchemy
 from datetime import datetime, timedelta
 
 from main import create_app
-from flask import render_template, redirect, request, make_response, jsonify
+from flask import render_template, redirect, request, make_response, jsonify, flash
 from flask_migrate import Migrate
 
 import sys
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, not_
 from loguru import logger
 
 from datetime import date
@@ -133,7 +133,6 @@ Migration
 ######################
 """
 migrate = Migrate(app, db)
-
 # Bridge2ObjectCustomerAddressController(erp_obj=erp_obj).sync_range(start=10026, end=10026)
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_range(start=10026, end=10030)
 # Bridge2ObjectCustomerController(erp_obj=erp_obj).sync_changed()
@@ -160,81 +159,28 @@ migrate = Migrate(app, db)
 Mappei
 ######################
 """
+
+
 # get_products_list()
-
-
-"""
-######################
-Threaded 
-######################
-erp_obj = ERPConnectionEntity()
-erp_obj.connect()
-
-from main.src.Shopware6Bridge.process import *
-while True:
-    # Bridge2ObjectTaxController(erp_obj=erp_obj).sync_changed()
-
-    Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_changed()
-    sw6_cat.sync_changed_CATEGORIES_from_BRIDGE_to_SW6()
-
-    Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()
-    sw6_prod.sync_changed_PRODUCTS_from_BRIDGE_to_SW6()
-
-
-
-# ERPCustomerController(erp_obj=erp_obj_test).sync_changed()
-    if BridgeSynchronizeEntity().get_entity_by_id_1().loop_continue == 0:
-        break
-
-erp_obj.close()
-
-def sync_thread():
-    threaded_app = create_app()
-    threaded_app.app_context().push()
-    erp_obj = ERPConnectionEntity()
-    erp_obj.connect()
-    while True:
-        Bridge2ObjectCategoryController(erp_obj=erp_obj).sync_changed()
-        Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()
-
-
-t1 = threading.Thread(target=sync_thread)
-t1.start()
-"""
-
-
-# SW5_2OrderObjectController().get_todays_open_orders()
-# SW5_2CustomerObjectController().delete_duplicates_by_adrnr(44760)
-
-# 1. Neuen Bestellungen
-# orders = SW5_2OrderObjectEntity().get_open_orders_by_startdate(date(year=2023, month=5, day=9))
-# for order in orders["data"]:
-#     #pprint(order)
-#     customer = SW5_2CustomerObjectEntity().get_customer(order["customerId"])
-#     # pprint(customer)
-#     SW5_2CustomerObjectController().get_new_customer(customer)
-#     order_details = SW5_2OrderObjectEntity().get_order_by_id(order["id"])
-#     order_data = SW5_2OrderObjectController().get_orders(order_details)
-#     #pprint(order)
-#     #pprint(order_data)
-#     SW5_2OrderObjectController().insert_order_data(order_data)
-
 
 
 # erp_obj = ERPConnectionEntity(mandant="58")
 # erp_obj.connect()
-# Bridge2ObjectProductController(erp_obj=erp_obj).sync_range('204045', '204045/06')
+# Bridge2ObjectProductController(erp_obj=erp_obj).sync_range('20000', '299999ZZZ')
 # erp_obj.close()
-# customer = ERPAnschriftenEntity(erp_obj=erp_obj)
+# customer = ERPAdressenEntity(erp_obj=erp_obj)
 # # for index in customer.created_dataset.Indices:
 # #     for index_field in index.IndexFields:
 # #         print(index.Name, " - ", index_field.Name)
-# customer.set_range_wildcard("Na2", '?Mösch')
-# customer.filter_expression('Ort = "Offenbach"')
+# customer.set_range_wildcard("Na2", '?Labom')
+# customer.filter_expression('Ort = "Hude"')
 # customer.range_first()
+# adrnr = 68000
 # while not customer.range_eof():
-#     print(customer.get_("AdrNr"))
-#     customer.range_next()
+#     print(customer.get_("Na2"), customer.get_("AdrNr"))
+#     customer.delete_dataset()
+    # adrnr += 1
+    # customer.range_next()
 #
 # ds_customer = erp_obj.get_erp().DataSetInfos("Anschriften").CreateDataSetEx()
 # ds_customer.Indices("Na2").Select()
@@ -294,9 +240,44 @@ def main():
 
     # Products
     # Bridge2ObjectProductController(erp_obj=erp_obj).sync_changed()  #  sync_all_changed_products()
-    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_range('204045/00', '204046')
-
     # Bridge2ObjectProductController(erp_obj=erp_obj).sync_all()
+
+    # Customer
+    # in_db = SW5_2CustomerObjectEntity().get_customer(58720, True)
+    # if in_db['success']:
+    #     print('Jupp,')
+    #     pprint(in_db)
+    # else:
+    #     print('Nope,', in_db['message'])
+
+    # erp_obj = ERPConnectionEntity(mandant="58")
+    # erp_obj.connect()
+    # ERPAdressenEntity(erp_obj=erp_obj, id_value='13285').delete_dataset_with_check()
+    # erp_obj.close()
+
+    # Prices
+    # erp_obj = ERPConnectionEntity(mandant="58")
+    # erp_obj.connect()
+    # erp_nr = "214023"
+    # Set special price
+    # ERPArtikelEntity(erp_obj=erp_obj, id_value=erp_nr).set_special_price(datetime.now(), end_date=datetime(year=2024, month=12, day=31), percentage=50)
+    # # Reset Prices
+    # ERPArtikelEntity(erp_obj=erp_obj, id_value=erp_nr).reset_prices()
+    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_one(erp_nr)
+    # product = BridgeProductEntity.query.filter_by(erp_nr=erp_nr).one_or_none()
+    # response = SW5_2ProductObjectEntity().update(bridge_entity=product)
+    # erp_obj.close()
+
+    # erp_obj = ERPConnectionEntity(mandant="58")
+    # erp_obj.connect()
+    # erp_nr = "214023"
+    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_one(erp_nr)
+    # product = BridgeProductEntity.query.filter_by(erp_nr=erp_nr).one_or_none()
+    # # Reset price
+    # response = SW5_2ProductObjectEntity().set_price_by_bridge_product_object(product)
+    # # Set special price
+    # response = SW5_2ProductObjectEntity().set_special_price_by_bridge_product_object(product)
+    # erp_obj.close()
 
     # Adressen
     # ERPCustomerController(erp_obj=erp_obj).sync_changed()
@@ -317,7 +298,6 @@ def main():
 
     # erp_obj.close()
 
-
     """
     ######################
     Mappei
@@ -325,17 +305,12 @@ def main():
     When activated it asks you in the CLI if you want to download and save the xml,
     then reads the xml with parse and xmlreader and saves all information in the db
     """
+
     # This is just a CLI Version which awaits input
     # get_products_list()
     # products = MappeiProductEntity.query.filter(MappeiProductEntity.prices[.has(land="ch"))
     # products = MappeiProductEntity.query.join(MappeiProductEntity)
     # pprint(products)
-
-    """
-    ######################
-    Flask Server
-    ######################
-    """
 
     @app.route('/')
     def index():
@@ -362,14 +337,6 @@ def main():
         customers = BridgeCustomerEntity().query.all()
         return render_template('classei/customer/customers.html', customers=customers)
 
-    @app.route('/customer/<customer_id>')
-    def show_customer(customer_id):
-        try:
-            customer = BridgeCustomerEntity().query.get(customer_id)
-            return render_template("classei/customer/customer_details.html", customer=customer)
-        except sqlalchemy.exc.MultipleResultsFound:
-            return redirect("/dashborad")
-
     @app.route('/classei/price_raise')
     def show_classei_products():
         classei_products = BridgeProductEntity.query.order_by(BridgeProductEntity.erp_nr).all()
@@ -390,11 +357,16 @@ def main():
 
     @app.route("/gc-bridge/erp/adresse/<adrnr>/_action")
     def gcbridge_erp_adresse_action(adrnr):
+        response = []
         erp_obj = ERPConnectionEntity(mandant="58")
         erp_obj.connect()
         try:
             erp_customer = ERPAdressenEntity(erp_obj=erp_obj, id_value=int(adrnr))
-            response = erp_customer.get_address_json()
+            found =erp_customer.find_(value=adrnr)
+            if found:
+                response = erp_customer.get_address_json()
+            else:
+                response["message"] = f"Adresse {adrnr} nicht gefunden"
         except:
             response["message"] = f"Adresse {adrnr} nicht gefunden"
         erp_obj.close()
@@ -479,9 +451,9 @@ def main():
         erp_obj.close()
         return jsonify(response)
 
-    """ 
-    E-Mail 
-    """
+    """     ######  """
+    """     E-Mail  """
+    """     ######  """
 
     @app.route('/<domain>/email/<year>/<newsletter>/<erp_nums>')
     def render_and_save_mjml(domain, year, newsletter, erp_nums):
@@ -527,7 +499,7 @@ def main():
         rendered_html = render_template(f"/{domain}/email/{year}/{newsletter}/newsletter.mjml", products=products,
                                         special_end_date=special_end_date)
 
-        # Schreiben Sie den Inhalt des Newsletters in eine HTML-Datei
+        # Write the
         rendered_mjml_file = os.path.join(path, f"{newsletter}.mjml")
         with open(rendered_mjml_file, "w", encoding="utf-8") as f:
             f.write(rendered_html)
@@ -545,14 +517,15 @@ def main():
 
         return render_template(f'/classei/email/{year}/{newsletter}/{newsletter}.html')
 
-    """ 
-    Order Functions and urls 
-    """
+    """     ########################    """
+    """     Order Functions and urls    """
+    """     ########################    """
 
     @app.route("/gc-bridge/get-orders")
     def gcbridge_get_orders():
         # Check the date
         start_date_arg = request.args.get('start_date')
+        start_date = None
         if start_date_arg and start_date_arg.strip():
             try:
                 start_date = datetime.strptime(start_date_arg, "%Y-%m-%dT%H:%M")
@@ -560,13 +533,16 @@ def main():
                 start_date = datetime.now()
         else:
             start_date = datetime.now()
-        yesterday = (start_date - timedelta(days=1)).replace(hour=0, minute=0)
+        yesterday = (start_date - timedelta(days=1)).replace(hour=12, minute=0)
+
+        # Check whether it was weekend and use the last friday
+        if yesterday.weekday() in (5, 6):   # saturday=5, sunday=6
+            days_since_friday = (yesterday.weekday() - 4) % 7  # friday=4
+            yesterday = (yesterday - timedelta(days=days_since_friday)).replace(hour=12, minute=0)
 
         # Get the states
         order_state = request.args.get('order_state') or None
         payment_state = request.args.get('payment_state') or None
-
-        print("Order State", order_state)
 
         # Start the query build
         query = BridgeOrderEntity.query
@@ -592,19 +568,32 @@ def main():
                                orders=orders,
                                yesterday=yesterday)
 
-    @app.route("/gcbridge/get-orders/<startdate>/_action")
-    def gcbridge_get_orders_from_startdate(startdate):
-        startdate = datetime.strptime(startdate, "%Y-%m-%dT%H:%M")
+    @app.route("/gcbridge/get-orders/<startdate>/<enddate>/_action")
+    def gcbridge_get_orders_from_startdate(startdate, enddate):
+        datetime_format="%Y-%m-%dT%H:%M"
+        startdate = datetime.strptime(startdate, datetime_format)
+
+        # Überprüfen, ob enddate gesetzt ist und in ein datetime-Objekt umwandeln
+        if enddate and enddate != 'None':  # oder jede andere Bedingung, um 'None' oder ungültige Werte zu erkennen
+            enddate = datetime.strptime(enddate, datetime_format)
+        else:
+            enddate = None
+
         response = {
             'status': 'success',
             'message': "",
             'data': {},
             'success': True  # Setzen Sie success auf True
         }
-        orders = SW5_2OrderObjectEntity().get_open_orders_by_startdate(startdate=startdate)
+        # Check for enddate
+        if enddate:
+            orders = SW5_2OrderObjectEntity().get_open_orders_by_startdate_and_enddate(startdate=startdate, enddate=enddate)
+        else:
+            orders = SW5_2OrderObjectEntity().get_open_orders_by_startdate(startdate=startdate)
 
         if orders['success']:
-            response['message'] = f"{orders['total']} offene Bestellungen seit {startdate.strftime('%d.%m.%Y')} gefunden"
+            response[
+                'message'] = f"{orders['total']} offene Bestellungen seit {startdate.strftime('%d.%m.%Y')} gefunden"
 
             for order in orders["data"]:
                 customer = SW5_2CustomerObjectEntity().get_customer(customer_id=order["customer"]["id"])
@@ -632,27 +621,6 @@ def main():
                     response['success'] = False  # Setzen Sie success auf False, wenn ein Fehler aufgetreten ist
 
         return jsonify(response), 200
-
-    @app.route('/update_erp_nr/', methods=['POST'])
-    def update_erp_nr():
-        customer_id = request.form.get('customerId')
-        new_erp_nr = request.form.get('newErpNr')
-        try:
-            # update the customer
-            customer = BridgeCustomerEntity.query.get(customer_id)
-            customer.erp_nr = new_erp_nr
-
-            # update the addresses
-            addresses = customer.addresses
-            for address in addresses:
-                address.erp_nr = new_erp_nr
-
-            db.session.commit()
-
-            return jsonify({"status": "success", "message": "ERP Nr updated successfully."})
-
-        except Exception as e:
-            return jsonify({"status": "error", "message": f"Failed to update ERP Nr: {e}"})
 
     @app.route("/gcbridge/create_order/<customer_id>/<order_id>/_action")
     def gcbridge_create_order_customer_id_order_id(customer_id, order_id):
@@ -690,7 +658,7 @@ def main():
             elif result is False:
                 response["status"] = 'error'
                 response["message"] += "New Customer was not created!\n"
-            else: # an 'AdrNr' was returned
+            else:  # an 'AdrNr' was returned
                 response["status"] = 'success'
                 response["message"] += f"Customer successfully synced with ERP. AdrNr is {result}.\n"
 
@@ -711,7 +679,8 @@ def main():
         response = {}
         if not order_id or not payment_status_id or not order_status_id:
             response["status"] = "error"
-            response["message"] = "Missing parameters. All parameters (order_id, payment_status_id, order_status_id) are required."
+            response[
+                "message"] = "Missing parameters. All parameters (order_id, payment_status_id, order_status_id) are required."
             return jsonify(response), 400
 
         order_entity = BridgeOrderEntity()
@@ -737,7 +706,8 @@ def main():
 
             if not sw5_status:
                 response["status"] = "error"
-                response["message"] = f"Failed to set order and payment status in SW5 for order_id: {order_id} and payment_id: {payment_status_id}"
+                response[
+                    "message"] = f"Failed to set order and payment status in SW5 for order_id: {order_id} and payment_id: {payment_status_id}"
                 return jsonify(response), 500
 
             db.session.add(order)
@@ -751,82 +721,209 @@ def main():
         except Exception as e:
             db.session.rollback()
             response["status"] = "error"
-            response["message"] = f"Updating States in SW5 gone wrong with order_id: {order_id} and payment_id: {payment_status_id}. Error: {e}"
+            response[
+                "message"] = f"Updating States in SW5 gone wrong with order_id: {order_id} and payment_id: {payment_status_id}. Error: {e}"
             return jsonify(response), 500
 
-    @app.route("/gcbridge/check_sw5_orders_against_db_orders/<startdate>/_action")
-    def gcbridge_check_sw5_orders_against_db_orders():
-        sw5_orders = SW5_2OrderObjectEntity.get_open_orders_by_startdate()
-        pass
+    @app.route("/gcbridge/csv_zoll/ch/<order_id>/_action", methods=['POST'])
+    def gcbridge_csv_zoll_ch(order_id):
+        response = {
+            'status': 'success',
+            'message': "",
+            'data': {}
+        }
 
+        order_in_db = BridgeOrderEntity.query.get(order_id)
+        # csv = order_in_db.map_bridge_to_xml()
+        csv = order_in_db.map_bridge_to_gls_csv()
+        response["data"] = csv
 
-    """ 
-    Customer functions 
-    """
-    @app.route("/customer/is_duplicate/<erp_nrs>")
-    def gcbridge_customer_is_duplicate(erp_nrs):
-        # Get the erp_nums as list
-        erp_nums_str = erp_nrs.split(',')
-        erp_nums_list = list(map(int, erp_nums_str))
+        return jsonify(response)
 
-        sw5_customers = []
+    """     ##################  """
+    """     Customer functions  """
+    """     ##################  """
+
+    @app.route("/customer/is_duplicate", methods=['POST', 'GET'])
+    def gcbridge_customer_is_duplicate():
+        # Get the erp_nums as list from form data
+        erp_nums_list = request.form.getlist('erp_num_list[]')
+        erp_nums_list = list(map(int, erp_nums_list))
+
+        # Get the erp_num from the manual search
+        manual_search_str = request.form.get('manual_search', '')
+        manual_erp_nums = [int(nr.strip()) for nr in manual_search_str.split(',') if nr.strip().isdigit()]
+
+        # Extend the erp_nums_list with the manually entered numbers
+        erp_nums_list.extend(manual_erp_nums)
+
+        data = {}
+
+        # Loop through all erp_nums
         for erp_nr in erp_nums_list:
-            response = SW5_2CustomerObjectEntity().get_all_customers_by_adrnr(int(erp_nr))
-            if response["success"]:
-                sw5_customers.extend(response["data"])
+            # Search in SW5 for the customer
+            response = SW5_2CustomerObjectEntity().get_all_customers_by_adrnr(erp_nr)
+            sw5_customer = response["data"] if response["success"] else None
 
-        bridge_customers = BridgeCustomerEntity.query.filter(or_(BridgeCustomerEntity.erp_nr == erp_num for erp_num in erp_nums_list)).all()
-        bridge_customer_addresses = BridgeCustomerAddressEntity.query.filter(or_(BridgeCustomerAddressEntity.erp_nr == erp_num for erp_num in erp_nums_list)).all()
+            # Search in Bridge for the customer
+            bridge_customer = BridgeCustomerEntity.query.filter_by(erp_nr=erp_nr).first()
+
+            # Add the data to the erp_data dictionary
+            data[erp_nr] = {
+                "erp_nr": erp_nr,
+                "sw5_customer": sw5_customer,
+                "bridge_customer": bridge_customer
+            }
 
         return render_template("classei/customer/customers_duplicates.html",
-                               erp_nrs=erp_nums_list,
-                               bridge_customers=bridge_customers,
-                               bridge_customer_addresses=bridge_customer_addresses,
-                               sw5_customers=sw5_customers
+                               data=data
                                )
 
-    @app.route("/customer/remove_webshop_id/<erp_nr>/_action")
-    def gcbridge_customer_remove_webshop_id(erp_nr):
-        response = {
-            'status': 'success',
-            'message': "",
-            'data': {}
-        }
-        try:
-            erp_obj = ERPConnectionEntity()
-            erp_obj.connect()
-            client = ERPAdressenEntity(id_value=erp_nr)
-            webshop_id = client.get_("WShopID")
-            client.remove_webshop_id()
-            response["status"] = "success"
-            response["message"] = f"Webshop ID {webshop_id} was removed from client {erp_nr}"
-        except Exception as e:
-            print(f"Error on remove webshop id: {webshop_id} from client: {erp_nr}")
-            response["status"] = 'error'
+    @app.route('/customer/bridge/update_erp_nr_and_api_id/', methods=['POST'])
+    def gcbridge_customer_bridge_update_erp_nr_and_api_id():
+        customer_id = request.form.get('customerId')
+        new_erp_nr = request.form.get('newErpNr')
+        new_api_id = request.form.get('newApiId', None)  # Default to None if not provided
 
-    @app.route("/customer/erp/search/_action")
-    def gcbridge_customer_erp_search(dataset, field, value):
-        response = {
-            'status': 'success',
-            'message': "",
-            'data': {}
-        }
+        if not all([customer_id, new_erp_nr]):  # Check if any of the essential fields are missing
+            return jsonify({"status": "error", "message": "Both Customer ID and new ERP number must be provided."})
+
+        try:
+            # Update the customer
+            customer = BridgeCustomerEntity.query.get(customer_id)
+            if customer is None:
+                return jsonify({"status": "error", "message": "Customer not found"})
+
+            customer.erp_nr = new_erp_nr
+
+            if new_api_id:  # Update only if new_api_id is not None
+                customer.api_id = new_api_id
+
+            # Update the addresses
+            for i, address in enumerate(customer.addresses):
+                address.erp_nr = new_erp_nr
+                address.erp_ansnr = i
+
+            db.session.commit()
+
+            return jsonify({"status": "success", "message": "ERP Nr updated successfully."})
+
+        except Exception as e:
+            return jsonify({"status": "error", "message": f"Failed to update ERP Nr: {e}"})
+
+    @app.route("/customer/bridge/merge_customers/<false_customer_id>/<right_customer_id>/_action", methods=['POST'])
+    def gcbridge_customer_bridge_merge_customers(false_customer_id, right_customer_id):
         erp_obj = ERPConnectionEntity()
         erp_obj.connect()
-
-        ds_customer = erp_obj.get_erp().DataSetInfos(dataset).CreateDataSetEx()
-        ds_customer.Indices(field).Select()
-        ds_customer.WildcardRange(value)
-        ds_customer.First()
-
-        print(f"{field} = {value} found in {dataset} {ds_customer.RecordCount}x")
-        while not ds_customer.EOF:
-            print(ds_customer.Fields("AdrNr").AsString)
-            ds_customer.Next()
-
+        response = Bridge2ObjectCustomerController(erp_obj=erp_obj).merge_customer_and_relations(
+            false_customer_id=false_customer_id,
+            right_customer_id=right_customer_id
+        )
         erp_obj.close()
 
-    @app.route("/customer/bridge/delete/address/<id>/_action")
+        return jsonify(response)
+
+    @app.route("/customer/sw5/merge/<false_erp_nr>/<right_erp_nr>/_action", methods=['POST'])
+    def gcbridge_customer_sw5_merge(false_erp_nr, right_erp_nr):
+        # Define the return
+        response = {
+            'status': 'success',
+            'message': [],
+            'errors': [],
+            'data': {}
+        }
+        # Get False customer
+        false_customer_sm = SW5_2CustomerObjectEntity().get_customer(customer_id=false_erp_nr, is_number_not_id=True)
+        if 'message' in false_customer_sm and 'More than one result' in false_customer_sm['message']:
+            response['errors'].append(f"'Falsche' AdrNr. {false_erp_nr} gibt es bereits.<br/> {false_customer_sm['message']}")
+            return jsonify(response)
+        elif 'message' in false_customer_sm:
+            response['message'].append(false_customer_sm['message'])
+            return jsonify(response)
+        false_customer = SW5_2CustomerObjectEntity().get_customer(customer_id=false_customer_sm['data']['id'])
+
+        # Get Right customer
+        right_customer_sm = SW5_2CustomerObjectEntity().get_customer(customer_id=right_erp_nr, is_number_not_id=True)
+        if 'message' in right_customer_sm and 'More than one result' in right_customer_sm['message']:
+            response['errors'].append(f"'Richtige' AdrNr. {right_erp_nr} gibt es bereits.<br/> {right_customer_sm['message']}")
+            return jsonify(response)
+        elif 'message' in right_customer_sm:
+            response['message'].append(right_customer_sm['message'])
+            return jsonify(response)
+        right_customer = SW5_2CustomerObjectEntity().get_customer(customer_id=right_customer_sm['data']['id'])
+
+        # Password Change Date
+        false_customer_passwordchangedate = datetime.strptime(false_customer['data']['passwordChangeDate'], "%Y-%m-%dT%H:%M:%S+%f")
+        right_customer_passwordchangedate = datetime.strptime(right_customer['data']['passwordChangeDate'], "%Y-%m-%dT%H:%M:%S+%f")
+
+        # We use the fields and values from the right customer. if the password change date from the false
+        # customer is more recent, we use its fields and values for the right customer
+        if false_customer_passwordchangedate > right_customer_passwordchangedate:
+            response['message'].append("Daten vom 'falschen' Kunden übernommen.")
+            right_customer['data']['passwordChangeDate'] = false_customer['data']['passwordChangeDate']
+            right_customer['data']['hashPassword'] = false_customer['data']['hashPassword']
+            right_customer['data']['encoderName'] = false_customer['data']['encoderName']
+            right_customer['data']['lastLogin'] = false_customer['data']['lastLogin']
+            right_customer['data']['email'] = false_customer['data']['email']
+
+        # Copy all addresses from the false customer to the right customer
+        right_customer_address_ids = {address['id'] for address in right_customer['data']['addresses']}
+        for false_address in false_customer['data']['addresses']:
+            if false_address['id'] not in right_customer_address_ids:
+                false_address = SW5_2AddressObjectEntity().get_address(false_address['id'])
+                false_address['data']['customer']['id'] = right_customer['data']['id']
+
+                SW5_2AddressObjectEntity().update(false_address)
+
+        # Change the customer id of all orders from false to right
+        right_customer_order_ids = {order['id'] for order in SW5_2OrderObjectEntity().get_orders_by_customerId(customerId=right_customer['data']['id'])}
+        false_customer_orders = SW5_2OrderObjectEntity().get_orders_by_customerId(customerId=false_customer['data']['id'])
+
+        for order in false_customer_orders:
+            if order['id'] not in right_customer_order_ids and order['number'] != "0":
+                order['customerId'] = right_customer['data']['id']
+                response['message'].append(f"Bestellung {order['number']} übernommen.")
+
+                SW5_2OrderObjectEntity().update(order)
+
+        # We get the addresses from the adjusted API Endpoint. It adds the addresses to the user
+        # When putting the user back, the addresses creating an error
+        # Since we just need the changed values. Lets make a new customer
+
+        # But first, lets change the "old" customers email. SW5 does not accept duplicates
+
+        temp_email_false_customer = {
+            'id': false_customer['data']['id'],
+            'email': 'info@old.com'
+        }
+
+        response_temp_email = SW5_2CustomerObjectEntity().update(temp_email_false_customer)
+
+        if not response_temp_email['success']:
+            response['status'] = response_temp_email['success']
+            response['message'].append(response_temp_email['message'])
+            response['errors'].append(response_temp_email['errors'])
+
+        new_customer = {
+                'id': right_customer['data']['id'],
+                'passwordChangeDate': right_customer['data']['passwordChangeDate'],
+                'rawPassword': false_customer['data']['hashPassword'],
+                'encoderName': right_customer['data']['encoderName'],
+                'lastLogin': right_customer['data']['lastLogin'],
+                'email': right_customer['data']['email']
+            }
+
+        response_customer = SW5_2CustomerObjectEntity().update(customer=new_customer)
+
+        if not response_customer['success']:
+            response['status'] = response_customer['success']
+            response['message'].append(response_customer['message'])
+            response['errors'].append(response_customer['errors'])
+
+        pprint(response)
+        return jsonify(response)
+
+    @app.route("/customer/bridge/delete/address/<id>/_action", methods=['DELETE'])
     def gcbridge_customer_bridge_delete_address(id):
         response = {
             'status': 'success',
@@ -858,15 +955,229 @@ def main():
             db.session.rollback()
             response['status'] = 'fail'
             response['message'] = str(e)
+        finally:
+            db.session.close()
 
         return jsonify(response)
 
+    @app.route("/customer/sw5/update_customernumber/_action", methods=["POST"])
+    def gcbridge_customer_sw5_update_customernumber():
+        customer_id = request.form.get('customerId')
+        new_erp_nr = request.form.get('newErpNr')
+
+        try:
+            updated_customer = SW5_2CustomerObjectController().change_customer_number(
+                customer_id=customer_id,
+                new=new_erp_nr,
+                is_number_not_id=False
+            )
+            return jsonify({"status": "success", "message": "ERP Nr updated successfully."})
+        except Exception as e:
+            return jsonify({"status": "error", "message": f"Failed to update SW5 Customernumber: {e}"})
+
+    @app.route("/customer/remove_webshop_id/<erp_nr>/_action")
+    def gcbridge_customer_remove_webshop_id(erp_nr):
+        response = {
+            'status': 'success',
+            'message': "",
+            'data': {}
+        }
+        try:
+            erp_obj = ERPConnectionEntity()
+            erp_obj.connect()
+            client = ERPAdressenEntity(id_value=erp_nr)
+            webshop_id = client.get_("WShopID")
+            client.remove_webshop_id()
+            response["status"] = "success"
+            response["message"] = f"Webshop ID {webshop_id} was removed from client {erp_nr}"
+
+        except Exception as e:
+            print(f"Error on remove webshop id: {webshop_id} from client: {erp_nr}")
+            response["status"] = 'error'
+
+    @app.route("/customer/erp/search/<erp_nr>/_action")
+    def gcbridge_customer_erp_search(erp_nr):
+        response = {
+            'status': 'success',
+            'message': "",
+            'data': {}
+        }
+        erp_obj = ERPConnectionEntity()
+        erp_obj.connect()
+
+        customer = ERPAdressenEntity(erp_obj=erp_obj)
+        found = customer.find_("Nr", erp_nr)
+
+        if found:
+            response['data'] = {
+                'erp_nr':customer.get_("AdrNr"),
+                "address":customer.get_address_json(),
+                "webshop_id":customer.get_("WShopID"),
+            }
 
 
+        # ds_customer = erp_obj.get_erp().DataSetInfos(dataset).CreateDataSetEx()
+        # ds_customer.Indices(field).Select()
+        # ds_customer.WildcardRange(value)
+        # ds_customer.First()
 
+        erp_obj.close()
+        return jsonify(response)
 
+    @app.route("/customer/delete_in_bridge/<customer_id>/_action", methods=['DELETE'])
+    def gcbridge_customer_delete_in_bridge(customer_id):
+        try:
+            # Retrieve the customer from the database
+            customer_in_db = BridgeCustomerEntity.query.get(customer_id)
+            if not customer_in_db:
+                return jsonify(message="Customer not found"), 404
 
+            # Delete all orders related to this customer
+            orders = BridgeOrderEntity.query.filter_by(customer_id=customer_id).all()
+            for order in orders:
+                db.session.delete(order)
 
+            # Now delete the customer
+            db.session.delete(customer_in_db)
+
+            # Commit all changes to the database
+            db.session.commit()
+
+            return jsonify(message="Customer and related orders successfully deleted"), 200
+        except Exception as e:
+            print("Could not delete customer from DB with ID:", customer_id)
+            return jsonify(message=str(e))
+
+    @app.route("/customer/erp/change_webshop_id/<adrnr>/<webshop_id>/_action", methods=["POST"])
+    def gcbridge_customer_erp_change_webshop_id(adrnr, webshop_id=None):
+        """
+        Change the webshop ID of a customer in the ERP system.
+
+        This function finds a customer in the ERP system by its address number (adrnr)
+        and updates its associated webshop ID.
+
+        Parameters:
+        - adrnr (str): The address number of the customer in the ERP system.
+        - webshop_id (str, optional): The new webshop ID for the customer.
+
+        Returns:
+        - response (dict): A dictionary containing the status and message of the operation.
+        """
+
+        response = {
+            'status': 'success',
+            'message': "Successfully changed the webshop ID for the customer.",
+            'data': {}
+        }
+
+        try:
+            erp_obj = ERPConnectionEntity()
+            erp_obj.connect()
+
+            erp_customer = ERPAdressenEntity(erp_obj=erp_obj)
+            found = erp_customer.find_(value=adrnr)
+
+            if found:
+                erp_customer.remove_webshop_id()
+                erp_customer.add_webshop_id(webshop_id=webshop_id)
+
+            erp_obj.close()
+
+        except Exception as e:
+            # On error, update the response object with the error status and message
+            response['status'] = 'error'
+            response['message'] = f"Error changing the webshop ID for customer {adrnr}. Error: {str(e)}"
+
+        return response
+
+    @app.route("/customer/erp/remove_webshop_id/<adrnr>/_action", methods=["POST"])
+    def gcbridge_customer_erp_remove_webshop_id(adrnr):
+        """
+        Remove the webshop ID of a customer in the ERP system.
+
+        This function finds a customer in the ERP system by its address number (adrnr)
+        and removes its associated webshop ID.
+
+        Parameters:
+        - adrnr (str): The address number of the customer in the ERP system.
+
+        Returns:
+        - response (dict): A dictionary containing the status and message of the operation.
+        """
+
+        response = {
+            'status': 'success',
+            'message': "Successfully removed the webshop ID for the customer.",
+        }
+
+        try:
+            erp_obj = ERPConnectionEntity()
+            erp_obj.connect()
+
+            erp_customer = ERPAdressenEntity(erp_obj=erp_obj)
+            found = erp_customer.find_(value=adrnr)
+
+            if found:
+                erp_customer.remove_webshop_id()
+
+            erp_obj.close()
+
+        except Exception as e:
+            # On error, update the response object with the error status and message
+            response['status'] = 'error'
+            response['message'] = f"Error removing the webshop ID for customer {adrnr}. Error: {str(e)}"
+
+        return response
+
+    @app.route("/customer/delete_in_sw5/<customer_id>/_action", methods=['DELETE'])
+    def gcbridge_customer_delete_in_sw5(customer_id):
+        response = {
+            'status': 'success',
+            'message': "",
+            'data': {}
+        }
+
+        try:
+            # Check if customer is available in sw5
+            customer_in_sw5 = SW5_2CustomerObjectEntity().get_customer(customer_id=customer_id)
+            if customer_in_sw5:
+                print(f"Found customer {customer_id} in sw5. Deleting")
+
+                response['message'] = SW5_2CustomerObjectEntity().delete_customer(customer_id=customer_id)
+
+                return jsonify(response)
+        except Exception as e:
+            print(f"Could not delete customer {customer_id}. Error: {e}")
+
+    @app.route("/customer/delete_in_erp/<adrnr>/_action", methods=['DELETE', 'POST'])
+    def gcbridge_customer_delete_in_erp(adrnr):
+        response = {
+            'status': 'success',
+            'message': [],
+            'errors': [],
+            'data': {}
+        }
+        erp_obj = ERPConnectionEntity()
+        erp_obj.connect()
+
+        try:
+
+            erp_customer = ERPAdressenEntity(erp_obj=erp_obj)
+            found = erp_customer.find_(value=adrnr)
+
+            if found:
+                result = erp_customer.delete_dataset_with_check()
+                response['messages'].append(f"Kunde {adrnr} wurde gelöscht!")
+
+        except Exception as e:
+            # On error, update the response object with the error status and message
+            response['status'] = 'error'
+            response['errors'].append(f"Error deleting customer {adrnr}. Error: {str(e)}")
+
+        finally:
+            erp_obj.close()
+
+        return response
 
 # EOF main
 

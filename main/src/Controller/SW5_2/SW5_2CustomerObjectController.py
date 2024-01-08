@@ -249,6 +249,8 @@ class SW5_2CustomerObjectController(SW5_2ObjectController):
 
         if customer_in_db:
             customer_for_db = customer_in_db.update_entity(mapped_bridge_customer)
+            # Since we do not compare the addresses, we simply delete every address
+            customer_in_db.addresses.clear()
         else:
             customer_for_db = mapped_bridge_customer
 
@@ -261,6 +263,7 @@ class SW5_2CustomerObjectController(SW5_2ObjectController):
             mapped_bridge_address.erp_ansnr = address_index
             mapped_bridge_address.erp_aspnr = 0
             address_index += 1
+
             customer_address_in_db = None
             try:
                 # Validate the extracted data
@@ -298,3 +301,20 @@ class SW5_2CustomerObjectController(SW5_2ObjectController):
         self.commit_with_errors()
 
         return customer_for_return
+
+    def change_customer_number(self, customer_id, new, is_number_not_id=False):
+        sw5_customer = SW5_2CustomerObjectEntity().get_customer(customer_id=customer_id, is_number_not_id=is_number_not_id)
+
+        # When using id, we do not get ["total"] so check for existence and if check for
+        if "total" not in sw5_customer or sw5_customer["total"] == 1:
+            response = SW5_2CustomerObjectEntity().set_customer_number_by_id(
+                customer_id=sw5_customer["data"]["id"],
+                number=new
+            )
+            return True
+        else:
+            # This line will print the issue,
+            error_message = f"{sw5_customer['total']} Customers found with {customer_id}"
+            print(error_message)
+            # Raise an exception if to handle this situation as an error in the Flask route
+            raise ValueError(error_message)

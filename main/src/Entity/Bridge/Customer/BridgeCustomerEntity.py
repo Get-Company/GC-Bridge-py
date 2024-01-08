@@ -111,6 +111,9 @@ class BridgeCustomerEntity(db.Model):
             "WShopAdrKz": 1,
             "WShopID": self.api_id
         }
+        if self.ustid:
+            updated_fields_list["UStId"] = self.ustid
+
         return updated_fields_list
 
     def map_sw6_to_db(self, customer: dict):
@@ -128,8 +131,8 @@ class BridgeCustomerEntity(db.Model):
         self.ustid = customer['defaultBillingAddress']['vatId']
         self.email = customer["email"]
         # Parse Date
-        date_firstLogin = datetime.strptime(customer["firstLogin"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
-        date_changed = datetime.strptime(customer["changed"], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
+        date_firstLogin = self._get_date_or_none(customer["firstLogin"])
+        date_changed = self._get_date_or_none(customer["changed"])
         self.created_at = date_firstLogin
         self.updated_at = date_changed
 
@@ -145,6 +148,15 @@ class BridgeCustomerEntity(db.Model):
                     self.erp_liansnr = index
 
         return self
+
+    def map_db_to_sw5(self, customer):
+        pass
+
+    def _get_date_or_none(self, date):
+        if date:
+            return datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
+        else:
+            return None
 
     def __repr__(self):
         # text = f"BridgeCustomerEntity: {self.id} - {self.erp_nr}"

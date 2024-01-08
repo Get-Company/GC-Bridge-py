@@ -1,4 +1,6 @@
-from main.src.Entity.SW5_2.SW5_2ObjectEntity import SW5_2ObjectEntity
+from pprint3x import pprint
+
+from main.src.Entity.SW5_2.SW5_2ObjectEntity import SW5_2ObjectEntity, APIRequestException
 
 
 class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
@@ -9,11 +11,8 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
         url = f"/customers/{customer_id}"
         if is_number_not_id:
             url += '?useNumberAsId=true'
-        try:
-            response = self.get(url)
-            return response
-        except Exception as e:
-            raise Exception(f"Error retrieving customer with ID '{customer_id}': {e}")
+        response = self.get(url)
+        return response
 
     def get_customer_addresses_by_id(self, address_id):
         url = f"/addresses/{address_id}"
@@ -52,11 +51,30 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
         except Exception as e:
             raise Exception(f"Error retrieving customers with same email '{email}': {e}")
 
+    def update(self, customer):
+        url = f"/customers/{customer['id']}"
+        pprint(customer)
+        response = self.put(url=url, data=customer)
+
+        return response
+
+    def delete_customer(self, customer_id):
+        if not customer_id:
+            return "No customer ID given"
+
+        url = f"/customers/{customer_id}"
+        try:
+            response = self.delete(url)
+            return response
+        except Exception as e:
+            raise Exception(f"Error on deleting the Customer: {customer_id}. Error: {e}")
+
     """
     ### 
     Addresses
     ###
     """
+
     def get_addresses(self, address_id):
         url = f"/addresses/{address_id}"
         try:
@@ -76,3 +94,4 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
             return response
         except Exception as e:
             raise Exception(f"Error on updating Adrnr: {number} on Customer_ID: {customer_id}: {e}")
+

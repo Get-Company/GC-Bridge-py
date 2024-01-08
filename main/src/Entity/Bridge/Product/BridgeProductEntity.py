@@ -45,6 +45,7 @@ class BridgeProductEntity(db.Model):
     wshopkz = db.Column(db.Boolean(), nullable=True)
     shipping_cost_per_bundle = db.Column(db.Float(), nullable=True)
     shipping_bundle_size = db.Column(db.Integer(), nullable=True)
+    sort = db.Column(db.Integer(), nullable=True)
 
     created_at = db.Column(db.DateTime(), nullable=True, default=' ')
 
@@ -146,7 +147,9 @@ class BridgeProductEntity(db.Model):
         self.image = erp_entity.get_images()
         self.description = erp_entity.get_("Bez5")
         self.description_short = erp_entity.get_("Bez2")
-        self.stock = erp_entity.get_("VerfMge")
+
+        self.stock = erp_entity.get_("LagMge")
+
         if erp_entity.get_("Sel6"):
             self.factor = erp_entity.get_("Sel6")
         else:
@@ -164,6 +167,7 @@ class BridgeProductEntity(db.Model):
         self.shipping_cost_per_bundle = erp_entity.get_("Sel70")  # Frachtkostenpauschale
         self.shipping_bundle_size = erp_entity.get_("Sel71")  # Frachtkostenaufschlag pro Stück
 
+        self.sort = erp_entity.get_("Sel19")  # Selektions-Feld Sortierung
 
         # Relations are set in the Bridge2ObjectProductController
 
@@ -226,6 +230,9 @@ class BridgeProductEntity(db.Model):
         elif self.prices:
             # If the product has at least one price, check the current price and return the shipping cost if applicable.
             current_price = self.get_current_price()
+            # if there is a factor
+            if self.factor:
+                current_price = current_price / self.factor
             if current_price <= no_shipping_from:
                 # If the current price is below the threshold for free shipping, return the shipping cost.
                 if isinstance(shipping, str):
@@ -266,7 +273,6 @@ class BridgeProductTranslationEntity(db.Model):
         self.image = entity.image
         self.description = entity.description
         return True
-
 
 
 def map_product_erp_language_to_bridge(dataset, entity, language, img=None):

@@ -1,6 +1,7 @@
 from main.src.Entity.SW5_2.SW5_2ObjectEntity import SW5_2ObjectEntity
 from datetime import datetime, date, timedelta
 
+
 class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
     def __init__(self):
         super().__init__()
@@ -131,5 +132,14 @@ class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
             response = self.put('/orders/%s' % order_id, data)['data']
             return response
         except Exception as e:
+            print(e)
             raise Exception(f"Error on updating Order- and Payment-Status for OrderId: {order_id}: {e}")
 
+    def update(self, order):
+        url = '/orders'
+        data = order
+        try:
+            response = self.put('/orders/%s' % order['id'], data)['data']
+            return response
+        except Exception as e:
+            raise Exception(f"Error on updating Order: {order['id']} on Customer_ID: {order['customerId']}: {e}")

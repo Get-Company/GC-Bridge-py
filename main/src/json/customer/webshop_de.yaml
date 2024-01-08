@@ -19,8 +19,8 @@
   VtrNr: 99
   #
   # Tab Gesperrt / Händler / Euro
-  #
-  GspKz: 1
+# Geändert am 28.08.2023 - Nicht mehr notwendig den Kunden zu sperren
+  GspKz: 0
   #
   # Tab Rabatt
   #

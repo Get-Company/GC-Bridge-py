@@ -8,8 +8,14 @@ import logging
 
 
 class ERPConnectionEntity:
-    def __init__(self, mandant="58"):
+    _instance = None  # Singleton instance
+    _connection = None  # Connection instance
 
+    def __init__(self, mandant="58"):
+        """
+        Initialize the ERPConnectionEntity.
+        :param mandant: The default mandant. Defaults to "58".
+        """
         self.mandant = None
         self.erp = None
         self.mand_state = None
@@ -34,6 +40,9 @@ class ERPConnectionEntity:
         # self.connect()
 
     def __del__(self):
+        """
+        Deinitialize the ERPConnectionEntity.
+        """
         self.close()
 
     """
@@ -51,19 +60,26 @@ class ERPConnectionEntity:
 
     def get_erp(self):
         """
-        Check if erp ist set and return it. The pythoncom.CoInitialize is necessary for the flask server.
-        It initializes the com instance for the calling thread. So its callablöe multiple times (hopefully)
+        Check if erp is set and return it. The pythoncom.CoInitialize is necessary for the flask server.
+        It initializes the com instance for the calling thread. So it's callable multiple times (hopefully)
         :return: com object erp BpNT.Application
         """
         if self.erp:
             return self.erp
 
-
     # Mandant
     def set_mandant(self, mandant):
+        """
+        Set the mandant.
+        :param mandant: The mandant to set.
+        """
         self.mandant = str(mandant)
 
     def get_mandant(self):
+        """
+        Get the mandant.
+        :return: The mandant if it is available, False otherwise.
+        """
         if self.mandant:
             return self.mandant
         else:
@@ -81,12 +97,14 @@ class ERPConnectionEntity:
         self.mand_state = self.get_erp().GetMandState()
 
     def get_mandant_state(self):
+        """
+        Get the mandant state.
+        :return: The mandant state if it is available.
+        """
         if self.mand_state:
             self.logging.info(
-                "Getting Mandant State: %s \n 0=ok, 1=Tageswechsel durchgeführt, 2=Parameteränderung durchgeführt" % self.mand_state)
+                "Getting Mandant State: %s \\n 0=ok, 1=Tageswechsel durchgeführt, 2=Parameteränderung durchgeführt" % self.mand_state)
             return self.mand_state
-
-
 
     """
     Functions
@@ -127,6 +145,3 @@ class ERPConnectionEntity:
             self.logging.info("ERP is closed")
             print("Closed: This is ERP: %s" % self.get_erp())
             return True
-
-    def set_cursor_to_field_value(self, field, value):
-        self.dataset.FindKey(field, value)

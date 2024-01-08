@@ -25,6 +25,7 @@ class ERPArtikelEntity(ERPDatasetObjectEntity):
             prefill_json_directory=self.prefill_json_directory
         )
 
+
     """ Special Queries """
     def get_einheit(self):
         self.find_(value=self.dataset_id_value)
@@ -46,9 +47,19 @@ class ERPArtikelEntity(ERPDatasetObjectEntity):
 
             print("Preis:", price)
         if end_date is None:
-            end_date = datetime(start_date.year, start_date.month + 2, 1) - timedelta(days=1)
+            # Beware for the 11th and 12th month. We would have the 13th and 14th month,
+            # thatswhy we subtract 12 Month from it
 
-        print("End of next month", end_date)
+            end_date_year = start_date.year
+            end_date_month = start_date.month + 2
+
+            if end_date_month > 12:
+                end_date_month -= 12
+                end_date_year += 1
+
+            end_date = datetime(end_date_year, end_date_month, 1) - timedelta(days=1)
+
+        print("Startdate:", start_date, "End of the month after the next month:", end_date)
         self.update_("Vk0.SVonDat", start_date)
         self.update_("Vk0.SBisDat", end_date)
         self.update_("Vk0.SPr", price)
@@ -57,4 +68,20 @@ class ERPArtikelEntity(ERPDatasetObjectEntity):
         self.update_("Vk1.SPr", price)
 
         self.post_()
+
+    def reset_prices(self):
+        self.edit_()
+
+        self.update_("Vk0.SVonDat", "")
+        self.update_("Vk0.SBisDat", "")
+        self.update_("Vk0.SPr", 0)
+        self.update_("Vk0.SRabKz", True)
+        self.update_("Vk1.SVonDat", "")
+        self.update_("Vk1.SBisDat", "")
+        self.update_("Vk1.SPr", 0)
+        self.update_("Vk1.SRabKz", True)
+
+        self.post_()
+
+
 

@@ -62,7 +62,14 @@ class BridgeCustomerContactEntity(db.Model):
         self.api_id = address["id"]
         self.first_name = address["firstName"]
         self.last_name = address["lastName"]
-        self.title = address["title"]
+        # Assign value to self.title based on the content of address["title"]
+        if address["title"] == 'mr':
+            self.title = "Herr"  # Set to "Herr" for male title
+        elif address["title"] == 'mrs':
+            self.title = "Frau"  # Set to "Frau" for female title
+        else:
+            self.title = address["title"]  # Use the title field directly if it's neither 'mr' nor 'mrs'
+
         self.email = customer["email"]
 
         return self

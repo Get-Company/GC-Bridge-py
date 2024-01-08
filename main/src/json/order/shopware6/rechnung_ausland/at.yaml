@@ -3,7 +3,7 @@
   # Tab Adresse
   #
   SuchBeg: "CL"
-  VsdArt: 11
+  VsdArt: 12
   ZahlArt: 22
   #
   # Tab
@@ -13,11 +13,9 @@
   # Tab Adr.-Kennzeichen
   #
   # 14 Tage 2% - 30 Tage rein netto
-  ZahlBed: "30 Tage rein netto"
+  ZahlBed: "14 Tage 2% - 30 Tage rein netto"
 
   #
   # Tab Vorgaben
   #
-  TextKz1: 0
-  TextKz3: 1
-
+  TextKz1: 1

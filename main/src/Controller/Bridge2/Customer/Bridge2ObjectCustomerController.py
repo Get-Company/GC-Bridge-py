@@ -2,6 +2,7 @@ from sqlalchemy.exc import NoResultFound
 
 from main.src.Controller.Bridge2.Bridge2ObjectController import Bridge2ObjectController
 import sqlalchemy
+from main import db
 
 # ERP Entities
 from main.src.Entity.ERP.ERPAdressenEntity import ERPAdressenEntity
@@ -263,6 +264,59 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
         except Exception as e:
             print(f"Could not find right SW customer with adrnr {right_adrnr}: {e}")
             right_sw_customer = None
+
+    def merge_customer_and_relations(self, false_customer_id, right_customer_id):
+        """
+        Merge relations of a wrong customer to the right customer.
+
+        This function transfers all related addresses and orders from the wrong customer
+        to the right customer. After successful transfer, the wrong customer is deleted.
+
+        Parameters:
+        - false_customer_id: ID of the wrong customer to be merged.
+        - right_customer_id: ID of the correct customer to which data should be transferred.
+
+        Returns:
+        - response (dict): A dictionary containing the status, message, and any related data.
+        """
+
+        response = {
+            'status': 'success',
+            'message': "Successfully merged wrong customer into right customer.",
+            'data': {}
+        }
+
+        try:
+            # Retrieve the entities for wrong and right customers
+            wrong_customer = BridgeCustomerEntity().query.get(false_customer_id)
+            right_customer = BridgeCustomerEntity().query.get(right_customer_id)
+
+            # Transfer all addresses from wrong customer to the right customer
+            for address in wrong_customer.addresses:
+                address.customer = right_customer
+                db.session.add(address)  # Add the updated address to the database session
+
+            # Transfer all orders from wrong customer to the right customer
+            for order in wrong_customer.orders:
+                order.customer = right_customer
+                db.session.add(order)  # Add the updated order to the database session
+
+            # Delete the wrong customer
+            db.session.delete(wrong_customer)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+        except Exception as e:
+            # On error, rollback the database transaction and update the response object
+            db.session.rollback()
+            response['status'] = 'error'
+            response['message'] = f"Error merging customers. Could not merge Wrong Customer {false_customer_id} into Right Customer {right_customer_id}. Error: {str(e)}"
+
+        return response
+
+
+
 
 
 

@@ -98,9 +98,11 @@ class Bridge2ObjectProductController(Bridge2ObjectController):
         mapped_erp_price = BridgePriceEntity().map_erp_to_db(erp_entity=self.erp_entity)
 
         if bridge_price_entity:
+            print("Found Price Entity - Update", bridge_price_entity.id, bridge_entity.id)
             bridge_price_entity.update_entity(entity=mapped_erp_price)
             bridge_entity.prices = bridge_price_entity
         else:
+            print("New Price Entity - Create", bridge_entity.id)
             bridge_entity.prices = mapped_erp_price
 
         return bridge_entity

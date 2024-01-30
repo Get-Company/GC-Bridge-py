@@ -71,7 +71,8 @@ class BridgeProductEntity(db.Model):
     prices = db.relationship(
         'BridgePriceEntity',
         uselist=False,  # It's a one-to-one, is one-to-many a better idea?
-        back_populates="product")
+        back_populates="product",
+        cascade="all, delete")
 
     # Tax one - to - one
     tax_id = db.Column(db.Integer, db.ForeignKey('bridge_tax_entity.id'))
@@ -81,7 +82,8 @@ class BridgeProductEntity(db.Model):
     medias = db.relationship(
         'BridgeMediaEntity',
         secondary=media_prod,
-        back_populates="products"
+        back_populates="products",
+        cascade="all, delete"
     )
 
     # Order Relation many - to - many

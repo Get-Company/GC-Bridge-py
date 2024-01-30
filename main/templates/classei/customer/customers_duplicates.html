@@ -41,15 +41,16 @@
                 <h3>SW5</h3>
             </div>
             <div class="card-body">
+                {% if data.sw5_customer %}
                 {% for sw5_account in data.sw5_customer %}
+                <p>
+                    AdrNr: {{ sw5_account.number }}
+                    <br/>
+                    SW5 ID: {{ sw5_account.id }}
+                    <br/>
+                    E-Mail: {{ sw5_account.email }}
+                </p>
 
-                    <p>
-                        AdrNr: {{ sw5_account.number }}
-                        <br/>
-                        SW5 ID: {{ sw5_account.id }}
-                        <br/>
-                        E-Mail: {{ sw5_account.email }}
-                    </p>
                 <!-- Addressnummer ändern -->
                 <form class="sw5UpdateForm">
                     <input type="hidden" class="customerId" value="{{sw5_account.id}}">
@@ -110,9 +111,16 @@
                     SW5 ID: {{ sw5_address.id }}
                 </p>
 
+
                 <hr>
+
                 {% endfor %}
                 {% endfor %}
+                {% else %}
+                <h5>{{ erp_nr }} Gibts ned - sorry</h5>
+                <img class='img-thumbnail mx-auto d-block'
+                     src='https://picsum.photos/seed/{{loop.index + 10}}/320/200?grayscale'>
+                {% endif %}
 
 
             </div>
@@ -145,8 +153,9 @@
                     Bridge ID: {{ data.bridge_customer.id }}
                 </p>
                 {% else %}
-                    <h5>{{erp_nr}} Gibts ned - sorry</h5>
-                    <img class='img-thumbnail mx-auto d-block' src='https://loremflickr.com/g/320/200/beach,mountain/all?random={{loop.index + 20}}'>
+                <h5>{{ erp_nr }} Gibts ned - sorry</h5>
+                <img class='img-thumbnail mx-auto d-block'
+                     src='https://picsum.photos/seed/{{loop.index + 20}}/320/200?grayscale'>
                 {% endif %}
                 <!-- Addressnummer ändern -->
                 <form class="bridgeUpdateForm">
@@ -279,7 +288,7 @@
                         </button>
                     </div>
                 </form>
-                <hr />
+                <hr/>
 
 
             </div>
@@ -632,7 +641,7 @@
                 if (!fetchedData.data.address) {
                     document.getElementById("erp_body_{{erp_nr}}").innerHTML =
                         "<h5>{{erp_nr}} Gibts ned - sorry</h5>" +
-                        "<img class='img-thumbnail mx-auto d-block' src='https://loremflickr.com/g/320/200/beach,mountain/all?random={{loop.index}}'>";
+                        "<img class='img-thumbnail mx-auto d-block' src='https://picsum.photos/seed/{{loop.index + 40}}/320/200?grayscale'>";
                     return;
                 }
                 console.log(fetchedData)
@@ -792,6 +801,7 @@
     function showSpinner(spinner_button) {
         spinner_button.find('.spinner-border').removeClass('d-none');
     }
+
     function hideSpinner(spinner_button) {
         spinner_button.find('.spinner-border').addClass('d-none');
     }
@@ -818,13 +828,13 @@
         toastContainer.insertAdjacentHTML('beforeend', toastTemplate);
         var toastElement = toastContainer.lastChild;
 
-        if(timeout) {
+        if (timeout) {
             var countdown = timeout / 1000;
             // Start countdown
-            var countdownInterval = setInterval(function() {
+            var countdownInterval = setInterval(function () {
                 countdown -= 1;
                 toastElement.querySelector('.countdown').textContent = countdown + 's';
-                if(countdown <= 0) clearInterval(countdownInterval);
+                if (countdown <= 0) clearInterval(countdownInterval);
             }, 1000);
 
         }
@@ -834,14 +844,26 @@
     }
 
     // Resend the main form
-    function main_form_resend(timeout=2000){
-        // Send the form again, to reload the results
-        addToast('Reload', `Die Seite wird in ${timeout/1000}s neu geladen`, timeout)
+    function main_form_resend(timeout = 0) {
+        // Findet das Formularelement
         var form = document.querySelector('form[action="/customer/is_duplicate"]');
-        setTimeout(function() {
+        if (!form) {
+            console.error('Formular nicht gefunden!');
+            return;
+        }
+
+        // Fügt eine Benachrichtigung hinzu und sendet das Formular nach einer Verzögerung, falls ein Timeout angegeben wurde
+        if (timeout > 0) {
+            addToast('Reload', `Die Seite wird in ${timeout / 1000}s neu geladen`, timeout);
+            setTimeout(function () {
+                form.submit();
+            }, timeout); // ms delay 5s = 5000
+        } else {
+            // Sendet das Formular sofort, wenn kein Timeout angegeben wurde
             form.submit();
-        }, timeout); // ms delay 5s = 5000
+        }
     }
+
 
 </script>
 {% endblock %}

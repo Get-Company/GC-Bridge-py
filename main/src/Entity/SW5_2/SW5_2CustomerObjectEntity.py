@@ -41,6 +41,15 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
         except Exception as e:
             raise Exception(f"Error retrieving customers with same adrnr '{adrnr}': {e}")
 
+    def get_all_customers_without_standard_addresses(self):
+        url = "/customers?filter[0][property]=defaultBillingAddress&filter[0][expression]=NULL&filter[1][property]=defaultShippingAddress&filter[1][expression]=NULL&limit=20"
+
+        try:
+            response = self.get(url=url)
+            return response
+        except Exception as e:
+            raise Exception(f"Error retrieving customers without standard addresses: {e}")
+
     def get_all_customers_by_email(self, email):
         url = "/customers"
         url = url + f'?filter[email]={email}'

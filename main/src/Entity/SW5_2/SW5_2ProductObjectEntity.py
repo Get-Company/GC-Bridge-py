@@ -33,8 +33,8 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
             "supplier": "Classei",
             "mainDetail": {
                 "number": entity.erp_nr,
-                # "inStock": self.get_stock(entity),
-                "maxPurchase": 20000,
+                "inStock": entity.stock,
+                "maxPurchase": self.get_max_purchase(entity=entity),
                 "minPurchase": entity.min_purchase,
                 "packUnit": "Stck" if "% Stck" in entity.unit else entity.unit,
                 "purchaseSteps": entity.purchase_unit,
@@ -71,6 +71,10 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
             return 1000 * entity.purchase_unit
         else:
             return entity.stock
+
+    def get_max_purchase(self, entity):
+        max_purchase = 2000 * entity.purchase_unit
+        return max_purchase
 
     def get_product_by_id(self, id, use_order_number=False):
         """
@@ -246,6 +250,10 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
             print(f"Couldn't find product by product.id:", bridge_product_id, e)
             return False
 
+        if product.wwshopkz != 1:
+            print(f"No update for {product.erp_nr}. WShopKz is: {product.wshopkz}. Leaving update method")
+            return
+
         try:
             sw5_product = self.get_product_by_id(product.erp_nr, True)
         except Exception as e:
@@ -263,6 +271,9 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
     def create_product(self, product_id):
         try:
             product = BridgeProductEntity.query.get(product_id)
+            if product.wwshopkz != 1:
+                print(f"Ca not create {product.erp_nr}. WShopKz is: {product.wshopkz}. Leaving method")
+                return
         except Exception as e:
             print(f"Couldn't find product by product.id:", product_id, e)
             return False

@@ -270,14 +270,24 @@ def main():
 
     # erp_obj = ERPConnectionEntity(mandant="58")
     # erp_obj.connect()
-    # erp_nr = "214023"
-    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_one(erp_nr)
+    # erp_nr = "214025"
     # product = BridgeProductEntity.query.filter_by(erp_nr=erp_nr).one_or_none()
     # # Reset price
     # response = SW5_2ProductObjectEntity().set_price_by_bridge_product_object(product)
     # # Set special price
     # response = SW5_2ProductObjectEntity().set_special_price_by_bridge_product_object(product)
+    # # Update product
+    # BridgeProductEntity.query.filter_by(erp_nr='180003').delete()
     # erp_obj.close()
+
+    # Kunde nach Webshop ID
+    # erp_obj = ERPConnectionEntity(mandant=58)
+    # erp_obj.connect()
+    # erp_entity = ERPAdressenEntity(erp_obj=erp_obj, id_value='11124')
+    # erp_entity.find_by_webshop_id(webshop_id=35)
+    # print(erp_entity.get_("AdrNr"))
+    # erp_obj.close()
+
 
     # Adressen
     # ERPCustomerController(erp_obj=erp_obj).sync_changed()
@@ -311,6 +321,7 @@ def main():
     # products = MappeiProductEntity.query.filter(MappeiProductEntity.prices[.has(land="ch"))
     # products = MappeiProductEntity.query.join(MappeiProductEntity)
     # pprint(products)
+
 
     @app.route('/')
     def index():
@@ -765,6 +776,13 @@ def main():
             response = SW5_2CustomerObjectEntity().get_all_customers_by_adrnr(erp_nr)
             sw5_customer = response["data"] if response["success"] else None
 
+            # for sw5_custom in sw5_customer:
+            #     pprint(sw5_custom)
+            #     sw5_custom["lastLogin"] = datetime.strptime(sw5_custom["lastLogin"], '%Y-%m-%dT%H:%M:%S%z')
+            #     sw5_custom["changed"] = datetime.strptime(sw5_custom["changed"], '%Y-%m-%dT%H:%M:%S%z')
+            #     sw5_custom["passwordChangedDate"] = datetime.strptime(sw5_custom["passwordChangeDate"], '%Y-%m-%dT%H:%M:%S%z')
+            #     pprint(sw5_custom)
+
             # Search in Bridge for the customer
             bridge_customer = BridgeCustomerEntity.query.filter_by(erp_nr=erp_nr).first()
 
@@ -832,59 +850,74 @@ def main():
             'errors': [],
             'data': {}
         }
-        # Get False customer
-        false_customer_sm = SW5_2CustomerObjectEntity().get_customer(customer_id=false_erp_nr, is_number_not_id=True)
-        if 'message' in false_customer_sm and 'More than one result' in false_customer_sm['message']:
-            response['errors'].append(f"'Falsche' AdrNr. {false_erp_nr} gibt es bereits.<br/> {false_customer_sm['message']}")
-            return jsonify(response)
-        elif 'message' in false_customer_sm:
-            response['message'].append(false_customer_sm['message'])
-            return jsonify(response)
-        false_customer = SW5_2CustomerObjectEntity().get_customer(customer_id=false_customer_sm['data']['id'])
+        try:
+            # Get False customer
+            false_customer_sm = SW5_2CustomerObjectEntity().get_customer(customer_id=false_erp_nr, is_number_not_id=True)
+            if 'message' in false_customer_sm and 'More than one result' in false_customer_sm['message']:
+                response['errors'].append(f"'Falsche' AdrNr. {false_erp_nr} gibt es bereits.<br/> {false_customer_sm['message']}")
+                return jsonify(response)
+            elif 'message' in false_customer_sm:
+                response['message'].append(false_customer_sm['message'])
+                return jsonify(response)
+            false_customer = SW5_2CustomerObjectEntity().get_customer(customer_id=false_customer_sm['data']['id'])
+        except Exception as e:
+            response['errors'].append(f"Fehler beim Abrufen des 'falschen' Kunden: {str(e)}")
 
-        # Get Right customer
-        right_customer_sm = SW5_2CustomerObjectEntity().get_customer(customer_id=right_erp_nr, is_number_not_id=True)
-        if 'message' in right_customer_sm and 'More than one result' in right_customer_sm['message']:
-            response['errors'].append(f"'Richtige' AdrNr. {right_erp_nr} gibt es bereits.<br/> {right_customer_sm['message']}")
-            return jsonify(response)
-        elif 'message' in right_customer_sm:
-            response['message'].append(right_customer_sm['message'])
-            return jsonify(response)
-        right_customer = SW5_2CustomerObjectEntity().get_customer(customer_id=right_customer_sm['data']['id'])
+        try:
+            # Get Right customer
+            right_customer_sm = SW5_2CustomerObjectEntity().get_customer(customer_id=right_erp_nr, is_number_not_id=True)
+            if 'message' in right_customer_sm and 'More than one result' in right_customer_sm['message']:
+                response['errors'].append(f"'Richtige' AdrNr. {right_erp_nr} gibt es bereits.<br/> {right_customer_sm['message']}")
+                return jsonify(response)
+            elif 'message' in right_customer_sm:
+                response['message'].append(right_customer_sm['message'])
+                return jsonify(response)
+            right_customer = SW5_2CustomerObjectEntity().get_customer(customer_id=right_customer_sm['data']['id'])
+        except Exception as e:
+            response['errors'].append(f"Fehler beim Abrufen des 'richtigen' Kunden: {str(e)}")
 
-        # Password Change Date
-        false_customer_passwordchangedate = datetime.strptime(false_customer['data']['passwordChangeDate'], "%Y-%m-%dT%H:%M:%S+%f")
-        right_customer_passwordchangedate = datetime.strptime(right_customer['data']['passwordChangeDate'], "%Y-%m-%dT%H:%M:%S+%f")
+        try:
+            # Password Change Date
+            false_customer_passwordchangedate = datetime.strptime(false_customer['data']['passwordChangeDate'], "%Y-%m-%dT%H:%M:%S+%f")
+            right_customer_passwordchangedate = datetime.strptime(right_customer['data']['passwordChangeDate'], "%Y-%m-%dT%H:%M:%S+%f")
 
-        # We use the fields and values from the right customer. if the password change date from the false
-        # customer is more recent, we use its fields and values for the right customer
-        if false_customer_passwordchangedate > right_customer_passwordchangedate:
-            response['message'].append("Daten vom 'falschen' Kunden übernommen.")
-            right_customer['data']['passwordChangeDate'] = false_customer['data']['passwordChangeDate']
-            right_customer['data']['hashPassword'] = false_customer['data']['hashPassword']
-            right_customer['data']['encoderName'] = false_customer['data']['encoderName']
-            right_customer['data']['lastLogin'] = false_customer['data']['lastLogin']
-            right_customer['data']['email'] = false_customer['data']['email']
+            # We use the fields and values from the right customer. if the password change date from the false
+            # customer is more recent, we use its fields and values for the right customer
+            if false_customer_passwordchangedate > right_customer_passwordchangedate:
+                response['message'].append("Daten vom 'falschen' Kunden übernommen.")
+                right_customer['data']['passwordChangeDate'] = false_customer['data']['passwordChangeDate']
+                right_customer['data']['hashPassword'] = false_customer['data']['hashPassword']
+                right_customer['data']['encoderName'] = false_customer['data']['encoderName']
+                right_customer['data']['lastLogin'] = false_customer['data']['lastLogin']
+                right_customer['data']['email'] = false_customer['data']['email']
+        except Exception as e:
+            response['errors'].append("Fehler beim Vergleichen und Übernehmen der Passwortänderungsdaten: " + str(e))
 
-        # Copy all addresses from the false customer to the right customer
-        right_customer_address_ids = {address['id'] for address in right_customer['data']['addresses']}
-        for false_address in false_customer['data']['addresses']:
-            if false_address['id'] not in right_customer_address_ids:
-                false_address = SW5_2AddressObjectEntity().get_address(false_address['id'])
-                false_address['data']['customer']['id'] = right_customer['data']['id']
+        try:
+            # Copy all addresses from the false customer to the right customer
+            right_customer_address_ids = {address['id'] for address in right_customer['data']['addresses']}
+            for false_address in false_customer['data']['addresses']:
+                if false_address['id'] not in right_customer_address_ids:
+                    false_address = SW5_2AddressObjectEntity().get_address(false_address['id'])
+                    false_address['data']['customer']['id'] = right_customer['data']['id']
 
-                SW5_2AddressObjectEntity().update(false_address)
+                    SW5_2AddressObjectEntity().update(false_address)
+        except Exception as e:
+            response['errors'].append("Fehler bei der Adressübertragung: " + str(e))
 
-        # Change the customer id of all orders from false to right
-        right_customer_order_ids = {order['id'] for order in SW5_2OrderObjectEntity().get_orders_by_customerId(customerId=right_customer['data']['id'])}
-        false_customer_orders = SW5_2OrderObjectEntity().get_orders_by_customerId(customerId=false_customer['data']['id'])
+        try:
+            # Change the customer id of all orders from false to right
+            right_customer_order_ids = {order['id'] for order in SW5_2OrderObjectEntity().get_orders_by_customerId(customerId=right_customer['data']['id'])}
+            false_customer_orders = SW5_2OrderObjectEntity().get_orders_by_customerId(customerId=false_customer['data']['id'])
 
-        for order in false_customer_orders:
-            if order['id'] not in right_customer_order_ids and order['number'] != "0":
-                order['customerId'] = right_customer['data']['id']
-                response['message'].append(f"Bestellung {order['number']} übernommen.")
+            for order in false_customer_orders:
+                if order['id'] not in right_customer_order_ids and order['number'] != "0":
+                    order['customerId'] = right_customer['data']['id']
+                    response['message'].append(f"Bestellung {order['number']} übernommen.")
 
-                SW5_2OrderObjectEntity().update(order)
+                    SW5_2OrderObjectEntity().update(order)
+        except Exception as e:
+            response['errors'].append("Fehler bei der Übertragung der Bestellungen: " + str(e))
 
         # We get the addresses from the adjusted API Endpoint. It adds the addresses to the user
         # When putting the user back, the addresses creating an error
@@ -892,33 +925,45 @@ def main():
 
         # But first, lets change the "old" customers email. SW5 does not accept duplicates
 
-        temp_email_false_customer = {
-            'id': false_customer['data']['id'],
-            'email': 'info@old.com'
-        }
+        try:
+            # Änderung der E-Mail des alten Kunden
+            temp_email_false_customer = {
+                'id': false_customer['data']['id'],
+                'email': 'info@old.com'
+            }
+            response_temp_email = SW5_2CustomerObjectEntity().update(temp_email_false_customer)
 
-        response_temp_email = SW5_2CustomerObjectEntity().update(temp_email_false_customer)
+            if not response_temp_email['success']:
+                response['status'] = 'failure'
+                response['message'].append(response_temp_email['message'])
+                response['errors'].append(response_temp_email['errors'])
+        except Exception as e:
+            response['errors'].append(f"Fehler beim Ändern der E-Mail des 'falschen' Kunden: {str(e)}")
 
-        if not response_temp_email['success']:
-            response['status'] = response_temp_email['success']
-            response['message'].append(response_temp_email['message'])
-            response['errors'].append(response_temp_email['errors'])
 
-        new_customer = {
+        try:
+            # Aktualisieren des neuen Kunden mit den übernommenen Daten
+            new_customer = {
                 'id': right_customer['data']['id'],
                 'passwordChangeDate': right_customer['data']['passwordChangeDate'],
-                'rawPassword': false_customer['data']['hashPassword'],
+                'rawPassword': right_customer['data']['hashPassword'],
                 'encoderName': right_customer['data']['encoderName'],
                 'lastLogin': right_customer['data']['lastLogin'],
                 'email': right_customer['data']['email']
             }
+            response_customer = SW5_2CustomerObjectEntity().update(customer=new_customer)
 
-        response_customer = SW5_2CustomerObjectEntity().update(customer=new_customer)
+            if not response_customer['success']:
+                response['status'] = 'failure'
+                response['message'].append(response_customer['message'])
+                response['errors'].append(response_customer['errors'])
+        except Exception as e:
+            response['errors'].append(f"Fehler beim Aktualisieren des 'richtigen' Kunden: {str(e)}")
 
-        if not response_customer['success']:
-            response['status'] = response_customer['success']
-            response['message'].append(response_customer['message'])
-            response['errors'].append(response_customer['errors'])
+        # Überprüfen, ob Fehler aufgetreten sind
+        if response['errors']:
+            response['status'] = 'failure'
+            response['message'].append('Es sind Fehler aufgetreten, siehe Fehlerdetails.')
 
         pprint(response)
         return jsonify(response)
@@ -1178,6 +1223,7 @@ def main():
             erp_obj.close()
 
         return response
+
 
 # EOF main
 

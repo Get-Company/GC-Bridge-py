@@ -123,6 +123,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
     """ Create and Update Customer """
 
+
     def update_customer(self, update_fields_list, bridge_customer):
         self.edit_()
         for field_key, field_value in update_fields_list.items():

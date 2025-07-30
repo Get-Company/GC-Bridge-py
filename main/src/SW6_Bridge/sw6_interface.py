@@ -1,11 +1,10 @@
 import json
 import requests
-import logging
+from loguru import logger
 from datetime import datetime, timedelta
 from pprint import pprint
 class Sw6Interface:
     def __init__(self, config, type):
-        self.logger = logging.getLogger(__name__)
         self.__type = type
         self.config = config
         self.__sw6_client_admin_url = self.config['sw_options']['shopware_admin_api_url']

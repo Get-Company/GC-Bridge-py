@@ -7,11 +7,31 @@ from main.src.Entity.Mappei.MappeiPriceEntity import *
 from main.src.Repository.functions_repository import parse_a_date
 
 
-def get_html_content(url):
-    print('Get content from url: %s' % url)
-    html = requests.get(url)
-    html_content = lxml.html.fromstring(html.content)
-    return html_content
+def get_html_content(url: str) -> 'lxml.html.HtmlElement':
+    """
+    Fetches the HTML content of a given URL and returns it as parsed lxml HtmlElement.
+
+    Parameters:
+    url (str): The URL to retrieve the HTML content from.
+
+    Returns:
+    lxml.html.HtmlElement: The HTML content of provided URL parsed into an lxml HtmlElement.
+    """
+    try:
+        # Output the URL being accessed
+        print('Get content from url: %s' % url)
+
+        # Fetch the HTML content of the URL
+        html = requests.get(url)
+
+        # Parse HTML content using lxml
+        html_content = lxml.html.fromstring(html.content)
+
+        return html_content
+
+    except Exception as e:
+        # Log any errors or exceptions
+        print(f'Error while retrieving HTML content: {e}')
 
 
 def is_product(content):
@@ -22,69 +42,199 @@ def is_product(content):
         print('This is not a Product Page. Skip\n')
         return False
 
+def get_article_number(content):
+    """
+    This function retrieves the product's article number from the provided HTML content.
+
+    Parameters:
+    content (str): The HTML content from which to extract the product's article number.
+
+    Returns:
+    str: The product's article number as a string.
+    """
+    try:
+        # Retrieving article number using a helper function
+        number = get_itemprop(content, 'span', 'sku')
+        return number
+    except Exception as e:
+        # Logging error details in case of any exception
+        print('An error occurred while retrieving the article number: {}'.format(e))
+        return None
+
 
 def get_article_price(content):
-    is_staffel = content.find_class('product-block-prices')
-    if is_staffel:
-        price_highest = get_itemprop_att(content, 'meta', 'highPrice', 'content')
-        price_lowest_amount = get_itemprop_att(content, 'meta', 'offerCount', 'content')
-        price_lowest = get_itemprop_att(content, 'meta', 'lowPrice', 'content')
-        price = {
-            "highest": price_highest,
-            "lowest": price_lowest,
-            "lowest_amount": price_lowest_amount
-        }
-    else:
-        price = get_itemprop_att(content, 'meta', 'price', 'content')
+    """
+    This function takes the parsed HTML content and retrieves the product
+    prices. If prices are listed in ranges (staffel), it retrieves highest, lowest,
+    and lowest amount prices. If a single price is provided, it retrieves the price.
+
+    :param content: a parsed HTML content
+    :return: a dictionary with price details if staffel prices present; otherwise a single price
+    """
+    try:
+        # Check if the content contains class for staffel prices
+        is_staffel = get_itemprop_att(content, 'meta', 'offerCount', 'content')
+
+        if is_staffel:
+            # Retrieve price details if staffel prices present
+            price_highest = get_itemprop_att(content, 'meta', 'highPrice', 'content')
+            price_lowest_amount = get_itemprop_att(content, 'meta', 'offerCount', 'content')
+            price_lowest = get_itemprop_att(content, 'meta', 'lowPrice', 'content')
+            price = {
+                "highest": price_highest,
+                "lowest": price_lowest,
+                "lowest_amount": price_lowest_amount
+            }
+        else:
+            # Retrieve the price if a single price is provided
+            price = get_itemprop_att(content, 'meta', 'price', 'content')
+
+    except Exception as e:
+        print(f"Error occurred while getting article price. Exception: {e}")
+        return None
 
     return price
 
 
-def get_article_number(content):
-    number = get_itemprop(content, 'span', 'sku')
-    return number
-
-
 def get_article_name(content):
-    name = get_itemprop(content, 'title', 'name')
-    return name
+    """
+    Get the name of the article from the content.
+
+    Parameters:
+    content (str): The HTML content from which to extract the article name.
+
+    Returns:
+    str: The article name as a string.
+    """
+    try:
+        # Retrieving article name
+        name = get_itemprop(content, 'title', 'name')
+        return name
+    except Exception as e:
+        print('An error occurred while retrieving the article name: {}'.format(e))
+        return None
 
 
 def get_article_img(content):
-    img = get_itemprop_att(content, 'img', 'image', 'src')
-    return img
+    """
+    Get the image URL of the article from the content.
+
+    Parameters:
+    content (str): The HTML content from which to extract the image URL.
+
+    Returns:
+    str: The image URL as a string.
+    """
+    try:
+        # Retrieving article image URL
+        img = get_itemprop_att(content, 'img', 'image', 'src')
+        return img
+    except Exception as e:
+        print('An error occurred while retrieving the article image URL: {}'.format(e))
+        return None
 
 
 def get_article_description(content):
-    description = get_itemprop(content, 'div', 'description')
-    return description
+    """
+    Get the description of the article from the content.
+
+    Parameters:
+    content (str): The HTML content from which to extract the article description.
+
+    Returns:
+    str: The article description as a string.
+    """
+    try:
+        # Retrieving article description
+        description = get_itemprop(content, 'div', 'description')
+        return description
+    except Exception as e:
+        print('An error occurred while retrieving the article description: {}'.format(e))
+        return None
 
 
 def get_release_date(content):
-    release_date = get_itemprop_att(content, 'meta', 'releaseDate', 'content')
-    # Example string 01.01.90
-    date_obj = parse_a_date(release_date)
-    return date_obj
+    """
+    Get the release date of the article from the content.
+
+    Parameters:
+    content (str): The HTML content from which to extract the article release date.
+
+    Returns:
+    datetime: The release date of the article as a datetime object.
+    """
+    try:
+        # Retrieving raw release date string
+        release_date = get_itemprop_att(content, 'meta', 'releaseDate', 'content')
+        # Parsing release date
+        date_obj = parse_a_date(release_date)
+        return date_obj
+    except Exception as e:
+        print('An error occurred while retrieving the article release date: {}'.format(e))
+        return None
 
 
 def get_itemprop(content, tag, itemproperty, nr=0):
-    property_raw = content.xpath(f'//{tag}[@itemprop="{itemproperty}"]//text()')
-    if property_raw:
-        property = property_raw[nr].strip()
-        print('Get %s from %s: "%s"' % (itemproperty, tag, property))
-        return property
-    else:
-        return
+    """
+    Get the value of a specific itemprop from the content.
+
+    Parameters:
+    content (str): The HTML content from which to extract the value of the itemprop.
+    tag (str): The HTML tag where the itemprop can be found.
+    itemproperty (str): The itemprop to be retrieved.
+    nr (int, optional): The index of the itemprop's value if there are more than one. Defaults to 0.
+
+    Returns:
+    str: The value of the itemprop as a string.
+    """
+    try:
+        # Retrieving element containing itemprop
+        property_raw = content.xpath(f'//{tag}[@itemprop="{itemproperty}"]//text()')
+        if property_raw:
+            property = property_raw[nr].strip()
+            return property
+        else:
+            return None
+    except Exception as e:
+        print('An error occurred while retrieving the value of the itemprop: {}'.format(e))
+        return None
 
 
 def get_itemprop_att(content, tag, itemproperty, attribute, nr=0):
-    property_raw = content.xpath(f'//{tag}[@itemprop="{itemproperty}"]')
-    if property_raw:
-        property = property_raw[nr].get(attribute)
-        print('Get %s from %s: "%s"' % (itemproperty, tag, property))
-        return property
-    else:
-        return
+    """
+    This function parses an lxml.html object to find and return a specfic itemprop attribute.
+
+    :param content: Parsed lxml.html object
+    :param tag: HTML tag where to look for the itemprop.
+    :param itemproperty: itemprop name to look for.
+    :param attribute: Attribute of the itemprop to return.
+    :param nr: Index of the tag to consider if multiple tags with the same itemprop exist. Default is 0.
+    :return: Value of required attribute for the itemprop if exist, else return None.
+    """
+
+    try:
+        # Attempt to find the itemprop in the content
+        property_raw = content.xpath(f'//{tag}[@itemprop="{itemproperty}"]')
+
+        # If the itemprop is found, get the required attribute value
+        if property_raw:
+            property = property_raw[nr].get(attribute)
+
+            # Log the property found
+            # print(f'Get {itemproperty} from {tag}: "{property}"')
+
+            return property
+
+        else:
+
+            # Log that the itemprop wasn't found
+            # print(f'No {itemproperty} found in {tag}')
+
+            return
+
+    except Exception as e:
+        # Log any exceptions that occur
+        print(f'An error occurred while fetching itemprop: {e}')
 
 
 def get_products_list():
@@ -106,36 +256,59 @@ def get_products_list():
 
 
 def read_urls_and_save_in_db(urls, language_iso):
-    for url in urls:
-        content = get_html_content(url[0].text)
-        product = is_product(content)
-        if product:
+    """
+    ```python
+    This function reads given URLs, collects product related information from each URL and stores it in the database.
 
-            # Set the product
-            new_product = MappeiProductEntity()
-            new_product.nr = get_article_number(content)
-            new_product.name = get_article_name(content)
-            new_product.image = get_article_img(content)
-            new_product.release_date = get_release_date(content)
+    Parameters:
+    urls (str,list): One or more URL(s) from which the product info should be extracted.
+    language_iso (str): The language in ISO format for the pages being processed.
 
-            # Set the prices
-            new_prices = MappeiPriceEntity()
-            price = get_article_price(content)
-            # If Staffelprices
-            if isinstance(price, dict):
-                new_prices.price_high = price['highest']
-                new_prices.price_low = price['lowest']
-                new_prices.price_quantity = price['lowest_amount']
-                new_prices.land = language_iso
-            # If not Staffelprices
-            else:
-                new_prices.price_high = price
-                new_prices.land = language_iso
+    Returns:
+    bool: Indicates whether the function executed successfully. True if successful, False otherwise.
+    ```
+    """
+    try:
+        # Ensure input 'urls' is a list
+        if not isinstance(urls, list):
+            urls = [urls]
 
-            new_product_filter = {'nr': get_article_number(content)}
-            upsert_product_and_prices(new_product, new_product_filter, new_prices)
+        # Process each URL
+        for url in urls:
+            content = get_html_content(url)
+            if is_product(content):  # Check if content corresponds to a product
+                # Initialize product entity and populate properties
+                new_product = MappeiProductEntity()
+                new_product.nr = get_article_number(content)
+                new_product.name = get_article_name(content)
+                new_product.image = get_article_img(content)
+                new_product.release_date = get_release_date(content)
 
-    return True
+                # Initialize price entity and populate properties
+                new_prices = MappeiPriceEntity()
+                price = get_article_price(content)
+
+                if isinstance(price, dict):  # Check if price contains multiple price levels
+                    new_prices.price_high = price['highest']
+                    new_prices.price_low = price['lowest']
+                    new_prices.price_quantity = price['lowest_amount']
+                    new_prices.land = language_iso
+                else:  # Single price level
+                    new_prices.price_high = price
+                    new_prices.land = language_iso
+
+                new_product_filter = {'nr': get_article_number(content)}
+
+                # Store new product and its price in the database
+                upsert_product_and_prices(new_product, new_product_filter, new_prices)
+
+            return True
+
+    except Exception as e:
+        # Logging
+        print(f'Something went wrong during URL processing and data storage. Error details: {e}')
+
+        return False
 
 
 def upsert_product_and_prices(parent, parent_filter, child):
@@ -173,3 +346,4 @@ def upsert_product_and_prices(parent, parent_filter, child):
         db.session.merge(child)
 
     db.session.commit()
+

@@ -7,6 +7,11 @@ import pywintypes
 import logging
 
 
+from loguru import logger
+import win32com.client as win32
+import pythoncom
+import pywintypes
+
 class ERPConnectionEntity:
     _instance = None  # Singleton instance
     _connection = None  # Connection instance
@@ -16,132 +21,100 @@ class ERPConnectionEntity:
         Initialize the ERPConnectionEntity.
         :param mandant: The default mandant. Defaults to "58".
         """
-        self.mandant = None
+        # Initialisierung
         self.erp = None
+        self.mandant = None
         self.mand_state = None
         self.max_reconnections = 3
         self.count_reconnects = 0
-
-        self.auto_vorgang = None
-
         self.dataset = None
 
-        self.logging = logging
+        logger.info("ERPConnectionEntity initialized with mandant %s", mandant)
 
-        # loggin setup
-        self.logging.basicConfig(
-            filename="logfiles/ERPObjectEntity.log"
-        )
-        self.logging.info("Log Initialized")
-
-        # functions
+        # Mandant setzen und ERP initialisieren
         self.set_erp()
-        self.set_mandant(mandant=mandant)
-        # self.connect()
+        self.set_mandant(mandant)
 
     def __del__(self):
-        """
-        Deinitialize the ERPConnectionEntity.
-        """
         self.close()
 
-    """
-    Getter & Setter
-    """
-
-    # ERP
     def set_erp(self):
-        """
-        Sets the BpNT.Application
-        """
+        """Sets the BpNT.Application COM object."""
         pythoncom.CoInitialize()
-        self.erp = win32.dynamic.Dispatch("BpNT.Application")
-        self.logging.info("BpNT is dispatched")
+        try:
+            self.erp = win32.dynamic.Dispatch("BpNT.Application")
+            logger.info("BpNT.Application dispatched successfully")
+        except pywintypes.com_error as e:
+            logger.error("COM dispatch error: {}", e)
+            self.erp = None
 
     def get_erp(self):
-        """
-        Check if erp is set and return it. The pythoncom.CoInitialize is necessary for the flask server.
-        It initializes the com instance for the calling thread. So it's callable multiple times (hopefully)
-        :return: com object erp BpNT.Application
-        """
-        if self.erp:
-            return self.erp
+        """Return the COM object or raise if not available."""
+        if not self.erp:
+            logger.error("ERP COM object is not initialized.")
+            raise RuntimeError("ERP COM object is not initialized.")
+        return self.erp
 
-    # Mandant
     def set_mandant(self, mandant):
-        """
-        Set the mandant.
-        :param mandant: The mandant to set.
-        """
+        """Set the mandant identifier."""
         self.mandant = str(mandant)
+        logger.info("Mandant set to %s", self.mandant)
 
     def get_mandant(self):
-        """
-        Get the mandant.
-        :return: The mandant if it is available, False otherwise.
-        """
-        if self.mandant:
-            return self.mandant
-        else:
-            self.logging.warning("No mandant available")
-            return False
+        """Return the mandant identifier or raise if missing."""
+        if not self.mandant:
+            logger.warning("Mandant not set.")
+            raise RuntimeError("Mandant not set.")
+        return self.mandant
 
-    def set_mandant_state(self):
-        """
-        Check for the state of the mandand. only connect when 0 is returned
-        0=ok,
-        1=Tageswechsel durchgeführt,
-        2=Parameteränderung durchgeführt
-        :return:
-        """
-        self.mand_state = self.get_erp().GetMandState()
-
-    def get_mandant_state(self):
-        """
-        Get the mandant state.
-        :return: The mandant state if it is available.
-        """
-        if self.mand_state:
-            self.logging.info(
-                "Getting Mandant State: %s \\n 0=ok, 1=Tageswechsel durchgeführt, 2=Parameteränderung durchgeführt" % self.mand_state)
-            return self.mand_state
-
-    """
-    Functions
-    """
     def connect(self, firma="Egon Heimann GmbH", benutzer="GC-Autosync"):
         """
-        The connection with the given credentials will be established. The fields are:
-        Firmenname, Solution Partner ID (bleibt Leer), Anmeldename, Passwort
-
-        :return:
+        Establish a connection with the given credentials.
+        :param firma: Company name
+        :param benutzer: Username
+        :return: True if successful, False otherwise
         """
-        # 1 Check if erp is available. Avoid duplicate connections
+        # Überprüfe ERP-Objekt
         try:
             self.get_erp()
-        except UnboundLocalError as e:
-            self.logging.warning("No ERP to connect. Did you created it? self.set_erp")
-        except pywintypes.com_error as e:
-            print(e)
-        else:
-            self.erp.Init(f'{firma}', "", f'{benutzer}', '')
+        except Exception as e:
+            logger.warning("Cannot connect: {}", e)
+            return False
+
+        # Verbindung aufbauen
+        try:
+            self.erp.Init(firma, "", benutzer, "")
             self.erp.SelectMand(self.get_mandant())
-            print("ERP connects to:", self.get_mandant(), "with user:", benutzer)
-        finally:
-            print("Connected: This is ERP: %s" % self.get_erp())
+            logger.info("ERP connected: mandant=%s, user=%s", self.get_mandant(), benutzer)
+        except pywintypes.com_error as e:
+            logger.error("ERP COM error on Init/SelectMand: {}", e)
+            return False
+        except Exception as e:
+            logger.error("Unexpected error during ERP connect: {}", e)
+            return False
+
+        return True
 
     def close(self):
         """
-        The connection will be closed by LogOff() and the object ist set to None. For another connection,
-        selfset_erp needs to be called again.
-        :return:
+        Close the ERP connection and release resources.
+        :return: True if closed cleanly, False otherwise
         """
+        if not self.erp:
+            logger.info("No ERP connection to close.")
+            return False
+
         try:
-            self.erp.DeInit()
+            # LogOff oder DeInit je nach API
+            if hasattr(self.erp, 'LogOff'):
+                self.erp.LogOff()
+            elif hasattr(self.erp, 'DeInit'):
+                self.erp.DeInit()
+            logger.info("ERP connection closed successfully.")
+        except Exception as e:
+            logger.warning("Error during ERP disconnection: {}", e)
+            return False
+        finally:
             self.erp = None
-        except:
-            self.logging.warning("Cannot DeInit. Object is NoneType")
-        else:
-            self.logging.info("ERP is closed")
-            print("Closed: This is ERP: %s" % self.get_erp())
-            return True
+
+        return True

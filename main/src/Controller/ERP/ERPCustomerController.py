@@ -20,6 +20,7 @@ from main import db
 from pprint import pprint
 from datetime import datetime, timedelta
 import time
+from loguru import logger
 
 from main.src.Entity.SW5_2.SW5_2CustomerObjectEntity import SW5_2CustomerObjectEntity
 
@@ -41,7 +42,7 @@ class ERPCustomerController(ERPController):
     """ #### Type of Sync #### """
 
     def sync_ranged(self, start, end):
-        print("Customer Range Sync started", start, end)
+        logger.info("Customer Range Sync started", start, end)
         erp_customer_found = self.erp_entity.set_range(
             start=start, end=end
         )
@@ -62,11 +63,11 @@ class ERPCustomerController(ERPController):
         # erp_customer_found = self.erp_entity.get_all_since_last_sync(last_sync_date=self.last_sync_date, offset=1)
         # if erp_customer_found:
         #     while not self.erp_entity.range_eof():
-        #         print("ERP Customer found:", self.erp_entity.get_("AdrNr"), self.erp_entity.get_("LtzAend"))
+        #         logger.info("ERP Customer found:", self.erp_entity.get_("AdrNr"), self.erp_entity.get_("LtzAend"))
         #         self.erp_entity.range_next()
         # else:
         #     self.erp_entity = None
-        #     print("No ERP Customer found.")
+        #     logger.info("No ERP Customer found.")
 
         self.bridge_customer_list = self._get_changed_bridge()
         if self.bridge_customer_list:
@@ -304,83 +305,115 @@ class ERPCustomerController(ERPController):
         return True
 
     def sync_bridge_customer_to_erp(self, bridge_customer):
-        # Atti is setting the api_id 36 char into the erp_nr field
-        # when the customer is new.
-        if len(bridge_customer.erp_nr) > 5:
-            erp_customer = None
-        else:
-            erp_customer = ERPAdressenEntity(erp_obj=self.erp_obj, id_value=bridge_customer.erp_nr)
-            if bridge_customer.erp_nr != erp_customer.get_("AdrNr"):
+        """
+        Synchronize a bridge customer record to the ERP system.
+
+        Returns:
+            - str AdrNr if existing customer updated or unchanged
+            - True if a new customer was created successfully
+            - False on any failure
+        """
+        try:
+            # Determine if the customer already exists in ERP
+            if len(bridge_customer.erp_nr) > 5:
                 erp_customer = None
-        # Customer Update
-        if erp_customer:
-            bridge_date = bridge_customer.updated_at
-            erp_date = erp_customer.get_('LtzAend').replace(tzinfo=None)
-            # If Bridge is newer
-            if bridge_date > erp_date:
-                # Adresses
-                for bridge_address in bridge_customer.addresses:
-                    self._sync_bridge_customer_addresses_to_erp(bridge_address=bridge_address)
-
-                # Customer
-                updated_fields_list = bridge_customer.map_db_to_erp()
-                erp_customer.update_customer(
-                    update_fields_list=updated_fields_list,
-                    bridge_customer=bridge_customer
-                )
-                return erp_customer.get_("AdrNr")
-            # Else Bridge is not newer, pass
             else:
-                pass
-            return erp_customer.get_("AdrNr")
+                erp_customer = ERPAdressenEntity(erp_obj=self.erp_obj,
+                                                 id_value=bridge_customer.erp_nr)
+                if bridge_customer.erp_nr != erp_customer.get_("AdrNr"):
+                    erp_customer = None
 
-        # New Customer, Create
-        else:
-            print("Create new Customer")
+            # --- Update existing customer ---
+            if erp_customer:
+                bridge_date = bridge_customer.updated_at
+                erp_date = erp_customer.get_("LtzAend").replace(tzinfo=None)
+                logger.debug("Bridge updated_at=%s, ERP LtzAend=%s", bridge_date, erp_date)
+
+                if bridge_date > erp_date:
+                    # Synchronize addresses
+                    for bridge_address in bridge_customer.addresses:
+                        try:
+                            self._sync_bridge_customer_addresses_to_erp(
+                                bridge_address=bridge_address
+                            )
+                        except Exception as e:
+                            logger.error("Error syncing address %s: {}", bridge_address.id, e)
+
+                    # Update customer fields
+                    try:
+                        updated_fields = bridge_customer.map_db_to_erp()
+                        erp_customer.update_customer(
+                            update_fields_list=updated_fields,
+                            bridge_customer=bridge_customer
+                        )
+                        logger.info("ERP customer %s updated", erp_customer.get_("AdrNr"))
+                    except Exception as e:
+                        logger.error("Error updating ERP customer %s: {}", erp_customer.get_("AdrNr"), e)
+
+                return erp_customer.get_("AdrNr")
+
+            # --- Create new customer ---
+            logger.info("Creating new customer in ERP for bridge_customer id=%s", bridge_customer.id)
             new_customer = ERPAdressenEntity(erp_obj=self.erp_obj)
-
+            # Choose configuration file based on country
             customer_file = "webshop.yaml"
-            default_billing_address = bridge_customer.get_default_billing_address()
-            if default_billing_address.land_ISO2 and default_billing_address.land_ISO2 == "CH":
-                customer_file = f"webshop_ch.yaml"
+            default_billing = bridge_customer.get_default_billing_address()
+            if getattr(default_billing, 'land_ISO2', None) == "CH":
+                customer_file = "webshop_ch.yaml"
+
+            # Create in ERP
             try:
-                new_customer_info = new_customer.create_new_customer(
+                new_info = new_customer.create_new_customer(
                     bridge_customer=bridge_customer,
                     customer_file=customer_file
                 )
             except Exception as e:
-                print(e)
+                logger.error("Exception creating new ERP customer: {}", e)
+                return False
 
-            if new_customer_info["adrnr"]:
-                print(f"New Customer in ERP created!")
+            adrnr = new_info.get("adrnr")
+            if adrnr:
+                logger.info("New ERP customer created with AdrNr %s", adrnr)
+                # Update bridge_customer and related addresses
+                bridge_customer.erp_nr = adrnr
+                bridge_customer.erp_ltz_aend = new_info.get("erp_ltz_aend")
+                for addr in bridge_customer.addresses:
+                    addr.erp_nr = adrnr
+                    addr.erp_ltz_aend = new_info.get("erp_ltz_aend")
 
-                bridge_customer.erp_nr = new_customer_info["adrnr"]
-                for address in bridge_customer.addresses:
-                    address.erp_nr = new_customer_info["adrnr"]
-                    address.erp_ltz_aend = new_customer_info["erp_ltz_aend"]
-                bridge_customer.erp_ltz_aend = new_customer_info["erp_ltz_aend"]
+                # Persist changes in Bridge DB
                 db.session.add(bridge_customer)
                 self.commit_with_errors()
 
-                # Now lets forward the new adrnr to the shop
-                # but only if it is not already there
-
-                # get the customer again from the bridge
-                in_db = BridgeCustomerEntity().query.filter_by(erp_nr=new_customer_info["adrnr"]).one_or_none()
-                if in_db:
-                    # Synch the new adrnr to shopware
-                    adrn_in_sw5 = SW5_2CustomerObjectEntity().get_customer(
-                        customer_id=new_customer_info["adrnr"],
-                        is_number_not_id=True)
-                    if adrn_in_sw5['success']:
-                        print(f'AdrNr {new_customer_info["adrnr"]} existiert bereits in der DB')
-                    else:
-                        response = SW5_2CustomerObjectEntity().set_customer_number_by_id(customer_id=in_db.api_id,number=new_customer_info["adrnr"])
+                # Sync back to shopware if needed
+                try:
+                    in_db = BridgeCustomerEntity.query.filter_by(
+                        erp_nr=adrnr
+                    ).one_or_none()
+                    if in_db:
+                        sw_res = SW5_2CustomerObjectEntity().get_customer(
+                            customer_id=adrnr,
+                            is_number_not_id=True
+                        )
+                        if sw_res.get('success'):
+                            logger.info("AdrNr %s already exists in Shopware", adrnr)
+                        else:
+                            update_res = SW5_2CustomerObjectEntity().set_customer_number_by_id(
+                                customer_id=in_db.api_id,
+                                number=adrnr
+                            )
+                            logger.info("Shopware set_customer_number response: %s", update_res)
+                except Exception as e:
+                    logger.error("Error syncing AdrNr %s to Shopware: {}", adrnr, e)
 
                 return True
             else:
-                print("New Customer was not created!", new_customer_info)
-                return new_customer_info
+                logger.error("ERP did not return AdrNr, response: %s", new_info)
+                return False
+
+        except Exception as e:
+            logger.error("Unhandled exception in sync_bridge_customer_to_erp: {}", e)
+            return False
 
     def _sync_bridge_customer_addresses_to_erp(self, bridge_address: BridgeCustomerAddressEntity):
         return

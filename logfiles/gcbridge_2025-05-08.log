@@ -1,0 +1,197 @@
+2025-05-08 08:21:44 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-08 08:21:49 | INFO | Try updating order 74699 with payment status: 10 and order status: 2
+2025-05-08 08:21:52 | INFO | BpNT.Application dispatched successfully
+2025-05-08 08:21:52 | INFO | Mandant set to %s
+2025-05-08 08:21:53 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-08 08:21:54 | INFO | Object Adressen destroyed
+2025-05-08 08:21:54 | INFO | Object Adressen destroyed
+2025-05-08 08:21:54 | INFO | Object Anschriften destroyed
+2025-05-08 08:21:54 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-08 08:21:54 | INFO | Retrieving positions for order %s
+2025-05-08 08:21:54 | INFO | Retrieved %d positions for order %s
+2025-05-08 08:21:55 | INFO | looking for
+2025-05-08 08:21:55 | INFO | 204009 Orgamappen 90 hb
+2025-05-08 08:21:55 | INFO | Add Position: 
+2025-05-08 08:21:55 | INFO | Object Artikel destroyed
+2025-05-08 08:21:55 | INFO | Object Artikel destroyed
+2025-05-08 08:21:55 | INFO | ERP connection closed successfully.
+2025-05-08 08:21:55 | INFO | Object Vorgang destroyed
+2025-05-08 08:21:55 | INFO | No ERP connection to close.
+2025-05-08 08:28:24 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-08 08:28:26 | INFO | Try updating order 74701 with payment status: 10 and order status: 2
+2025-05-08 08:28:30 | INFO | BpNT.Application dispatched successfully
+2025-05-08 08:28:30 | INFO | Mandant set to %s
+2025-05-08 08:28:32 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-08 08:28:32 | INFO | Object Adressen destroyed
+2025-05-08 08:28:32 | INFO | Object Adressen destroyed
+2025-05-08 08:28:32 | INFO | Object Anschriften destroyed
+2025-05-08 08:28:33 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-08 08:28:33 | INFO | Retrieving positions for order %s
+2025-05-08 08:28:33 | INFO | Retrieved %d positions for order %s
+2025-05-08 08:28:33 | INFO | looking for
+2025-05-08 08:28:33 | INFO | 204011 Orgamappen Recycling (FSC®) 170, weiß
+2025-05-08 08:28:33 | INFO | Add Position: 
+2025-05-08 08:28:33 | INFO | Object Artikel destroyed
+2025-05-08 08:28:33 | INFO | 581005 Quick-Tabs rosa
+2025-05-08 08:28:33 | INFO | Add Position: 
+2025-05-08 08:28:33 | INFO | Object Artikel destroyed
+2025-05-08 08:28:33 | INFO | 581002 Quick-Tabs rot
+2025-05-08 08:28:33 | INFO | Add Position: 
+2025-05-08 08:28:33 | INFO | Object Artikel destroyed
+2025-05-08 08:28:33 | INFO | 581007 Quick-Tabs hellrot
+2025-05-08 08:28:33 | INFO | Add Position: 
+2025-05-08 08:28:34 | INFO | Object Artikel destroyed
+2025-05-08 08:28:34 | INFO | 581009 Quick-Tabs hellbraun
+2025-05-08 08:28:34 | INFO | Add Position: 
+2025-05-08 08:28:34 | INFO | Object Artikel destroyed
+2025-05-08 08:28:34 | INFO | 581019 Quick-Tabs hellgelb
+2025-05-08 08:28:34 | INFO | Add Position: 
+2025-05-08 08:28:34 | INFO | Object Artikel destroyed
+2025-05-08 08:28:34 | INFO | 104522 Archivboxen weiß
+2025-05-08 08:28:34 | INFO | Add Position: 
+2025-05-08 08:28:34 | INFO | Object Artikel destroyed
+2025-05-08 08:28:34 | INFO | 104033 Kunststoffboxen magenta red
+2025-05-08 08:28:34 | INFO | Add Position: 
+2025-05-08 08:28:34 | INFO | Object Artikel destroyed
+2025-05-08 08:28:34 | INFO | 104032 Kunststoffboxen azure blue
+2025-05-08 08:28:34 | INFO | Add Position: 
+2025-05-08 08:28:34 | INFO | Object Artikel destroyed
+2025-05-08 08:28:34 | INFO | 510214 Entnahmekarten
+2025-05-08 08:28:34 | INFO | Add Position: 
+2025-05-08 08:28:34 | INFO | Object Artikel destroyed
+2025-05-08 08:28:34 | INFO | 224551 Transparenthüllen
+2025-05-08 08:28:34 | INFO | Add Position: 
+2025-05-08 08:28:34 | INFO | Object Artikel destroyed
+2025-05-08 08:28:34 | INFO | 204113V24 Orgamappen mit Sonderdruck/Kunden
+2025-05-08 08:28:34 | INFO | Add Position: 
+2025-05-08 08:28:35 | INFO | Object Artikel destroyed
+2025-05-08 08:28:35 | INFO | ERP connection closed successfully.
+2025-05-08 08:28:35 | INFO | Object Vorgang destroyed
+2025-05-08 08:28:35 | INFO | No ERP connection to close.
+2025-05-08 08:36:03 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-08 08:36:07 | INFO | Try updating order 74704 with payment status: 17 and order status: 1
+2025-05-08 08:36:08 | INFO | BpNT.Application dispatched successfully
+2025-05-08 08:36:08 | INFO | Mandant set to %s
+2025-05-08 08:36:09 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-08 08:36:10 | INFO | Object Adressen destroyed
+2025-05-08 08:36:10 | INFO | Object Adressen destroyed
+2025-05-08 08:36:10 | INFO | Object Anschriften destroyed
+2025-05-08 08:36:10 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-08 08:36:10 | INFO | Retrieving positions for order %s
+2025-05-08 08:36:10 | INFO | Retrieved %d positions for order %s
+2025-05-08 08:36:10 | INFO | looking for
+2025-05-08 08:36:10 | INFO | 581000 Quick-Tabs weiß
+2025-05-08 08:36:10 | INFO | Add Position: 
+2025-05-08 08:36:10 | INFO | Object Artikel destroyed
+2025-05-08 08:36:10 | INFO | 581001 Quick-Tabs gelb
+2025-05-08 08:36:10 | INFO | Add Position: 
+2025-05-08 08:36:10 | INFO | Object Artikel destroyed
+2025-05-08 08:36:10 | INFO | 581012 Quick-Tabs hellviolett
+2025-05-08 08:36:10 | INFO | Add Position: 
+2025-05-08 08:36:11 | INFO | Object Artikel destroyed
+2025-05-08 08:36:11 | INFO | 581005 Quick-Tabs rosa
+2025-05-08 08:36:11 | INFO | Add Position: 
+2025-05-08 08:36:11 | INFO | Object Artikel destroyed
+2025-05-08 08:36:11 | INFO | 581007 Quick-Tabs hellrot
+2025-05-08 08:36:11 | INFO | Add Position: 
+2025-05-08 08:36:11 | INFO | Object Artikel destroyed
+2025-05-08 08:36:11 | INFO | 581006 Quick-Tabs grün
+2025-05-08 08:36:11 | INFO | Add Position: 
+2025-05-08 08:36:11 | INFO | Object Artikel destroyed
+2025-05-08 08:36:11 | INFO | 581021 Quick-Tabs hellgrün
+2025-05-08 08:36:11 | INFO | Add Position: 
+2025-05-08 08:36:11 | INFO | Object Artikel destroyed
+2025-05-08 08:36:11 | INFO | 581019 Quick-Tabs hellgelb
+2025-05-08 08:36:11 | INFO | Add Position: 
+2025-05-08 08:36:11 | INFO | Object Artikel destroyed
+2025-05-08 08:36:11 | INFO | 581016 Quick-Tabs dunkelgrün
+2025-05-08 08:36:11 | INFO | Add Position: 
+2025-05-08 08:36:11 | INFO | Object Artikel destroyed
+2025-05-08 08:36:11 | INFO | 581011 Quick-Tabs türkis
+2025-05-08 08:36:11 | INFO | Add Position: 
+2025-05-08 08:36:11 | INFO | Object Artikel destroyed
+2025-05-08 08:36:11 | INFO | 581015 Quick-Tabs violett
+2025-05-08 08:36:11 | INFO | Add Position: 
+2025-05-08 08:36:12 | INFO | Object Artikel destroyed
+2025-05-08 08:36:12 | INFO | 581009 Quick-Tabs hellbraun
+2025-05-08 08:36:12 | INFO | Add Position: 
+2025-05-08 08:36:12 | INFO | Object Artikel destroyed
+2025-05-08 08:36:12 | INFO | 104071 Projekt-Box, glasklar
+2025-05-08 08:36:12 | INFO | Add Position: 
+2025-05-08 08:36:12 | INFO | Object Artikel destroyed
+2025-05-08 08:36:12 | INFO | ERP connection closed successfully.
+2025-05-08 08:36:12 | INFO | Object Vorgang destroyed
+2025-05-08 08:36:12 | INFO | No ERP connection to close.
+2025-05-08 09:34:24 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-08 09:34:29 | INFO | BpNT.Application dispatched successfully
+2025-05-08 09:34:29 | INFO | Mandant set to %s
+2025-05-08 09:34:30 | INFO | Try updating order 74707 with payment status: 12 and order status: 2
+2025-05-08 09:34:31 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-08 09:34:32 | INFO | Object Adressen destroyed
+2025-05-08 09:34:32 | INFO | Object Adressen destroyed
+2025-05-08 09:34:32 | INFO | Object Anschriften destroyed
+2025-05-08 09:34:32 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-08 09:34:32 | INFO | Retrieving positions for order %s
+2025-05-08 09:34:32 | INFO | Retrieved %d positions for order %s
+2025-05-08 09:34:32 | INFO | looking for
+2025-05-08 09:34:32 | INFO | 204113 Orgamappen 120 hg
+2025-05-08 09:34:32 | INFO | Add Position: 
+2025-05-08 09:34:32 | INFO | Object Artikel destroyed
+2025-05-08 09:34:32 | INFO | Object Artikel destroyed
+2025-05-08 09:34:33 | INFO | ERP connection closed successfully.
+2025-05-08 09:34:33 | INFO | Object Vorgang destroyed
+2025-05-08 09:34:33 | INFO | No ERP connection to close.
+2025-05-08 10:00:55 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-08 10:01:00 | INFO | Try updating order 74709 with payment status: 10 and order status: 2
+2025-05-08 10:01:00 | INFO | BpNT.Application dispatched successfully
+2025-05-08 10:01:00 | INFO | Mandant set to %s
+2025-05-08 10:01:02 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-08 10:01:02 | INFO | Object Adressen destroyed
+2025-05-08 10:01:02 | INFO | Object Adressen destroyed
+2025-05-08 10:01:02 | INFO | Object Anschriften destroyed
+2025-05-08 10:01:02 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-08 10:01:02 | INFO | Retrieving positions for order %s
+2025-05-08 10:01:02 | INFO | Retrieved %d positions for order %s
+2025-05-08 10:01:02 | INFO | looking for
+2025-05-08 10:01:03 | INFO | 581002 Quick-Tabs rot
+2025-05-08 10:01:03 | INFO | Add Position: 
+2025-05-08 10:01:03 | INFO | Object Artikel destroyed
+2025-05-08 10:01:03 | INFO | 581004 Quick-Tabs orange
+2025-05-08 10:01:03 | INFO | Add Position: 
+2025-05-08 10:01:03 | INFO | Object Artikel destroyed
+2025-05-08 10:01:03 | INFO | 581006 Quick-Tabs grün
+2025-05-08 10:01:03 | INFO | Add Position: 
+2025-05-08 10:01:03 | INFO | Object Artikel destroyed
+2025-05-08 10:01:03 | INFO | 581001 Quick-Tabs gelb
+2025-05-08 10:01:03 | INFO | Add Position: 
+2025-05-08 10:01:03 | INFO | Object Artikel destroyed
+2025-05-08 10:01:03 | INFO | 104014 Kunststoffboxen lichtgrau
+2025-05-08 10:01:03 | INFO | Add Position: 
+2025-05-08 10:01:03 | INFO | Object Artikel destroyed
+2025-05-08 10:01:03 | INFO | 180014 Hängeleisten lichtgrau f. Kst. Box
+2025-05-08 10:01:03 | INFO | Add Position: 
+2025-05-08 10:01:03 | INFO | Object Artikel destroyed
+2025-05-08 10:01:03 | INFO | 204009 Orgamappen 90 hb
+2025-05-08 10:01:03 | INFO | Add Position: 
+2025-05-08 10:01:04 | INFO | Object Artikel destroyed
+2025-05-08 10:01:04 | INFO | ERP connection closed successfully.
+2025-05-08 10:01:04 | INFO | Object Vorgang destroyed
+2025-05-08 10:01:04 | INFO | No ERP connection to close.
+2025-05-08 10:59:52 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-08 10:59:56 | INFO | Try updating order 74711 with payment status: 10 and order status: 2
+2025-05-08 10:59:57 | INFO | BpNT.Application dispatched successfully
+2025-05-08 10:59:57 | INFO | Mandant set to %s
+2025-05-08 10:59:59 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-08 10:59:59 | INFO | Object Adressen destroyed
+2025-05-08 10:59:59 | INFO | Object Adressen destroyed
+2025-05-08 10:59:59 | INFO | Object Anschriften destroyed
+2025-05-08 10:59:59 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-08 10:59:59 | INFO | Retrieving positions for order %s
+2025-05-08 10:59:59 | INFO | Retrieved %d positions for order %s
+2025-05-08 11:00:00 | INFO | looking for
+2025-05-08 11:00:00 | INFO | 204009 Orgamappen 90 hb
+2025-05-08 11:00:00 | INFO | Add Position: 
+2025-05-08 11:00:00 | INFO | Object Artikel destroyed
+2025-05-08 11:00:00 | INFO | ERP connection closed successfully.
+2025-05-08 11:00:00 | INFO | Object Vorgang destroyed
+2025-05-08 11:00:00 | INFO | No ERP connection to close.

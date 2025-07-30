@@ -6,13 +6,14 @@ import html2text
 import subprocess
 import sqlalchemy
 from datetime import datetime, timedelta
+import pandas as pd
 
 from main import create_app
 from flask import render_template, redirect, request, make_response, jsonify, flash
 from flask_migrate import Migrate
 
 import sys
-from sqlalchemy import and_, or_, not_
+from sqlalchemy import and_, or_, not_, cast, func, Integer
 from loguru import logger
 
 from datetime import date
@@ -127,6 +128,28 @@ The context has to be pushed to app, to grant access to the db's
 app = create_app()
 app.app_context().push()
 
+
+"""
+######################
+Logger
+#######################
+"""
+# Entferne ggf. vorhandene Log-Handler
+logger.remove()
+# 1) Konsole (stdout) aktivieren
+logger.add(
+    sys.stdout,
+    level="INFO",
+    format="<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | {message}"
+)
+# 2) Datei-Logging (rotierend je 10 MB, 5 Backups)
+logger.add(
+    "logfiles/gcbridge_{time:YYYY-MM-DD}.log",
+    rotation="10 MB",
+    retention="5 days",
+    level="INFO",
+    format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"
+)
 """ 
 ######################
 Migration
@@ -153,15 +176,6 @@ migrate = Migrate(app, db)
 # Atti Zeugs
 
 # from main.src.Shopware6Bridge.process import *
-
-"""
-######################
-Mappei
-######################
-"""
-
-
-# get_products_list()
 
 
 # erp_obj = ERPConnectionEntity(mandant="58")
@@ -197,32 +211,6 @@ def main():
     # erp_obj = ERPConnectionEntity(mandant="58")
     # erp_obj.connect()
 
-    # ATTI #
-
-    ############# INIT ALL TAXES ##############
-    # sw6_tax.init_all_TAXES_from_BRIDGE_to_SW6()
-
-    ############# INIT ALL MEDIAS ##############
-    # sw6_media.init_all_MEDIAS_from_BRIDGE_to_SW6()
-
-    ############# INIT ALL CATEG ###############
-    # sw6_cat.init_all_CATEGORIES_from_BRIDGE_to_SW6()
-
-    ############# INIT ALL PROD ################
-    # sw6_prod.init_all_PRODUCTS_from_BRIDGE_to_SW6()
-    # sw6_prod.sync_selected_PRODUCTS_from_BRIDGE_to_SW6(start="7510", end="7510")
-    ############# CUSTOMERS ###################
-    # sw6_cus.sync_changed_CUSTOMERS_from_BRIDGE_to_SW6()
-    # sw6_cus.sync_changed_CUSTOMERS_from_SW6_to_BRIDGE()
-    # sw6_cus.upload_new_customers_from_SW6_to_BRIDGE()
-    # sw6_cus.sync_all_CUSTOMERS_from_BRIDGE_to_SW6()
-    # sw6_cus.sync_selected_CUSTOMERS_from_BRIDGE_to_SW6_without_syncronise_check("e6eb7732af184d9f971832065bc21567", "e6eb7732af184d9f971832065bc21567")
-
-    ############ ORDER FROM SW6 TO BRIDGE ######
-    # sw6_order.upload_all_new_orders_from_SW6_to_BRIDGE()
-    # order = BridgeOrderEntity.query.get(2)
-    # print(order.products[0].get_unit_price(order))
-
     """
     ######################
     Syncing
@@ -252,42 +240,131 @@ def main():
 
     # erp_obj = ERPConnectionEntity(mandant="58")
     # erp_obj.connect()
-    # ERPAdressenEntity(erp_obj=erp_obj, id_value='13285').delete_dataset_with_check()
+    # customer = ERPAdressenEntity(erp_obj=erp_obj, id_value='60992')
+    # customer.remove_webshop_id()
+    # webshop_id = customer.get_webshop_id()
+    # print("WebshopID:", webshop_id)
     # erp_obj.close()
 
-    # Prices
+    # Customers Anschriften
     # erp_obj = ERPConnectionEntity(mandant="58")
     # erp_obj.connect()
-    # erp_nr = "214023"
+    # adress = ERPAdressenEntity(erp_obj=erp_obj, id_value=10026)
+    # anschriften = adress.get_anschriften()
+    # print(f"{anschriften.range_count()} Anschriften gefunden")
+    # while not anschriften.range_eof():
+    #     print(anschriften.get_("ID"), anschriften.get_("AnsNr"), anschriften.get_("Na2"))
+    #     anschriften.range_next()
+    #
+    # test_anschrift = ERPAnschriftenEntity(erp_obj=erp_obj)
+    # test_anschrift.find_(field="ID", value=230428)
+    # print(test_anschrift.get_("ID"))
+    # erp_obj.close()
+
+    # Prices Product Range
+    # erp_obj = ERPConnectionEntity(mandant="58")
+    # erp_obj.connect()
+    # Range
+    # products = ERPArtikelEntity(erp_obj=erp_obj)
+    # products.filter_expression('WShopKz = 1')
+    # products.filter_set()
+    # range = products.set_range(start="900029 ", end="900035")
+    # products.range_first()
+    # if range:
+    #     print("We have a range of:", products.range_count())
+    #     products.range_first()
+    #     while not products.range_eof():
+    #         print(products.get_artkel_nummer(), products.get_("WShopKz"))
+    #         products.reset_prices()
+    #         artikelnr = products.get_artkel_nummer()
+    #         Bridge2ObjectProductController(erp_obj=erp_obj).sync_one(products.get_artkel_nummer())
+    #         bridge_product = BridgeProductEntity.query.filter_by(erp_nr=artikelnr).one_or_none()
+    #         SW5_2ProductObjectEntity().update(bridge_entity=bridge_product)
+    #         # SW5_2ProductObjectEntity().set_price_by_bridge_product_object(bridge_product=bridge_product)
+    #         products.range_next()
+    # erp_obj.close()
+
+    # Rename 204045/00 to 204045-00
+    # bridge_products = (
+    #     BridgeProductEntity.query
+    #     .filter(
+    #         or_(
+    #             # 1) numerischer Bereich 00–06
+    #             cast(
+
+    #                 func.substr(BridgeProductEntity.erp_nr, 8, 2),
+    #                 Integer
+    #             ).between(0, 6),
+    #             # 2) exakter S-Suffix
+    #             BridgeProductEntity.erp_nr == '204045S5'
+    #         )
+    #     )
+    #     .all()
+    # )
+    # for bridge_product in bridge_products:
+    #     print(bridge_product.erp_nr)
+    #     SW5_2ProductObjectEntity().set_price_by_bridge_product_object(bridge_product=bridge_product)
+
+
+    # erp_nr = "204045/03"
+    # erp_obj = ERPConnectionEntity(mandant="58")
+    # erp_obj.connect()
     # Set special price
-    # ERPArtikelEntity(erp_obj=erp_obj, id_value=erp_nr).set_special_price(datetime.now(), end_date=datetime(year=2024, month=12, day=31), percentage=50)
-    # # Reset Prices
+    # ERPArtikelEntity(erp_obj=erp_obj, id_value=erp_nr).set_special_price(start_date=datetime.now()), percentage=15)
+    # Reset Prices
     # ERPArtikelEntity(erp_obj=erp_obj, id_value=erp_nr).reset_prices()
     # Bridge2ObjectProductController(erp_obj=erp_obj).sync_one(erp_nr)
     # product = BridgeProductEntity.query.filter_by(erp_nr=erp_nr).one_or_none()
-    # response = SW5_2ProductObjectEntity().update(bridge_entity=product)
+    # product.erp_nr = product.erp_nr.replace("/", "-")
+
+    #
+    # pprint(product)
+    # response = SW5_2ProductObjectEntity().set_special_price_by_bridge_product_object(product)
+    # SW5_2ProductObjectEntity().set_price_by_bridge_product_object(bridge_product=product)
     # erp_obj.close()
 
+    # Set special price
     # erp_obj = ERPConnectionEntity(mandant="58")
     # erp_obj.connect()
-    # erp_nr = "214025"
+    # erp_nr = "900050"
+    # ERPArtikelEntity(erp_obj=erp_obj, id_value=erp_nr).set_special_price(start_date=datetime.now(), percentage=15)
+    # Bridge2ObjectProductController(erp_obj=erp_obj).sync_one(erp_nr)
     # product = BridgeProductEntity.query.filter_by(erp_nr=erp_nr).one_or_none()
-    # # Reset price
-    # response = SW5_2ProductObjectEntity().set_price_by_bridge_product_object(product)
-    # # Set special price
     # response = SW5_2ProductObjectEntity().set_special_price_by_bridge_product_object(product)
-    # # Update product
-    # BridgeProductEntity.query.filter_by(erp_nr='180003').delete()
     # erp_obj.close()
+
+    # Kunde nach Anschrift AdrNr
+    # erp_obj = ERPConnectionEntity(mandant="58")
+    # erp_obj.connect()
+    # erp_anschrift = ERPAnschriftenEntity(erp_obj=erp_obj)
+    # try:
+    #     found = erp_anschrift.find_(value=12368)
+    #     if found:
+    #        logger.info(f'Found: {erp_anschrift.get_("Na1")} {erp_anschrift.get_("Na2")} {erp_anschrift.get_("Na3")} {erp_anschrift.get_("AdrNr")}')
+    #        erp_anschrift.set_("AdrNr", 10026)
+    #     else:
+    #         logger.warning("Not found")
+    # except Exception as e:
+    #     logger.warning("Error:", e)
+    # finally:
+
+
+
+
+    #     erp_obj.close()
+
+
 
     # Kunde nach Webshop ID
     # erp_obj = ERPConnectionEntity(mandant=58)
     # erp_obj.connect()
-    # erp_entity = ERPAdressenEntity(erp_obj=erp_obj, id_value='11124')
-    # erp_entity.find_by_webshop_id(webshop_id=35)
-    # print(erp_entity.get_("AdrNr"))
+    # erp_entity = ERPAdressenEntity(erp_obj=erp_obj)
+    # found = erp_entity.find_by_webshop_id(webshop_id=29397)
+    # if found:
+    #     print(erp_entity.get_("AdrNr"))
+    # else:
+    #     print("Not found")
     # erp_obj.close()
-
 
     # Adressen
     # ERPCustomerController(erp_obj=erp_obj).sync_changed()
@@ -318,7 +395,9 @@ def main():
 
     # This is just a CLI Version which awaits input
     # get_products_list()
-    # products = MappeiProductEntity.query.filter(MappeiProductEntity.prices[.has(land="ch"))
+
+    # read_urls_and_save_in_db("https://www.mappei.de/de/Selbstklebe-Signalreiter-10-mm-breit-Karton/401000", "de")
+    # products = MappeiProductEntity.query.filter(MappeiProductEntity.prices[.has(land="de"))
     # products = MappeiProductEntity.query.join(MappeiProductEntity)
     # pprint(products)
 
@@ -464,6 +543,7 @@ def main():
 
     """     ######  """
     """     E-Mail  """
+    """ https://github.com/zalify/easy-email/tree/master """
     """     ######  """
 
     @app.route('/<domain>/email/<year>/<newsletter>/<erp_nums>')
@@ -684,6 +764,39 @@ def main():
         erp_obj.close()
         return jsonify(response)
 
+    @app.route("/gcbridge/delete_order/<order_id>/_action", methods=['DELETE'])
+    def gcbridge_delete_order_order_id(order_id):
+        response = {
+            'status': 'success',
+            'message': "",
+            'data': {}
+        }
+
+        try:
+            order_entity = BridgeOrderEntity.query.get(order_id)
+            if order_entity:
+                # Set states to open, to be ab le to reload the order
+                sw5_status = SW5_2OrderObjectEntity().set_order_and_payment_status(
+                    order_id=order_entity.api_id,
+                    payment_status_id=17,  # 17 Means 'Open'
+                    order_status_id=0  # 0 means 'Open'
+                )
+                print("SW5 States Response:", sw5_status)
+
+                db.session.delete(order_entity)
+                db.session.commit()
+                response['message'] = f'Order {order_id} successfully deleted'
+                response['data']['order_id'] = order_id
+            else:
+                response['status'] = 'failure'
+                response['message'] = f'Order {order_id} not found'
+                response['data']['order_id'] = order_id
+        except Exception as e:
+            response['status'] = 'error'
+            response['message'] = str(e)
+            response['data']['order_id'] = order_id
+        return jsonify(response)
+
     @app.route("/gcbridge/set_states/<order_id>/<payment_status_id>/<order_status_id>")
     def gcbridge_set_states(order_id, payment_status_id, order_status_id):
         # Prüfen ob alle Parameter vergeben sind
@@ -802,6 +915,7 @@ def main():
         customer_id = request.form.get('customerId')
         new_erp_nr = request.form.get('newErpNr')
         new_api_id = request.form.get('newApiId', None)  # Default to None if not provided
+
 
         if not all([customer_id, new_erp_nr]):  # Check if any of the essential fields are missing
             return jsonify({"status": "error", "message": "Both Customer ID and new ERP number must be provided."})
@@ -1224,6 +1338,21 @@ def main():
 
         return response
 
+    @app.route("/customer/get_duplicates")
+    def gcbridge_customer_get_duplicates():
+        response = {
+            'status': 'success',
+            'message': '',
+            'data': {}
+        }
+        try:
+            data_csv_file = pd.read_csv('src/csv/s_user.csv')
+
+        except Exception as e:
+            print(e)
+
+
+
 
 # EOF main
 
@@ -1236,7 +1365,7 @@ Server
 if __name__ == "__main__":
     with app.app_context():
         # db.drop_all()
-        db.create_all()
+        # db.create_all()
         main()
 
     # localhost:5000

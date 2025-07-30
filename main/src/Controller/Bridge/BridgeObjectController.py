@@ -11,6 +11,7 @@ from main import db
 import inspect
 # For the image json object
 import json
+from loguru import logger
 
 
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
@@ -73,7 +74,7 @@ class BridgeObjectController:
         self.img_file = 0
 
     def print_method_info(self, name):
-        print('\n#- %s %s -#' % (name, inspect.currentframe().f_back.f_code.co_name))
+        logger.info('\n#- %s %s -#' % (name, inspect.currentframe().f_back.f_code.co_name))
         write_log('#- %s %s -#' % (name, inspect.currentframe().f_back.f_code.co_name))
 
     def dataset_save_changed_to_db(self):
@@ -86,21 +87,21 @@ class BridgeObjectController:
         dataset_changed = self.dataset_get_changed_by_range()
         # 2. Loop
         if dataset_changed and erp_get_dataset_record_count(dataset_changed) >= 1:
-            print('Match! Enter the Loop for : "%s"'
+            logger.info('Match! Enter the Loop for : "%s"'
                   % dataset_changed.Fields.Item(self.dataset_field_title).AsString)
 
             i = 0
             # Call the erp function for the amount of records
-            print("%s Record(s) found" % erp_get_dataset_record_count(dataset_changed))
+            logger.info("%s Record(s) found" % erp_get_dataset_record_count(dataset_changed))
             while i < erp_get_dataset_record_count(dataset_changed):
-                print('In Loop nr: %s' % i)
-                print('Check for "%s". "%s" = "%s"' % (
+                logger.info('In Loop nr: %s' % i)
+                logger.info('Check for "%s". "%s" = "%s"' % (
                     self.dataset_field_gspkz,
                     dataset_changed.Fields.Item(self.dataset_field_gspkz).AsBoolean,
                     self.dataset_field_gspkz_must_be))
                 # Check if active (field is 0/False)
                 if dataset_changed.Fields.Item(self.dataset_field_gspkz).AsBoolean == self.dataset_field_gspkz_must_be:
-                    print('Is active, last sync (%s) and needs sync: "%s"' %
+                    logger.info('Is active, last sync (%s) and needs sync: "%s"' %
                           (
                               self.dataset_field_ltzaend,
                               dataset_changed.Fields.Item(self.dataset_field_title).AsString
@@ -115,7 +116,7 @@ class BridgeObjectController:
                 i += 1
 
         else:  # dataset_changed
-            print("... nothing found - no changes. Exit.")
+            logger.info("... nothing found - no changes. Exit.")
             return False
 
         self.dataset_set_sync_date()
@@ -125,15 +126,15 @@ class BridgeObjectController:
 
         i = 0
         # Call the erp function for the amount of records
-        print('We have got %s Entries to save! Lets go.' % erp_get_dataset_record_count(self.dataset))
+        logger.info('We have got %s Entries to save! Lets go.' % erp_get_dataset_record_count(self.dataset))
         while i < erp_get_dataset_record_count(self.dataset):
             # Check if active (field is 0/False
-            print("%s should be %s. Is->%s" % (
+            logger.info("%s should be %s. Is->%s" % (
                 self.dataset_field_gspkz,
                 self.dataset_field_gspkz_must_be,
                 self.dataset.Fields.Item(self.dataset_field_gspkz).AsBoolean))
             if self.dataset.Fields.Item(self.dataset_field_gspkz).AsBoolean == self.dataset_field_gspkz_must_be:
-                print('Is active and needs sync: "%s"' %
+                logger.info('Is active and needs sync: "%s"' %
                       self.dataset.Fields.Item(self.dataset_field_title).AsString)
                 # 2.1 Map and
                 # 2.2 Upsert
@@ -171,7 +172,7 @@ class BridgeObjectController:
         pass
 
     def dataset_map_to_db(self, dataset):
-        print("\n#- BOC dataset_map_to_db -#")
+        logger.info("\n#- BOC dataset_map_to_db -#")
         """
         This function is called in the child. The mapping depends on which Entity is mapped.
         So the right Entity is imported in the child and the mapping happens there.
@@ -181,7 +182,7 @@ class BridgeObjectController:
         pass
 
     def dataset_map_language_to_db(self, dataset, entity, language):
-        print("\n#- BOC dataset_map_to_db -#")
+        logger.info("\n#- BOC dataset_map_to_db -#")
         """
         This function is called in the child. The mapping depends on which Entity is mapped.
         So the right Entity is imported in the child and the mapping happens there.
@@ -203,10 +204,10 @@ class BridgeObjectController:
         :return: array of languages iso
         """
         if self.dataset_lang:
-            print("Languages are given: ", self.dataset_lang)
+            logger.info("Languages are given: ", self.dataset_lang)
             return self.dataset_lang
         else:
-            print('"No Language is given. Fallback to "de-DE" and "en-EN"')
+            logger.info('"No Language is given. Fallback to "de-DE" and "en-EN"')
             return ["de-DE", "en-EN"]
 
     def dataset_upsert_entity(self):
@@ -244,10 +245,10 @@ class BridgeObjectController:
         self.print_method_info("A-BOC")
         bridge_synchronize_entity = BridgeSynchronizeEntity()
         current_dates = bridge_synchronize_entity.get_entity_by_id_1()
-        print('Get last sync date from field: %s' % self.last_sync_date_field)
+        logger.info('Get last sync date from field: %s' % self.last_sync_date_field)
         last_sync_date = getattr(current_dates, self.last_sync_date_field)
         if last_sync_date:
-            print('Last sync date: "%s"' % last_sync_date.strftime("%d.%m.%Y %H:%M:%S"))
+            logger.info('Last sync date: "%s"' % last_sync_date.strftime("%d.%m.%Y %H:%M:%S"))
             return last_sync_date
         else:
             self.dataset_set_sync_date()
@@ -261,13 +262,13 @@ class BridgeObjectController:
             m = re.search(pattern, img_link)
             if m:
                 img = m.group(0)
-                print('Image Link found: "%s"' % img)
+                logger.info('Image Link found: "%s"' % img)
             else:
                 img = 0
-                print('Could not find img in Path: "%s"' % img_link)
+                logger.info('Could not find img in Path: "%s"' % img_link)
         else:
             img = 0
-            print("No Image in erp? Nothing found!")
+            logger.info("No Image in erp? Nothing found!")
 
         return img
 

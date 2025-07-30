@@ -116,7 +116,7 @@ class ERPObjectController:
         except UnboundLocalError:
             logging.warning("No ERP to connect. Did you created it? self.set_erp")
         else:
-            print("No Problems with the connection")
+            logger.info("No Problems with the connection")
         finally:
             print("This is ERP: %s" % self.get_erp)
 

@@ -7,9 +7,9 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: gc-bridge_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: fbuchner
+      MYSQL_PASSWORD: fbuchnerpassword
+      MYSQL_ROOT_PASSWORD: root_password
       TZ: Europe/Berlin
     command: ['mysqld', '--default-time-zone=+02:00']
     ports:
@@ -25,6 +25,14 @@ services:
       ADMINER_DEFAULT_SERVER: database
     ports:
       - 8080:8080
+      
+      
+  redis:
+    image: redis:7.0-alpine # Lightweight Redis version
+    restart: always
+    ports:
+      - 6379:6379
+
 
 volumes:
   db-volume:

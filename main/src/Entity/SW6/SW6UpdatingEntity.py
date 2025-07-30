@@ -2,6 +2,7 @@ from typing import Any, Dict
 from lib_shopware6_api_base import Shopware6AdminAPIClientBase
 from main.src.Controller.SW6.sw6_api_config import ConfShopware6ApiBase
 from main.src.Entity.SW6.PayloadEntity import PayloadEntity
+from loguru import logger
 
 class SW6UpdatingEntity:
     def __init__(self, type: str, entity: any, last_update: any):
@@ -19,31 +20,31 @@ class SW6UpdatingEntity:
     def update_entity(self):
         try:
             columns = self.__sw6_entity.query.where(self.__sw6_entity.erp_ltz_aend > self.__last_update).statement.columns.keys()
-            print(columns)
+            logger.info(columns)
             rows = self.__sw6_entity.query.where(self.__sw6_entity.erp_ltz_aend > self.__last_update)
             for row in rows:
                 payload = PayloadEntity(self.__type).setting_payload(row)
-                # print(payload)
+                # logger.info(payload)
                 if self.__is_exist_in_sw(payload): self.__update_to_sw(payload)
                 else: self.__insert_to_sw(payload)
 
         except Exception as e:
-            print(e)
+            logger.info(e)
 
     def __insert_to_sw(self, payload: Dict[str, Any]):
         try:
-            print(f"/{self.__type}")
+            logger.info(f"/{self.__type}")
             self.__sw6_client.request_post(f"/{self.__type}", payload)
         except Exception as e:
-            print(e)
+            logger.info(e)
             return None
 
     def __update_to_sw(self, payload: Dict[str, Any]):
         try:
             self.__sw6_client.request_patch(f"/{self.__type}/{payload['id']}", payload)
-            print(payload['name'])
+            logger.info(payload['name'])
         except Exception as e:
-            print(e)
+            logger.info(e)
             return None
 
     def __is_exist_in_sw(self, payload: Dict[str, Any]):

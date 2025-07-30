@@ -21,5 +21,5 @@ class SW5_2AddressObjectEntity(SW5_2ObjectEntity):
             response = self.put('/addresses/%s' % address['data']['id'], data)['data']
             return response
         except Exception as e:
-            pprint(e)
+            logger.info(e)
             raise Exception(f"Error on updating Address: {address['data']['id']} on Address_ID: {address['data']['id']}: {e}")

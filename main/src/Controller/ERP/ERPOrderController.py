@@ -1,113 +1,136 @@
+from loguru import logger
 from sqlalchemy import or_
 
 from main.src.Controller.ERP.ERPController import ERPController
 from main.src.Entity.ERP.ERPVorgangEntity import ERPVorgangEntity
 from main.src.Entity.Bridge.BridgeSynchronizeEntity import BridgeSynchronizeEntity
-from main.src.Entity.Bridge.Orders.BridgeOrderEntity import BridgeOrderEntity, BridgeOrderStateEntity, order_product
+from main.src.Entity.Bridge.Orders.BridgeOrderEntity import (
+    BridgeOrderEntity,
+    BridgeOrderStateEntity,
+    order_product
+)
 from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
-
 from main import db
-from pprint import pprint
-
 
 class ERPOrderController(ERPController):
     def __init__(self, erp_obj):
+        super().__init__(erp_obj)
         self.erp_obj = erp_obj
         self.erp_entity = ERPVorgangEntity(erp_obj=erp_obj)
         self.bridge_entity = BridgeOrderEntity()
         self.last_sync_date = BridgeSynchronizeEntity().get_dataset_order_sync_date()
-
         self.new_orders = []
-
-        super().__init__(erp_obj)
+        logger.info("ERPOrderController initialized, last_sync_date=%s", self.last_sync_date)
 
     def get_new_orders(self):
         """
-        Query the database to get all orders with payment_state, shipping_state, and order_state equal to 0 (new orders).
-        :return: A list of BridgeOrderEntity objects.
+        Query the database for orders with payment_state, shipping_state, and order_state == 0.
         """
         try:
-            new_orders = BridgeOrderEntity.query.join(BridgeOrderStateEntity).filter(
-                or_(
-                    BridgeOrderStateEntity.payment_state == 0,
-                    BridgeOrderStateEntity.payment_state == 17,
-                ),
-                BridgeOrderStateEntity.shipping_state == 0,
-                BridgeOrderStateEntity.order_state == 0
-            ).all()
-
-            self.new_orders = new_orders
+            self.new_orders = (
+                BridgeOrderEntity.query
+                .join(BridgeOrderStateEntity)
+                .filter(
+                    or_(
+                        BridgeOrderStateEntity.payment_state.in_([0, 17]),
+                    ),
+                    BridgeOrderStateEntity.shipping_state == 0,
+                    BridgeOrderStateEntity.order_state == 0
+                )
+                .all()
+            )
+            logger.info("Fetched %d new orders", len(self.new_orders))
         except Exception as e:
-            print(f"Error querying new orders: {str(e)}")
+            logger.error("Error querying new orders: {}", e)
+            self.new_orders = []
 
     def create_new_orders_in_erp(self):
         """
-        Create new orders in ERP.
-
-        Loops through the list of new orders and creates each order in the ERP system using the
-        `create_new_order_in_erp` function. If the new_orders list is empty, the function will not execute.
-
-        Returns:
-            None
+        Loops through new_orders and creates each in the ERP system.
         """
-
-        # Check if there are new orders to create in ERP
         if not self.new_orders:
-            print("No new orders to create in ERP.")
+            logger.info("No new orders to create in ERP.")
             return
 
-        print("Creating new orders in ERP...")
-
-        # Loop through the new orders and create each order in ERP
+        logger.info("Creating %d new orders in ERP...", len(self.new_orders))
         for order in self.new_orders:
             erp_order_id = self.create_new_order_in_erp(order)
-            print(f"Order {erp_order_id} was created")
-            order.order_state.order_state = 1
-            order.erp_order_id = erp_order_id
-            db.session.add(order)
+            if erp_order_id:
+                order.order_state.order_state = 1
+                order.erp_order_id = erp_order_id
+                db.session.add(order)
+                logger.info("Order %s created in ERP with ID %s", order.id, erp_order_id)
+            else:
+                logger.warning("Failed to create order %s in ERP", order.id)
 
-        db.session.commit()
-        db.session.close()
-        print(f"{len(self.new_orders)} new orders created in ERP.")
+        try:
+            db.session.commit()
+            logger.info("Committed %d orders to database", len(self.new_orders))
+        except Exception as e:
+            logger.error("Error committing new orders: {}", e)
+        finally:
+            db.session.close()
 
     def create_new_order_in_erp(self, order):
-        vorgang = ERPVorgangEntity(erp_obj=self.erp_obj)
-        positions = self.get_all_data_from_order(order=order)
-        erp_order_id = vorgang.create_new_webshop_order(order=order, positions=positions)
-
-        if erp_order_id:
-            pass
-
-        return erp_order_id
+        """
+        Create a single order in ERP and return the ERP order ID.
+        """
+        positions = self.get_all_data_from_order(order)
+        try:
+            erp_order_id = self.erp_entity.create_new_webshop_order(
+                order=order,
+                positions=positions
+            )
+            return erp_order_id
+        except Exception as e:
+            logger.error("Error creating order %s in ERP: {}", order.id, e)
+            return None
 
     def get_all_data_from_order(self, order):
-        print("Searching for position from order", order.id)
-        order_id = order.id
-        order = db.session.query(BridgeOrderEntity).filter(BridgeOrderEntity.id == order_id).first()
-        if order:
-            order_products = db.session.query(
-                BridgeProductEntity,
-                order_product.c.quantity,
-                order_product.c.unit_price,
-                order_product.c.total_price
-            ).join(
-                order_product,
-                BridgeProductEntity.id == order_product.c.product_id
-            ).filter(
-                order_product.c.order_id == order.id
-            ).all()
+        """
+        Retrieves all line items for a given order from the Bridge database.
+        """
+        logger.info("Retrieving positions for order %s", order.id)
+        try:
+            order_in_db = (
+                db.session.query(BridgeOrderEntity)
+                .filter_by(id=order.id)
+                .first()
+            )
+            if not order_in_db:
+                logger.warning("Order %s not found in DB", order.id)
+                return []
+
+            order_products = (
+                db.session.query(
+                    BridgeProductEntity,
+                    order_product.c.quantity,
+                    order_product.c.unit_price,
+                    order_product.c.total_price
+                )
+                .join(
+                    order_product,
+                    BridgeProductEntity.id == order_product.c.product_id
+                )
+                .filter(order_product.c.order_id == order.id)
+                .all()
+            )
+
             result = {
-                "order": order.__dict__,
+                "order": {k: v for k, v in order_in_db.__dict__.items() if not k.startswith('_sa_')},
                 "order_products": []
             }
             for product, quantity, unit_price, total_price in order_products:
-                product_dict = product.__dict__
-                product_dict.pop("_sa_instance_state", None)
-                product_dict["quantity"] = quantity
-                product_dict["unit_price"] = unit_price
-                product_dict["total_price"] = total_price
-                result["order_products"].append(product_dict)
+                pdict = {k: v for k, v in product.__dict__.items() if not k.startswith('_sa_')}
+                pdict.update({
+                    "quantity": quantity,
+                    "unit_price": unit_price,
+                    "total_price": total_price
+                })
+                result["order_products"].append(pdict)
+
+            logger.info("Retrieved %d positions for order %s", len(result["order_products"]), order.id)
             return result
-        else:
-            print(f"No order found with id {order_id}")
-            return False
+        except Exception as e:
+            logger.error("Error fetching positions for order %s: {}", order.id, e)
+            return []

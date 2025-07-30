@@ -3,13 +3,12 @@ from lib_shopware6_api import Shopware6AdminAPIClientBase, dal
 from lib_shopware6_api_base import EqualsFilter, RangeFilter, MultiFilter, DateHistogramAggregation
 
 from main.config import ConfShopware6ApiBase
-from pprint import pprint
 import datetime
 # Tools
 import uuid
 import requests
 import datetime
-
+from loguru import logger
 from main.src.Repository.functions_repository import get_current_datetime_and_convert_to_sw6_format
 
 # Config
@@ -75,7 +74,7 @@ class SW6_2ObjectEntity:
             "description": category.description
         }
         new_category = self.api.request_post(request_url='/category', payload=payload)
-        print("Created Category", category.title)
+        logger.info("Created Category", category.title)
         return new_category
 
     def _update_category(self, category):
@@ -85,7 +84,7 @@ class SW6_2ObjectEntity:
             "description": category.description
         }
         update_category = self.api.request_patch(request_url=f'/category/{category.api_id}', payload=payload)
-        print("Updated Category", category.title)
+        logger.info("Updated Category", category.title)
         return update_category
 
     def _update_category_with_parent(self, category):
@@ -94,30 +93,30 @@ class SW6_2ObjectEntity:
         }
         if category.erp_nr_parent > 0:
             patched_category = self.api.request_patch(request_url=f'/category/{category.api_id}', payload=payload)
-            print("Patched Category with Parent", category.title, category.api_idparent)
+            logger.info("Patched Category with Parent", category.title, category.api_idparent)
             return patched_category
         else:
-            print("No Patch for Category", category.title, category.erp_nr_parent)
+            logger.info("No Patch for Category", category.title, category.erp_nr_parent)
             pass
 
     def delete_category(self, id):
         delete_category = self.api.request_delete(request_url=f'/category/{id}')
-        print("Deleted Category", id)
+        logger.info("Deleted Category", id)
         return delete_category
 
     def delete_all_categories(self):
         categories = self.get_categories()
         for cat in categories['data']:
-            print("Category found:", cat['id'])
+            logger.info("Category found:", cat['id'])
             # Standard Category for salesChannel
             if not cat['id'] == 'c9c5084cd0ed4e2da4a5db50234805f9':
                 try:
                     self.delete_category(cat['id'])
                 except:
-                    print("Could not delete Cat ID:", cat['id'])
+                    logger.info("Could not delete Cat ID:", cat['id'])
                     pass
             else:
-                print("Main Category - do not delete")
+                logger.info("Main Category - do not delete")
 
     """    SalesChannel    """
 
@@ -125,12 +124,12 @@ class SW6_2ObjectEntity:
         sales_channels = self.api.request_get(request_url='sales-channel')
         for sc in sales_channels["data"]:
             if sc["name"] == 'Germany - Deutsch':
-                pprint(sc)
+                logger.info(sc)
 
     def get_saleschannels(self):
         sales_channels = self.api.request_get(request_url='sales-channel')
         for sc in sales_channels["data"]:
-            pprint(sc["name"])
+            logger.info(sc["name"])
 
     def create_saleschannel(self):
         payload = {
@@ -151,7 +150,7 @@ class SW6_2ObjectEntity:
             'typeId': sw6config.TYPE_ID,
         }
         new_sales_channel = self.api.request_post(request_url='/sales-channel', payload=payload)
-        print("Created Sales Channel", payload)
+        logger.info("Created Sales Channel", payload)
         return new_sales_channel
 
     """    Tax    """
@@ -199,7 +198,7 @@ class SW6_2ObjectEntity:
             "createdAt": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         new_tax = self.api.request_post(request_url='/tax', payload=payload)
-        print("Created Tax", tax.description)
+        logger.info("Created Tax", tax.description)
         return new_tax
 
     def _update_tax(self, tax):
@@ -211,12 +210,12 @@ class SW6_2ObjectEntity:
             "updatedAt": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         patched_tax = self.api.request_patch(request_url=f'/tax/{tax.api_id}', payload=payload)
-        print("Patched Tax", tax.description)
+        logger.info("Patched Tax", tax.description)
         return patched_tax
 
     def delete_tax(self, id):
         delete_tax = self.api.request_delete(request_url=f'/tax/{id}')
-        print("Deleted Tax", id)
+        logger.info("Deleted Tax", id)
         return delete_tax
 
     def delete_all_taxes(self):
@@ -225,10 +224,10 @@ class SW6_2ObjectEntity:
             if not tax['id'] == '16d9f10db07d41aba8fb7dda32e4d4a9' \
                     and not tax['id'] == '370a45078c4847038884fbd462967176' \
                     and not tax['id'] == 'a131a847f20846bc831a780286578e83':
-                print("Delete Tx", tax['id'])
+                logger.info("Delete Tx", tax['id'])
                 self.delete_tax(tax['id'])
             else:
-                print("Tax ID is standard - Can not be deleted", '16d9f10db07d41aba8fb7dda32e4d4a9')
+                logger.info("Tax ID is standard - Can not be deleted", '16d9f10db07d41aba8fb7dda32e4d4a9')
                 pass
 
     """    Products    """
@@ -289,7 +288,7 @@ class SW6_2ObjectEntity:
         #     payload["categoryIds"].append(cat.api_id)
 
         new_product = self.api.request_post(request_url='/product', payload=payload)
-        print("Created Product", product.erp_nr, product.name)
+        logger.info("Created Product", product.erp_nr, product.name)
         return new_product
 
     def _update_product(self, product):
@@ -314,7 +313,7 @@ class SW6_2ObjectEntity:
         #     payload["categoryIds"].append(cat.api_id)
 
         patched_product = self.api.request_patch(request_url=f'/product/{product.api_id}', payload=payload)
-        print("Patched Product", product.erp_nr, product.name)
+        logger.info("Patched Product", product.erp_nr, product.name)
         return patched_product
 
     def read_product(self, erp_nr=None, id=None, product=None):
@@ -333,18 +332,18 @@ class SW6_2ObjectEntity:
             return read_product
 
         else:
-            print("Can not search withaut a value:", "Erp_Nr:", erp_nr, "ID:", id, "Product Entity", product)
+            logger.warning("Can not search without a value:", "Erp_Nr:", erp_nr, "ID:", id, "Product Entity", product)
             return False
 
     def delete_product(self, id):
         delete_product = self.api.request_delete(request_url=f'/product/{id}')
-        print("Deleted Product", id)
+        logger.info("Deleted Product", id)
         return delete_product
 
     def delete_all_products(self):
         products = self.get_products()
         for product in products['data']:
-            print("Delete Product", product['id'])
+            logger.info("Delete Product", product['id'])
             self.delete_product(product['id'])
 
     """    CustomerAddress    """
@@ -465,7 +464,7 @@ class SW6_2ObjectEntity:
             payload["vatIds"] = [customer.ustid]
 
         new_customer = self.api.request_post(request_url='/customer', payload=payload)
-        print("Created Customer", customer.erp_nr, payload["firstName"], payload["lastName"])
+        logger.info("Created Customer", customer.erp_nr, payload["firstName"], payload["lastName"])
 
         return new_customer
 
@@ -489,7 +488,7 @@ class SW6_2ObjectEntity:
             payload["vatIds"] = [customer.ustid]
 
         patched_customer = self.api.request_patch(request_url=f'/customer/{customer.api_id}', payload=payload)
-        print("Patched Customer", customer.erp_nr, customer.addresses[0].contacts[0].first_name,
+        logger.info("Patched Customer", customer.erp_nr, customer.addresses[0].contacts[0].first_name,
               customer.addresses[0].contacts[0].last_name)
         return patched_customer
 

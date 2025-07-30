@@ -40,4 +40,4 @@ class SW5_2CategoryObjectEntity(SW5_2ObjectEntity):
                 return answer
 
         except Exception as e:
-            print(f'Something went worng, searching Categories by name:{name}')
+            logger.info(f'Something went worng, searching Categories by name:{name}')

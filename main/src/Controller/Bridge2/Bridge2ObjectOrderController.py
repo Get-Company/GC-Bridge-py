@@ -1,5 +1,7 @@
 from typing import Any, Dict
+from main import db
 from main.src.Entity.Bridge.Category.BridgeCategoryEntity import BridgeCategoryEntity
+from main.src.Entity.Bridge.Orders.BridgeOrderEntity import BridgeOrderEntity
 from main.src.Entity.Bridge.Tax.BridgeTaxEntity import BridgeTaxEntity
 from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
 from main.src.Entity.Bridge.Adressen.BridgeAdressenEntity import BridgeAdressenEntity

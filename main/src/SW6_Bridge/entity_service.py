@@ -1,6 +1,6 @@
 from main.src.SW6_Bridge.payloads import *
 from main.src.SW6_Bridge.sw6_interface import Sw6Interface
-import logging
+from loguru import logger
 import json
 
 class EntityService:
@@ -41,7 +41,7 @@ class CustomerService(EntityService):
         def __category_init(rows):
             self.logger.info("CustomerService - __category_init - Initializing customers")
             payloads = CustomerPayload(config).get_payload(rows)
-            # print(json.dumps(payloads, indent=4))
+            # logger.info(json.dumps(payloads, indent=4))
             sw6 = Sw6Interface(config, 'customer')
             self.logger.info("CustomerService - __category_init - Uploading customers")
             sw6.sync_entity_to_sw(payloads)

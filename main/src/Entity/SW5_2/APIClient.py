@@ -15,7 +15,7 @@ from urllib3 import Retry
 
 from main.src.Entity.SW5.SW5CustomerEntity import SW5CustomerEntity
 
-logger = logging.getLogger(__name__)
+from loguru import logger
 
 # This is a Shopware constant
 ROOT_ID = 3
@@ -92,7 +92,7 @@ class APIClient:
         :param id:
         :return:
         """
-        print('get Address from id: %s' % id)
+        logger.info('get Address from id: %s' % id)
         url = '/addresses/%s' % id
 
         return self.get(url)['data']
@@ -109,7 +109,7 @@ class APIClient:
         return self.get(url)['data']
 
     def set_address_by_id(self, address_id, user_id):
-        print('Update Address: %s to Customer: %s' % (address_id, user_id))
+        logger.info('Update Address: %s to Customer: %s' % (address_id, user_id))
         data = {
             'customer_address': int(user_id)
         }
@@ -183,7 +183,7 @@ class APIClient:
         if customer.get_orders_ids():
             for order_id in customer.get_orders_ids():
                 self.set_order_customerId_by_orderId(customer.get_webshopid(), order_id)
-        print("Set Ad, Ord, Cre", customer)
+        logger.info("Set Ad, Ord, Cre", customer)
 
         # 4. Credentials
         updated_customer = self.set_customer_credentials_by_customerId(
@@ -228,7 +228,7 @@ class APIClient:
         return self.get(url)['data']
 
     def set_orders_customerId_by_orderId(self, customerId, orderId):
-        print('Update Order %s to Customer: %s' % (orderId, customerId))
+        logger.info('Update Order %s to Customer: %s' % (orderId, customerId))
         if type(customerId) is not int:
             customerId = int(customerId)
         data = {

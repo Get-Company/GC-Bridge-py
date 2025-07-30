@@ -3,7 +3,7 @@
   # Tab Adresse
   #
   SuchBeg: "CL"
-  VsdArt: 11
+  VsdArt: 10
   ZahlArt: 22
   #
   # Tab
@@ -19,5 +19,7 @@
   # Tab Vorgaben
   #
   TextKz1: 0
+  TextKz2: 0
   TextKz3: 1
+  TextKz4: 0
 

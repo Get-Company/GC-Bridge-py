@@ -4,11 +4,12 @@ import json
 from main.src.Entity.Bridge.Product.BridgeProductEntity import *
 from uuid import UUID
 
+from loguru import logger
 
 class SW6ProductEntity:
 
     def map_db_to_sw6(self, ntt, add_parent=True):
-        print("SW6ProductEntity.map_db_to_sw6 - %s" % ntt.name)
+        logger.info("SW6ProductEntity.map_db_to_sw6 - %s" % ntt.name)
         payload = self.map_standard_fields_db_to_sw6(ntt)
         return payload
 

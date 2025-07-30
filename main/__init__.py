@@ -29,6 +29,7 @@ def create_app():
         'http://10.0.0.203:5000',  # Merkle
     ])
     app.config.from_object(Config)
+    app.secret_key = 'super_secret_key'
     app.debug = True
     db.init_app(app)
 

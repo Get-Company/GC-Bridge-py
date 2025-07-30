@@ -1,4 +1,4 @@
-from pprint3x import pprint
+
 
 from main.src.Entity.SW5_2.SW5_2ObjectEntity import SW5_2ObjectEntity, APIRequestException
 
@@ -62,7 +62,7 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
 
     def update(self, customer):
         url = f"/customers/{customer['id']}"
-        pprint(customer)
+
         response = self.put(url=url, data=customer)
 
         return response
@@ -103,4 +103,3 @@ class SW5_2CustomerObjectEntity(SW5_2ObjectEntity):
             return response
         except Exception as e:
             raise Exception(f"Error on updating Adrnr: {number} on Customer_ID: {customer_id}: {e}")
-

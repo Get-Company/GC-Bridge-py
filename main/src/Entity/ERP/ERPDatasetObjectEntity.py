@@ -2,7 +2,7 @@ import datetime
 import logging
 import string
 import json
-from pprint import pprint
+from loguru import logger
 
 import yaml
 
@@ -61,7 +61,8 @@ class ERPDatasetObjectEntity(object):
             'Byte': 'AsInteger',
             'Info': 'Text',
             'String': 'AsString',
-            'Double': 'AsString'
+            'Double': 'AsString',
+            'AutoInc': 'AsInteger'
 
         }
         self.field_types_to_set = {
@@ -108,7 +109,7 @@ class ERPDatasetObjectEntity(object):
         return "Entity: %s, %s: %s" % (self.dataset_name, self.dataset_id_field, self.dataset_id_value)
 
     def __del__(self):
-        print(f"Object {self.dataset_name} destroyed")
+        logger.info(f"Object {self.dataset_name} destroyed")
 
     """ CRUD Actions - set_, get_, update_, delete_ """
 
@@ -284,7 +285,7 @@ class ERPDatasetObjectEntity(object):
         try:
             self.created_dataset.Post()
         except Exception as e:
-            print(f"ERP Post gone wrong - Cancel | Error: {e}")
+            logger.info(f"ERP Post gone wrong - Cancel | Error: {e}")
             self.cancel_()
             return e
         return True
@@ -380,14 +381,13 @@ class ERPDatasetObjectEntity(object):
 
     def delete_dataset_with_check(self, gspkz="GspKz"):
         self.edit_()
-        print(f"Is customer {self.get_('AdrNr')} locked?:", self.get_(gspkz))
+        logger.info(f"Is customer {self.get_('AdrNr')} locked?: {self.get_(gspkz)}")
         if self.get_(gspkz) == 1:
             self.update_(field=gspkz, value=0)
             self.post_()
 
         result = self.created_dataset.CheckDelete(aMeld=0, aIgnoreWarnings=0)
-        result = True
-        print("Result:", result)
+        logger.info(f"Result: {result}")
         if result:
             self.delete_dataset(check_delete=result)
         else:
@@ -459,25 +459,25 @@ class ERPDatasetObjectEntity(object):
             if not isinstance(end, list):
                 end = [end]
 
-        # print("This is the range", field, start, end)
+        # logger.info("This is the range", field, start, end)
         self.created_dataset.SetRange(field, start, end)
 
         # Apply Range
         self.created_dataset.ApplyRange()
         # Check if we get results
         if self.range_count() == 0:
-            print("\nNo", self.dataset_name, "in given range", start,"and", end)
+            logger.info("\nNo", self.dataset_name, "in given range", start,"and", end)
             self.created_dataset.CancelRange()
             self.created_dataset = None
 
             return False
         # set the cursor to the first entry
         elif self.range_count() > 1:
-            print("Found", self.range_count(), self.dataset_name, "between", start, end)
+            logger.info("Found", self.range_count(), self.dataset_name, "between", start, end)
             self.range_first()
             return True
         elif self.range_count() == 1:
-            print("Found 1 between", start, end)
+            logger.info("Found 1 between", start, end)
             return True
 
     def set_range_wildcard(self, index_field, value):
@@ -583,7 +583,7 @@ class ERPDatasetObjectEntity(object):
             else:
                 return eval('dataset.Fields.Item(str(field)).' + self.field_types[field_type])
         else:
-            print("We got the not known Type '%s' for field '%s' " % (field_type, field))
+            logger.info("We got the not known Type '%s' for field '%s' " % (field_type, field))
             return False
 
     def helper_set_value_of(self, field, value):
@@ -607,6 +607,7 @@ class ERPDatasetObjectEntity(object):
                         " = '" +
                         str(value) +
                         "'")
+        # self.created_dataset.Fields("Auftrnr").AsString " = "SW6"
         else:
             print("We got the not known Type '%s' for field '%s' " % (field_type, field))
             return False

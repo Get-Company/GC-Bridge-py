@@ -1,0 +1,160 @@
+2025-05-12 08:07:08 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-12 08:07:14 | INFO | BpNT.Application dispatched successfully
+2025-05-12 08:07:14 | INFO | Mandant set to %s
+2025-05-12 08:07:16 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-12 08:07:16 | INFO | Creating new customer in ERP for bridge_customer id=%s
+2025-05-12 08:07:16 | INFO | Try updating order 74727 with payment status: 12 and order status: 2
+2025-05-12 08:07:16 | INFO | This AdrNr is reserved:
+2025-05-12 08:07:17 | INFO | Object Anschriften destroyed
+2025-05-12 08:07:17 | INFO | Object Ansprechpartner destroyed
+2025-05-12 08:07:17 | INFO | New ERP customer created with AdrNr %s
+2025-05-12 08:07:18 | INFO | AdrNr %s already exists in Shopware
+2025-05-12 08:07:18 | INFO | Object Adressen destroyed
+2025-05-12 08:07:18 | INFO | Object Adressen destroyed
+2025-05-12 08:07:18 | INFO | Object Anschriften destroyed
+2025-05-12 08:07:18 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-12 08:07:18 | INFO | Retrieving positions for order %s
+2025-05-12 08:07:18 | INFO | Retrieved %d positions for order %s
+2025-05-12 08:07:18 | INFO | looking for
+2025-05-12 08:07:18 | INFO | 900001 Business-Set
+2025-05-12 08:07:18 | INFO | Add Position: 
+2025-05-12 08:07:18 | INFO | Object Artikel destroyed
+2025-05-12 08:07:18 | INFO | ERP connection closed successfully.
+2025-05-12 08:07:18 | INFO | Object Vorgang destroyed
+2025-05-12 08:07:18 | INFO | No ERP connection to close.
+2025-05-12 08:11:04 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-12 08:11:08 | INFO | Try updating order 74730 with payment status: 10 and order status: 2
+2025-05-12 08:11:09 | INFO | BpNT.Application dispatched successfully
+2025-05-12 08:11:09 | INFO | Mandant set to %s
+2025-05-12 08:11:10 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-12 08:11:11 | INFO | ERP customer %s updated
+2025-05-12 08:11:11 | INFO | Object Adressen destroyed
+2025-05-12 08:11:11 | INFO | Object Adressen destroyed
+2025-05-12 08:11:11 | INFO | Object Anschriften destroyed
+2025-05-12 08:11:11 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-12 08:11:11 | INFO | Retrieving positions for order %s
+2025-05-12 08:11:11 | INFO | Retrieved %d positions for order %s
+2025-05-12 08:11:11 | INFO | looking for
+2025-05-12 08:11:11 | INFO | 806008 Planblätter weiß, 90 g/qm, lose/Pck./100Bl.
+2025-05-12 08:11:11 | INFO | Add Position: 
+2025-05-12 08:11:11 | INFO | Object Artikel destroyed
+2025-05-12 08:11:11 | INFO | 910000 Schreibtisch-Set (ZPM)
+2025-05-12 08:11:11 | INFO | Add Position: 
+2025-05-12 08:11:11 | INFO | Object Artikel destroyed
+2025-05-12 08:11:12 | INFO | ERP connection closed successfully.
+2025-05-12 08:11:12 | INFO | Object Vorgang destroyed
+2025-05-12 08:11:12 | INFO | No ERP connection to close.
+2025-05-12 08:15:36 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-12 08:15:41 | INFO | BpNT.Application dispatched successfully
+2025-05-12 08:15:41 | INFO | Mandant set to %s
+2025-05-12 08:15:43 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-12 08:15:43 | INFO | Object Adressen destroyed
+2025-05-12 08:15:43 | INFO | Object Adressen destroyed
+2025-05-12 08:15:43 | INFO | Object Anschriften destroyed
+2025-05-12 08:15:43 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-12 08:15:43 | INFO | Retrieving positions for order %s
+2025-05-12 08:15:43 | INFO | Retrieved %d positions for order %s
+2025-05-12 08:15:44 | INFO | looking for
+2025-05-12 08:15:44 | INFO | 204113 Orgamappen 120 hg
+2025-05-12 08:15:44 | INFO | Add Position: 
+2025-05-12 08:15:44 | INFO | Object Artikel destroyed
+2025-05-12 08:15:44 | INFO | 104014 Kunststoffboxen lichtgrau
+2025-05-12 08:15:44 | INFO | Add Position: 
+2025-05-12 08:15:44 | INFO | Object Artikel destroyed
+2025-05-12 08:15:44 | INFO | 581009 Quick-Tabs hellbraun
+2025-05-12 08:15:44 | INFO | Add Position: 
+2025-05-12 08:15:44 | INFO | Object Artikel destroyed
+2025-05-12 08:15:44 | INFO | 581003 Quick-Tabs blau
+2025-05-12 08:15:44 | INFO | Add Position: 
+2025-05-12 08:15:44 | INFO | Object Artikel destroyed
+2025-05-12 08:15:44 | INFO | 581004 Quick-Tabs orange
+2025-05-12 08:15:44 | INFO | Add Position: 
+2025-05-12 08:15:44 | INFO | Object Artikel destroyed
+2025-05-12 08:15:44 | INFO | 581007 Quick-Tabs hellrot
+2025-05-12 08:15:44 | INFO | Add Position: 
+2025-05-12 08:15:44 | INFO | Object Artikel destroyed
+2025-05-12 08:15:45 | INFO | Object Artikel destroyed
+2025-05-12 08:15:45 | INFO | ERP connection closed successfully.
+2025-05-12 08:15:45 | INFO | Object Vorgang destroyed
+2025-05-12 08:15:45 | INFO | No ERP connection to close.
+2025-05-12 08:17:22 | INFO | Try updating order 74735 with payment status: 10 and order status: 2
+2025-05-12 08:21:16 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-12 08:21:20 | INFO | Try updating order 74737 with payment status: 10 and order status: 2
+2025-05-12 08:21:21 | INFO | BpNT.Application dispatched successfully
+2025-05-12 08:21:21 | INFO | Mandant set to %s
+2025-05-12 08:21:23 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-12 08:21:23 | INFO | Creating new customer in ERP for bridge_customer id=%s
+2025-05-12 08:21:23 | INFO | This AdrNr is reserved:
+2025-05-12 08:21:24 | INFO | Object Anschriften destroyed
+2025-05-12 08:21:24 | INFO | Object Ansprechpartner destroyed
+2025-05-12 08:21:24 | INFO | New ERP customer created with AdrNr %s
+2025-05-12 08:21:25 | INFO | Shopware set_customer_number response: %s
+2025-05-12 08:21:25 | INFO | Object Adressen destroyed
+2025-05-12 08:21:25 | INFO | Object Adressen destroyed
+2025-05-12 08:21:25 | INFO | Object Anschriften destroyed
+2025-05-12 08:21:25 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-12 08:21:25 | INFO | Retrieving positions for order %s
+2025-05-12 08:21:25 | INFO | Retrieved %d positions for order %s
+2025-05-12 08:21:25 | INFO | looking for
+2025-05-12 08:21:25 | INFO | 900000 Basic-Set
+2025-05-12 08:21:25 | INFO | Add Position: 
+2025-05-12 08:21:25 | INFO | Object Artikel destroyed
+2025-05-12 08:21:25 | INFO | 581006 Quick-Tabs grün
+2025-05-12 08:21:25 | INFO | Add Position: 
+2025-05-12 08:21:26 | INFO | Object Artikel destroyed
+2025-05-12 08:21:26 | INFO | 581002 Quick-Tabs rot
+2025-05-12 08:21:26 | INFO | Add Position: 
+2025-05-12 08:21:26 | INFO | Object Artikel destroyed
+2025-05-12 08:21:26 | INFO | Object Artikel destroyed
+2025-05-12 08:21:26 | INFO | ERP connection closed successfully.
+2025-05-12 08:21:26 | INFO | Object Vorgang destroyed
+2025-05-12 08:21:26 | INFO | No ERP connection to close.
+2025-05-12 08:27:01 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-12 08:27:06 | INFO | BpNT.Application dispatched successfully
+2025-05-12 08:27:06 | INFO | Mandant set to %s
+2025-05-12 08:27:08 | INFO | Try updating order 74739 with payment status: 10 and order status: 2
+2025-05-12 08:27:08 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-12 08:27:09 | INFO | Creating new customer in ERP for bridge_customer id=%s
+2025-05-12 08:27:09 | INFO | This AdrNr is reserved:
+2025-05-12 08:27:10 | INFO | Object Anschriften destroyed
+2025-05-12 08:27:10 | INFO | Object Ansprechpartner destroyed
+2025-05-12 08:27:10 | INFO | New ERP customer created with AdrNr %s
+2025-05-12 08:27:10 | INFO | Shopware set_customer_number response: %s
+2025-05-12 08:27:10 | INFO | Object Adressen destroyed
+2025-05-12 08:27:10 | INFO | Object Adressen destroyed
+2025-05-12 08:27:10 | INFO | Object Anschriften destroyed
+2025-05-12 08:27:11 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-12 08:27:11 | INFO | Retrieving positions for order %s
+2025-05-12 08:27:11 | INFO | Retrieved %d positions for order %s
+2025-05-12 08:27:11 | INFO | looking for
+2025-05-12 08:27:11 | INFO | 104522 Archivboxen weiß
+2025-05-12 08:27:11 | INFO | Add Position: 
+2025-05-12 08:27:11 | INFO | Object Artikel destroyed
+2025-05-12 08:27:11 | INFO | 104016 Orga-Hartpappebox (FSC®), schwarz
+2025-05-12 08:27:11 | INFO | Add Position: 
+2025-05-12 08:27:11 | INFO | Object Artikel destroyed
+2025-05-12 08:27:11 | INFO | Object Artikel destroyed
+2025-05-12 08:27:11 | INFO | ERP connection closed successfully.
+2025-05-12 08:27:11 | INFO | Object Vorgang destroyed
+2025-05-12 08:27:11 | INFO | No ERP connection to close.
+2025-05-12 08:29:04 | INFO | ERPConnectionEntity initialized with mandant %s
+2025-05-12 08:29:06 | INFO | Try updating order 74742 with payment status: 10 and order status: 2
+2025-05-12 08:29:09 | INFO | BpNT.Application dispatched successfully
+2025-05-12 08:29:09 | INFO | Mandant set to %s
+2025-05-12 08:29:10 | INFO | ERP connected: mandant=%s, user=%s
+2025-05-12 08:29:11 | INFO | Object Adressen destroyed
+2025-05-12 08:29:11 | INFO | Object Adressen destroyed
+2025-05-12 08:29:11 | INFO | Object Anschriften destroyed
+2025-05-12 08:29:11 | INFO | ERPOrderController initialized, last_sync_date=%s
+2025-05-12 08:29:11 | INFO | Retrieving positions for order %s
+2025-05-12 08:29:11 | INFO | Retrieved %d positions for order %s
+2025-05-12 08:29:11 | INFO | looking for
+2025-05-12 08:29:11 | INFO | 224413 Kombi-Mappen 170 g/m² mit Klarsichthülle
+2025-05-12 08:29:11 | INFO | Add Position: 
+2025-05-12 08:29:11 | INFO | Object Artikel destroyed
+2025-05-12 08:29:11 | INFO | 581004 Quick-Tabs orange
+2025-05-12 08:29:11 | INFO | Add Position: 
+2025-05-12 08:29:11 | INFO | Object Artikel destroyed
+2025-05-12 08:29:12 | INFO | ERP connection closed successfully.
+2025-05-12 08:29:12 | INFO | Object Vorgang destroyed
+2025-05-12 08:29:12 | INFO | No ERP connection to close.

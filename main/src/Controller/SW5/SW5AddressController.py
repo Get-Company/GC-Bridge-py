@@ -27,8 +27,8 @@ def sw5_sync_duplicates_v2(false_adrnr, right_adrnr):
     right_customer = SW5CustomerEntity(adrnr=right_adrnr, mandant='58', sw5_api=sw5_api)
     false_customer = SW5CustomerEntity(adrnr=false_adrnr, mandant='58', sw5_api=sw5_api)
 
-    print("###\nStart Right Customer: \n###\n", right_customer)
-    print("###\nStart False Customer: \n###\n", false_customer)
+    logger.info("###\nStart Right Customer: \n###\n", right_customer)
+    logger.info("###\nStart False Customer: \n###\n", false_customer)
     ###
     # 3.1 Sync Webshop ID
     # Whether we keep the webshopid or we have to use the false
@@ -45,8 +45,8 @@ def sw5_sync_duplicates_v2(false_adrnr, right_adrnr):
     right_customer.sync_orders(false_customer=false_customer)
     right_customer.sync_addresses(false_customer=false_customer)
 
-    print("###\nAddresses and Orders Right Customer: \n###\n", right_customer)
-    print("###\nAddresses and Orders False Customer: \n###\n", false_customer)
+    logger.info("###\nAddresses and Orders Right Customer: \n###\n", right_customer)
+    logger.info("###\nAddresses and Orders False Customer: \n###\n", false_customer)
     return
     ###
     # Deleting/Updating

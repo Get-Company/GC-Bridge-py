@@ -19,8 +19,7 @@ from main.src.Controller.Bridge2.Customer.Bridge2ObjectCustomerAddressController
     Bridge2ObjectCustomerAddressController
 from datetime import datetime
 
-from pprint import pprint
-
+from loguru import logger
 
 class Bridge2ObjectCustomerController(Bridge2ObjectController):
     def __init__(self, erp_obj):
@@ -182,7 +181,7 @@ class Bridge2ObjectCustomerController(Bridge2ObjectController):
             print("Old customer:", customer["customerNumber"])
             updated_bridge_customer_entity = customer_in_db.update_entity(converted_bridge_customer_entity)
             self.db.session.add(updated_bridge_customer_entity)
-            pprint(updated_bridge_customer_entity)
+            logger.info(updated_bridge_customer_entity)
         else:
             print("New customer:", customer["customerNumber"])
             pprint(converted_bridge_customer_entity)

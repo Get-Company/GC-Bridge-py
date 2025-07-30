@@ -179,13 +179,14 @@ class BridgeProductEntity(db.Model):
         """
         Check if there is a special price for this product and return the special price if it exists,
         otherwise return False.
-
-        :return: float or False
+        :return: Union[Decimal, bool]
         """
+        from datetime import datetime
         now = datetime.now()
-        if self.prices.special_price and self.prices.special_start_date <= now <= self.prices.special_end_date:
+        if self.prices.special_price != 0 and self.prices.special_end_date >= now:
             return self.prices.special_price
-        return False
+        else:
+            return False
 
     def get_current_price(self):
         """

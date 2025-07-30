@@ -5,6 +5,7 @@ from main import db
 import datetime
 from json import dumps
 import pytz
+from loguru import logger
 
 try:
     from urllib import urlencode, unquote
@@ -35,7 +36,7 @@ def find_all_images_by_name_with_trailing_digits():
             if regex.match(file):
                 res.append(file)
 
-                print(res)
+                logger.info(res)
     return
 
 
@@ -123,9 +124,9 @@ def iterate_list(example_list=None):
         10: {"144150": "354373"}
     }
     for p_id, p_info in example_list.items():
-        print("\nID:", p_id)
+        logger.info("\nID:", p_id)
     for key in p_info:
-        print(key + ': ' + p_info[key])
+        logger.info(key + ': ' + p_info[key])
 
 
 def parse_english_number_to_european(number):
@@ -141,7 +142,7 @@ def parse_english_number_to_european(number):
         num = str(number)
         decmark_reg = re.compile('(?<=\d)\.(?=\d)')
         number_float_eu = decmark_reg.sub('.', num)
-        print(number_float_eu)
+        logger.info(number_float_eu)
         return number_float_eu
 
 
@@ -202,7 +203,7 @@ class bcolors:
     """
     Colors for the print output
     Example Header
-    print('\033[95m', Header/Title, '\033[0m')
+    logger.info('\033[95m', Header/Title, '\033[0m')
     """
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -223,12 +224,12 @@ def find_image_filename_in_path(image_link_or_path):
         m = re.search(pattern, img_link)
         if m:
             img = m.group(0)
-            # print('Image Link found: "%s"' % img)
+            # logger.info('Image Link found: "%s"' % img)
         else:
             img = 0
-            # print('Could not find img in Path: "%s"' % img_link)
+            # logger.info('Could not find img in Path: "%s"' % img_link)
     else:
         img = 0
-        # print("No Image in erp? Nothing found!")
+        # logger.info("No Image in erp? Nothing found!")
 
     return img

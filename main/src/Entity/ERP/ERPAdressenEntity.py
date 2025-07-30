@@ -47,7 +47,7 @@ from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
 from main.src.Entity.ERP.ERPAnschriftenEntity import ERPAnschriftenEntity
 from main.src.Entity.ERP.ERPAnsprechpartnerEntity import ERPAnsprechpartnerEntity
 from datetime import datetime, timedelta
-
+from loguru import logger
 
 class ERPAdressenEntity(ERPDatasetObjectEntity):
 
@@ -85,7 +85,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         self.created_dataset = self.get_dataset_infos().CreateDataSet()
         nested_data_set = self.created_dataset.NestedDataSets(nested_data_set_name)
         nested_data_set.FindKey("Jahr", 2022)
-        print(nested_data_set.Fields("UmsNov").AsString)
+        logger.info(nested_data_set.Fields("UmsNov").AsString)
 
     def range_first(self):
         self.created_dataset.First()
@@ -113,7 +113,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         current_time = datetime.now() + timedelta(seconds=offset)
 
         # Debugging message to show the start and end time of the query range.
-        print(f"Setting query range from {last_sync_date} to {current_time}")
+        logger.info(f"Setting query range from {last_sync_date} to {current_time}")
 
         # Set the query range using the start and end time.
         range_set_success = self.set_range(start=last_sync_date, end=current_time, field="LtzAend")
@@ -147,7 +147,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
         # Next free AdrNr
         adrnr = self.get_next_free_adrnr()
-        print("This AdrNr is reserved:", adrnr)
+        logger.info("This AdrNr is reserved:", adrnr)
         self.create_("AdrNr", adrnr)
 
         # Fields from the Entity
@@ -246,9 +246,12 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         if message:
             self.update_("GspInfo", message)
 
-        print("After update:", self.get_("WShopAdrKz"), self.get_("WShopID"))
+        logger.info("After update:", self.get_("WShopAdrKz"), self.get_("WShopID"))
 
         self.post_()
+
+    def get_webshop_id(self):
+        return self.get_("WShopID")
 
     def add_webshop_id(self, webshop_id):
         self.edit_()
@@ -256,7 +259,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
         self.update_('WShopAdrKz', 1)
         self.update_("WShopID", webshop_id)
 
-        print("After update:", self.get_("WShopAdrKz"), self.get_("WShopID"))
+        logger.info("After update:", self.get_("WShopAdrKz"), self.get_("WShopID"))
 
         self.post_()
 
@@ -358,9 +361,8 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
 
         if anschriften_ntt.is_ranged():
             anschriften_ntt.range_first()
-            return anschriften_ntt
-        else:
-            return False
+
+        return anschriften_ntt
 
     def get_special_standard_billing_address(self):
         """
@@ -435,7 +437,7 @@ class ERPAdressenEntity(ERPDatasetObjectEntity):
                 adressnummer, id_webshop, webshop_adresse_kennzeichen = row
                 erp_address_entity = ERPAdressenEntity(erp_obj=erp_obj, id_value=adressnummer)
                 if erp_address_entity:
-                    print(erp_address_entity.get_("AdrNr"))
+                    logger.info(erp_address_entity.get_("AdrNr"))
                     erp_address_entity.add_webshop_id(webshop_id=id_webshop)
 
-        print("Fertit")
+        logger.info("Fertit")

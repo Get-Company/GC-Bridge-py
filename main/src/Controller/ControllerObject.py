@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, SQLAlchemyError
 from main import db
-
+from loguru import logger
 
 class ControllerObject:
     def __int__(self, erp_obj):
@@ -17,12 +17,12 @@ class ControllerObject:
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            print("Error: Integrity constraint violated.")
+            logger.error("Error: Integrity constraint violated.")
         except InvalidRequestError:
             db.session.rollback()
-            print("Error: Invalid request.")
+            logger.info("Error: Invalid request.")
         except SQLAlchemyError as e:
             db.session.rollback()
-            print(f"Error: {e}")
+            logger.error(f"Error: {e}")
         finally:
             db.session.close()

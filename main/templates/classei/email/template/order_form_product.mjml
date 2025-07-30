@@ -22,9 +22,9 @@
             <!-- Verkaufseinheit -->
             pro
                 {% if product.factor and product.factor > 0 %}
-                {{ product.factor }} St.
+            <b>{{ product.factor }} St.</b>
                 {% else %}
-                {{ product.unit|default('St.') }}
+            <b>{{ product.unit|default('St.') }}</b>
                 {% endif %}
 
             <br/>

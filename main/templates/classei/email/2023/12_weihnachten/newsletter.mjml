@@ -20,18 +20,15 @@
         <!-- Header-Logo -->
         <mj-include path="..\..\template\header_logo.mjml"/>
 
+
         <!-- Title -->
         <mj-section padding="20px" background-color="#ffffff">
             <mj-column>
                 <mj-text>
                     <h1 align="center" style="color: #ff9933; font-weight:400; line-height:40px">
-                        Immer klaren Durchblick
+                        ...... ja, is den scho Weihnachten?
                     </h1>
-                    <h1 align="right" style="color: #8a8a8a; font-weight:400; line-height:36px">
-                        <small>
-                            .... für den Büro-Alltag mit Papier
-                        </small>
-                    </h1>
+
                 </mj-text>
             </mj-column>
         </mj-section>
@@ -63,18 +60,43 @@
             <mj-column>
                 <mj-text line-height="26px">
                     <p>
-                        egal ob wirkungsvoll gestaltetes Titelblatt oder ob Sie wichtige Daten auf Ihren Akten sofort
-                        erkennen möchten. Mit transparenten Ordnungs-Mappen in verschiedensten Ausführungen garantiert
-                        Ihnen Classei immer klare Sicht auf die Vorderseite Ihrer Unterlagen.
+                        in wenigen Tagen ist Weihnachten und kurz darauf steht schon das neue Jahr vor der Tür.
+                        Wir möchten uns an dieser Stelle für das von Ihnen entgegengebrachte Vertrauen und
+                        die tolle Zusammenarbeit recht herzlich bedanken.
                     </p>
                     <p>
-                        Mehr Transparenz und immer klaren Durchblick - so macht das Arbeiten mit dem Classei-System rund
-                        um den Schreibtisch noch mehr Spaß.
+                        Wieder war dieses Jahr für uns alle geprägt von unvorstellbaren Ereignissen und
+                        Herausforderungen.
                     </p>
+                    <p>
+                        Wir sind uns sicher, dass wir mit vereinten Kräften auch diese Herausforderung meistern werden
+                        und alles seinen gewohnten Gang gehen wird. Wenn auch in einer etwas anderen Form,
+                        der Mensch wächst mit seinen Aufgaben. Insofern sehen wir zuversichtlich in die Zukunft.
+                    </p>
+                    <p>
+                        Wir wünschen Ihnen, Ihren Familien und Freunden eine besinnliche Weihnachtszeit
+                        und für das Jahr 2025 viel Gesundheit, persönlichen und geschäftlichen Erfolg.
+                    </p>
+                    <p>
+                        <strong> ... und bleiben Sie xsund!</strong>
+                    </p>
+
                 </mj-text>
             </mj-column>
         </mj-section>
 
+        <!-- Header-Logo -->
+        <mj-include path="..\..\template\weihanchten.mjml"/>
+
+        <mj-section>
+            <mj-column>
+                <mj-text>
+                        <h2 align="right" style="color: #ff9933; font-weight:400; line-height:40px">
+                            Ihr Classei-Team
+                        </h2>
+                </mj-text>
+            </mj-column>
+        </mj-section>
 
         <!-- Products -->
         {% for product in products %}
@@ -163,7 +185,7 @@
         </mj-section>
 
         <!-- Rechtliches -->
-        <mj-section css-class="section_white" paading="0px" background-color="#ffffff">
+        <mj-section css-class="section_white" padding="0px" background-color="#ffffff">
             <mj-column>
                 <mj-text font-size="12px" line-height="16px">
                     <!-- Terms -->

@@ -22,7 +22,7 @@ import logging
 from main.src.Entity.ERP.ERPDatasetObjectEntity import ERPDatasetObjectEntity
 from main.src.Entity.ERP.ERPArtkelEntity import ERPArtikelEntity
 import datetime
-
+from loguru import logger
 
 class ERPVorgangEntity(ERPDatasetObjectEntity):
 
@@ -64,18 +64,18 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
         shipping_method = order.shipping_method.lower()
         specific_path = f"shopware6/{payment_method}/{shipping_method}.yaml"
         general_path = "shopware6/rechnung/de.yaml"
-        print("looking for", specific_path)
+        logger.info("looking for", specific_path)
         try:
             self.prefill_from_file(
                 file=self.prefill_json_directory + specific_path
             )
         except FileNotFoundError as e:
-            print("Error:", e, "Could not open", specific_path, "Using:", general_path)
+            logger.error("Error:", e, "Could not open", specific_path, "Using:", general_path)
             self.prefill_from_file(
                 file=self.prefill_json_directory + general_path
             )
         for pos in positions['order_products']:
-            print(pos["name"])
+            logger.info(pos["name"])
             # This is a test to recognise the order as CH - no tax!
             if order.shipping_method == "CH":
                 self.add_position(
@@ -112,7 +112,7 @@ class ERPVorgangEntity(ERPDatasetObjectEntity):
         :Param price: float Preis: if none, the standard Price is used from büro+
         :return:
         """
-        print("Add Position: ", quantity, artnr)
+        logger.info("Add Position: ", quantity, artnr)
         artikel = ERPArtikelEntity(erp_obj=self.erp_obj, id_value=artnr)
         self.order.Positionen.Add(quantity, artikel.get_('Einh'), artnr)
         if price:

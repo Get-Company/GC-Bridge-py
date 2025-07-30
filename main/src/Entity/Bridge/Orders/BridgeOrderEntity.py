@@ -2,7 +2,7 @@ from sqlalchemy import and_
 
 from main import db
 from datetime import datetime
-import pprint
+from loguru import logger
 import csv
 from main.src.Entity.Bridge.Customer.BridgeCustomerEntity import BridgeCustomerEntity
 from main.src.Entity.Bridge.Orders.BridgeOrderStateEntity import BridgeOrderStateEntity
@@ -256,7 +256,7 @@ class BridgeOrderEntity(db.Model):
                 # Sender
                 "exporter.address.name1": "Egon Heimann GmbH Classei",
                 "exporter.address.name2": "",
-                "exporter.address.street1": "Staudacherstr. 7e",
+                "exporter.address.street1": "Staudacherstr.",
                 "exporter.address.street2": "",
                 "exporter.address.houseNumber": "7e",
                 "exporter.address.postcode": "83250",
@@ -265,7 +265,7 @@ class BridgeOrderEntity(db.Model):
                 "exporter.address.countryCode": "DE",
                 "exporter.contactPerson.name": "Rita Angermeier",
                 "exporter.contactPerson.emailAddress": "rangermeier@classei.de",
-                "exporter.contactPerson.phoneCountryPrefix": "49",
+                "exporter.contactPerson.phoneCountryPrefix": "+49",
                 "exporter.contactPerson.phoneNumber": "8641975911",
                 "exporter.contactPerson.mobileCountryPrefix": "",
                 "exporter.contactPerson.mobileNumber": "",
@@ -345,7 +345,6 @@ class BridgeOrderEntity(db.Model):
             writer.writerows(rows)
 
         return file
-
 
     def __repr__(self):
         return f"" \

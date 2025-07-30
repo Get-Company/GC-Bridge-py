@@ -30,7 +30,7 @@ class SW6CategoryEntity:
     def add_parent_to_sw6(self, ntt, payload):
         ntt_parent = BridgeCategoryEntity.query.filter_by(api_id=ntt.api_idparent).first()
         if ntt_parent:
-            print("Parent of %s is %s." % (ntt.title, ntt_parent.title))
+            logger.info("Parent of %s is %s." % (ntt.title, ntt_parent.title))
             payload["parent"] = self.map_fields_db_to_sw6(ntt_parent)
         return payload
 

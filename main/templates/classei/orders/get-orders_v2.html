@@ -148,6 +148,16 @@
                                     </div>
                                 </form>
                             </div>
+                            <div class="col">
+                                <!-- Bestellung löschen -->
+                                <button type="button" class="btn btn-sm btn-primary order-delete-button"
+                                        data-customer-id="{{order.customer.id}}"
+                                        data-order-id="{{order.id}}">
+                                    Bestellung löschen
+                                    <span class="d-none spinner-border spinner-border-sm" role="status"
+                                          aria-hidden="true"></span>
+                                </button>
+                            </div>
 
                         </div>
                         <h4>Adressen</h4>
@@ -413,8 +423,7 @@
             });
         });
 
-        // CSV Formular
-        // AdrNr ändern
+        // CSV CH Formular
         $('.csvForm').on('submit', function (e) {
             e.preventDefault();
 
@@ -498,6 +507,10 @@
                     console.error(error);
                 }
             });
+
+
+
+            
         });
 
         // Bestellung und Kunden anlegen
@@ -560,6 +573,32 @@
                 }
             });
         });
+
+        // Order delete
+        $('.order-delete-button').click(function(){
+
+            var customer_id = $(this).data('customer-id');
+            var order_id = $(this).data('order-id');
+
+            var spinner_button = $(this)
+            showSpinner(spinner_button)
+
+            $.ajax({
+                url: '/gcbridge/delete_order/' + order_id +'/_action',
+                type: 'DELETE',
+                success: function (response) {
+                    hideSpinner(spinner_button)
+                    console.log(response);
+                },
+
+                error: function (error) {
+                    hideSpinner(spinner_button)
+                    console.error(error);
+                }
+            });
+
+
+        })
 
         // Show and hide spinner
         function showSpinner(spinner_button) {

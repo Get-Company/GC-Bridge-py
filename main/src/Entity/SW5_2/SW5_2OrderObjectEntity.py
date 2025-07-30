@@ -1,6 +1,6 @@
 from main.src.Entity.SW5_2.SW5_2ObjectEntity import SW5_2ObjectEntity
 from datetime import datetime, date, timedelta
-
+from loguru import logger
 
 class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
     def __init__(self):
@@ -123,7 +123,7 @@ class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
 
     def set_order_and_payment_status(self, order_id, payment_status_id, order_status_id):
         url = '/orders/%s' % order_id
-        print(f"Try updating order {order_id} with payment status: {payment_status_id} and order status: {order_status_id}")
+        logger.info(f"Try updating order {order_id} with payment status: {payment_status_id} and order status: {order_status_id}")
         data = {
             'paymentStatusId': payment_status_id,
             'orderStatusId': order_status_id
@@ -132,7 +132,7 @@ class SW5_2OrderObjectEntity(SW5_2ObjectEntity):
             response = self.put('/orders/%s' % order_id, data)['data']
             return response
         except Exception as e:
-            print(e)
+            logger.info(e)
             raise Exception(f"Error on updating Order- and Payment-Status for OrderId: {order_id}: {e}")
 
     def update(self, order):

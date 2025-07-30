@@ -92,7 +92,7 @@ class APIClient:
         :param id:
         :return:
         """
-        print('get Address from id: %s' % id)
+        logger.info('get Address from id: %s' % id)
         url = '/addresses/%s' % id
 
         return self.get(url)['data']
@@ -109,7 +109,7 @@ class APIClient:
         return self.get(url)['data']
 
     def set_address_by_id(self, address_id, user_id):
-        print('Update Address: %s to Customer: %s' % (address_id, user_id))
+        logger.info('Update Address: %s to Customer: %s' % (address_id, user_id))
         data = {
             'customer_address': int(user_id)
         }

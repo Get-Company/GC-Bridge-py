@@ -4,7 +4,7 @@ import pytz
 import inspect
 
 import logging
-
+from loguru import logger
 # Own
 from main.src.Controller.ERP.ERPController import *
 
@@ -80,9 +80,9 @@ class SW5CustomerEntity:
                 ))
 
     def print_method_info(self, message=False):
-        print('\n#- %s %s -#' % (self.class_name, inspect.currentframe().f_back.f_code.co_name))
+        logger.info('\n#- %s %s -#' % (self.class_name, inspect.currentframe().f_back.f_code.co_name))
         if message:
-            print(message)
+            logger.info(message)
 
     def set_sw5_customer_infos(self):
         """
@@ -161,7 +161,7 @@ class SW5CustomerEntity:
         """
         # Case 1: right_customer has Webshop ID:
         if self.get_webshopid():
-            print("%s - Right customer_address has a Webshop ID. We keep it: %s \n" % (
+            logger.info("%s - Right customer_address has a Webshop ID. We keep it: %s \n" % (
                 self.get_adrnr(),
                 self.get_webshopid())
                   )
@@ -170,7 +170,7 @@ class SW5CustomerEntity:
         # Case 2 : right_customer has no Webshop ID. Has false_customer one?
         # Take the creden tials
         elif false_customer.get_webshopid():
-            print("%s - False customer_address has a Webshop ID. We take it from there: %s\n" % (
+            logger.info("%s - False customer_address has a Webshop ID. We take it from there: %s\n" % (
                 false_customer.get_adrnr(),
                 false_customer.get_webshopid())
                   )
@@ -179,7 +179,7 @@ class SW5CustomerEntity:
             return True
 
         else:
-            print("No Webshop ID found \n")
+            logger.info("No Webshop ID found \n")
             self.set_webshopid(False)
             return False
 
@@ -193,7 +193,7 @@ class SW5CustomerEntity:
             """
         # Case 1: right_customer has Amazon ID:
         if self.get_amazonid():
-            print("%s - Right customer_address has a Amazon ID. We keep it: %s\n" % (
+            logger.info("%s - Right customer_address has a Amazon ID. We keep it: %s\n" % (
                 self.get_adrnr(),
                 self.get_amazonid())
                   )
@@ -201,7 +201,7 @@ class SW5CustomerEntity:
 
         # Case 2 : right_customer has no Amazon ID. Has false_customer one?
         elif false_customer.get_amazonid():
-            print("%s - False customer_address has a Amazonp ID. We take it from there: %s\n" % (
+            logger.info("%s - False customer_address has a Amazonp ID. We take it from there: %s\n" % (
                 false_customer.get_adrnr(),
                 false_customer.get_amazonid())
                   )
@@ -209,7 +209,7 @@ class SW5CustomerEntity:
             return True
 
         else:
-            print("No Amazon ID found \n")
+            logger.info("No Amazon ID found \n")
             self.set_amazonid(False)
             return False
 
@@ -223,23 +223,23 @@ class SW5CustomerEntity:
         """
         older_date = datetime.datetime(1900, 1, 1, 10, 10, 10, 10, pytz.UTC)
         if self.get_last_login():
-            print("Right has lastlogn")
+            logger.info("Right has lastlogn")
         else:
-            print("Right hast no lastlogin, we set 01.01.1900")
+            logger.info("Right hast no lastlogin, we set 01.01.1900")
             self.set_last_login(older_date)
 
         if false_customer.get_last_login():
-            print("False has lastlogin")
+            logger.info("False has lastlogin")
         else:
-            print("False has no lastlogin, we set 01.01.1900")
+            logger.info("False has no lastlogin, we set 01.01.1900")
             false_customer.set_last_login(older_date)
 
         if self.get_last_login() > false_customer.get_last_login():
-            print("Right was most recently logged in: %s > %s. We keep all fields!" % (
+            logger.info("Right was most recently logged in: %s > %s. We keep all fields!" % (
                 self.get_last_login(), false_customer.get_last_login()))
             return True
         else:
-            print(
+            logger.info(
                 "False was most recently logged in: %s < %s. We need to take the password and the encoder from false customer_address" % (
                     self.get_last_login(), false_customer.get_last_login()))
             # Set Customer fields in the SW5CustomerEntity
@@ -361,11 +361,11 @@ class SW5CustomerEntity:
         # self.print_method_info('Last Login: %s by AdrNr: %s' % (last_login, self.get_adrnr()))
         # Sometimes we get none or empty. Since we must have a date -> Make it far away in the past
         if last_login is None:
-            print("No Date, whether str nor any other was given. NoneType. Let's make 01.01.1800")
+            logger.info("No Date, whether str nor any other was given. NoneType. Let's make 01.01.1800")
             last_login = datetime.date(1900, 1, 1)
 
         if type(last_login) is str:
-            print("Last Login was given as string. Parsing it to Date")
+            logger.info("Last Login was given as string. Parsing it to Date")
             last_login = dateparser.parse(last_login)
 
         self.last_login = last_login
@@ -451,7 +451,7 @@ class SW5CustomerEntity:
         if len(self.addresses):
             addresses_ids = []
             for address in self.addresses:
-                print(address['id'])
+                logger.info(address['id'])
                 addresses_ids.append(address['id'])
             return addresses_ids
         else:

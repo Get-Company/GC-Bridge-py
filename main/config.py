@@ -12,7 +12,7 @@ class Config:
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost:3310/gc-bridge_python'
 
     #  Docker localhost:3306
-    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://root:password@localhost:3306/gc-bridge_db'
+    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://root:root_password@localhost:3306/gc-bridge_db'
     SESSION_TYPE = 'filesystem'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -44,7 +44,6 @@ class ConfShopware6ApiBase(object):
     ##############
     ##############
     ##############
-
 
     sales_channel = "a0651b52312b4f65b5938ac0e90b13e7"
     currency = "b7d2554b0ce847cd82f3ac9bd1c0dfca"

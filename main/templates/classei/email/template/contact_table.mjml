@@ -3,7 +3,7 @@
     <mj-section>
         <mj-column>
             <mj-text align="left" color="#000000" line-height="44px">
-                <h2 style="font-size: 34px; color: #ff9933" >Bestellformular</h2>
+                <h2 style="font-size: 34px;color: #ff9933" >Bestellformular</h2>
             </mj-text>
             <mj-text align="center">
                 <p style="font-size: 24px">Einfach Antworten und Anzahl eingeben</p>
@@ -21,7 +21,7 @@
             <mj-text>
                 <p style="font-weight: bold;">Stimmen ihre Daten noch? Bitte berichtigen Sie:</p>
             </mj-text>
-            <mj-table css-class="contact_table" line-height="40px" padding="10">
+            <mj-table css-class="contact_table" line-height="40px" padding="10px">
                 <tr>
                     <td width="20%" class="ct_text">Vorname:</td>
                     <td width="40%" class="ct_value">{subtag:vorname}</td>

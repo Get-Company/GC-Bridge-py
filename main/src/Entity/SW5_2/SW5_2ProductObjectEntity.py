@@ -6,7 +6,7 @@ from main.src.Entity.SW5_2.SW5_2CategoryObjectEntity import SW5_2CategoryObjectE
 from main.src.Entity.Bridge.Product.BridgeProductEntity import BridgeProductEntity
 from datetime import datetime, date, timedelta
 
-
+from loguru import logger
 class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
     def __init__(self):
         # It 06.12.23: 1.26 -> 1.0413
@@ -63,6 +63,7 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
             "metaTitle": entity.name,
             "name": entity.name,
         }
+        logger.debug(data)
         return data
 
     def get_stock(self, entity):
@@ -133,13 +134,18 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
         except Exception as e:
             raise Exception(f"Error on updating special prices for {bridge_product.erp_nr}: {e}")
 
-    def set_price_by_bridge_product_object(self, bridge_product):
-        url = f'/articles/{bridge_product.erp_nr}?useNumberAsId=true'
+    def set_price_by_bridge_product_object(self, bridge_product, sw5_id=None):
+        if sw5_id is not None:
+            url = f'/articles/{sw5_id}'
+        else:
+            url = f'/articles/{bridge_product.erp_nr}?useNumberAsId=true'
+
+        logger.info(f"Set price for {bridge_product.erp_nr} with url: {url}")
 
         prices = []
         for customer_group_key, factor in self.customer_groups.items():
-            price = math.ceil((bridge_product.prices.price * factor) / 0.05) * 0.05
-            rebate_price = math.ceil((bridge_product.prices.rebate_price * factor) / 0.05) * 0.05
+            price = round(math.ceil((bridge_product.prices.price * factor) / 0.05) * 0.05, 2)
+            rebate_price = round(math.ceil((bridge_product.prices.rebate_price * factor) / 0.05) * 0.05, 2)
 
             # Staffelpreise
             if bridge_product.prices.rebate_quantity and bridge_product.prices.rebate_price:
@@ -175,7 +181,11 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
             }
         }
         try:
+            logger.info("#### Data ####")
+            logger.info(data)
             response = self.put(url, data)['data']
+            logger.info("### Response ###")
+            logger.info(response)
             return response
         except Exception as e:
             raise Exception(f"Error on updating prices for {bridge_product.erp_nr}: {e}")
@@ -239,7 +249,7 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
 
     def update(self, bridge_product_id=None, bridge_entity=None):
         if not bridge_product_id and not bridge_entity:
-            print("At least set one value: bridge_product_id oder bridge_entity")
+            logger.info("At least set one value: bridge_product_id oder bridge_entity")
             return False
         try:
             if bridge_entity:
@@ -247,35 +257,38 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
             else:
                 product = BridgeProductEntity.query.get(bridge_product_id)
         except Exception as e:
-            print(f"Couldn't find product by product.id:", bridge_product_id, e)
+            logger.info(f"Couldn't find product by product.id:", bridge_product_id, e)
             return False
 
-        if product.wwshopkz != 1:
-            print(f"No update for {product.erp_nr}. WShopKz is: {product.wshopkz}. Leaving update method")
+        if product.wshopkz != 1:
+            logger.info(f"No update for {product.erp_nr}. WShopKz is: {product.wshopkz}. Leaving update method")
             return
 
         try:
             sw5_product = self.get_product_by_id(product.erp_nr, True)
         except Exception as e:
-            print(f"Couldn't find {product.erp_nr} in SW5")
+            logger.warning(f"Couldn't find {product.erp_nr} in SW5")
             return False
 
         url = f'/articles/{sw5_product["data"]["id"]}'
         data = self.map_bridge_to_sw5(product)
+
         try:
             response = self.put(url, data)["data"]
             return response
         except Exception as e:
-            print(f'Couldn\'t update {product.erp_nr} with id:{sw5_product["data"]["id"]}')
+            logger.warning(f'Couldn\'t update {product.erp_nr} with id:{sw5_product["data"]["id"]} | e: {e}')
+            logger.error(e)
+            return e
 
     def create_product(self, product_id):
         try:
             product = BridgeProductEntity.query.get(product_id)
             if product.wwshopkz != 1:
-                print(f"Ca not create {product.erp_nr}. WShopKz is: {product.wshopkz}. Leaving method")
+                logger.warning(f"Can not create {product.erp_nr}. WShopKz is: {product.wshopkz}. Leaving method")
                 return
         except Exception as e:
-            print(f"Couldn't find product by product.id:", product_id, e)
+            logger.warning(f"Couldn't find product by product.id:", product_id, e)
             return False
 
         url = f'/articles'
@@ -284,7 +297,7 @@ class SW5_2ProductObjectEntity(SW5_2ObjectEntity):
             response = self.post(url, data)['data']
             return response
         except Exception as e:
-            print(f"Could not create {product.name}:", e)
+            logger.warning(f"Could not create {product.name}:", e)
 
 
 

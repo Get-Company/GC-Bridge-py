@@ -128,22 +128,37 @@ class BridgeCustomerEntity(db.Model):
     def map_sw5_to_db(self, customer: list):
         self.erp_nr = customer['number']
         self.api_id = customer['id']
-        self.ustid = customer['defaultBillingAddress']['vatId']
+
+        # Prüfen, ob 'defaultBillingAddress' und 'vatId' existiert
+        if customer.get("defaultBillingAddress") and 'vatId' in customer["defaultBillingAddress"]:
+            billing_vat_id = customer['defaultBillingAddress']['vatId']
+        else:
+            billing_vat_id = None
+
+        # Prüfen, ob 'defaultShippingAddress' und 'vatId' existiert
+        if customer.get("defaultShippingAddress") and 'vatId' in customer["defaultShippingAddress"]:
+            shipping_vat_id = customer['defaultShippingAddress']['vatId']
+        else:
+            shipping_vat_id = None
+
+        # Sollte es in der Rechnungsadresse keine vatId geben, nehmen wir die aus der Versandadresse
+        # Wenn auch diese nicht existiert, setzen wir sie auf Null
+        self.ustid = billing_vat_id or shipping_vat_id or None
+
         self.email = customer["email"]
+
         # Parse Date
         date_firstLogin = self._get_date_or_none(customer["firstLogin"])
         date_changed = self._get_date_or_none(customer["changed"])
         self.created_at = date_firstLogin
         self.updated_at = date_changed
-
         self.erp_reansnr = 0
         self.erp_liansnr = 0
 
         def _find_address_index(customer):
             for index, address in enumerate(customer["addresses"]):
-                if address["id"] == customer["defaultBillingAdress"]["id"]:
+                if address["id"] == customer["defaultBillingAddress"]["id"]:
                     self.erp_reansnr = index
-
                 if address["id"] == customer["defaultShippingAddress"]["id"]:
                     self.erp_liansnr = index
 

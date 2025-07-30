@@ -1,13 +1,13 @@
 import sys
 from termcolor import colored
-
+from loguru import logger
 
 class Helper:
     def __init__(self):
         pass
 
     def upload_all_new_customer_from_shopware_to_bridge(self):
-        print(
+        logger.info(
         """
         Holt sich ein Zugangstoken von der Shopware 6 API, indem er eine POST-Anfrage an die Authentifizierungs-URL mit der Client-ID, dem Client-Geheimnis und dem Grant-Typ sendet.
 
@@ -23,7 +23,7 @@ class Helper:
 
 
     def sync_all_changed_customers_from_SW_to_bridge(self):
-        print(
+        logger.info(
         """
         Es holt sich dann die Shopware-API-Endpunkte und die Authentifizierungsinformationen aus einer Konfigurationsdatei.
 
@@ -45,7 +45,7 @@ class Helper:
 
 
     def sync_selected_customers_from_BRIDGE_to_sw_WITH_SYNC_CHECK(self):
-        print(
+        logger.info(
         """
         Dieser Code führt eine Abfrage in Datenbank aus, um Kundendaten abzurufen. 
         
@@ -56,7 +56,7 @@ class Helper:
         )
 
     def sync_selected_customers_from_BRIDGE_to_sw_WITHOUT_SYNC_CHECK_NIIIIX_CHECKEN_DIESE(self):
-        print(
+        logger.info(
         """
         Dieser Code-Abschnitt führt eine Abfrage in einer SQL-Datenbank aus, um Kundendaten abzurufen. 
         
@@ -73,9 +73,9 @@ class Helper:
 
     def help(self):
         methods = [func for func in dir(self) if callable(getattr(self, func)) and not func.startswith("__")]
-        print(colored("\nAvailable methods:", "green"))
+        logger.info(colored("\nAvailable methods:", "green"))
         for method in methods:
-            print(colored("- " + method + ":", "yellow"), end=" ")
-            print(colored(getattr(self, method).__doc__, "cyan"))
+            logger.info(colored("- " + method + ":", "yellow"), end=" ")
+            logger.info(colored(getattr(self, method).__doc__, "cyan"))
 
 atti_hilfe = Helper()
